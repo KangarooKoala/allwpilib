@@ -8,6 +8,8 @@
 #include <utility>
 
 #include <frc/simulation/DriverStationSim.h>
+#include <wpi/DenseMap.h>
+#include <wpi/SmallVector.h>
 
 #include "frc2/command/CommandHelper.h"
 #include "frc2/command/CommandScheduler.h"
@@ -16,9 +18,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "make_vector.h"
-
-#include <wpi/DenseMap.h>
-#include <wpi/SmallVector.h>
 
 namespace frc2 {
 
@@ -143,12 +142,14 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
 
  protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
-  
-  std::unique_ptr<CommandScheduler::Impl> GetSchedulerImpl(CommandScheduler& sched) {
+
+  std::unique_ptr<CommandScheduler::Impl> GetSchedulerImpl(
+      CommandScheduler& sched) {
     return std::move(sched.m_impl);
   }
 
-  void SetSchedulerImpl(CommandScheduler& sched, std::unique_ptr<CommandScheduler::Impl>&& impl) {
+  void SetSchedulerImpl(CommandScheduler& sched,
+                        std::unique_ptr<CommandScheduler::Impl>&& impl) {
     sched.m_impl = std::move(impl);
   }
 
