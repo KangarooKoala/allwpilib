@@ -17,7 +17,45 @@
 #include "gtest/gtest.h"
 #include "make_vector.h"
 
+#include <wpi/DenseMap.h>
+#include <wpi/SmallVector.h>
+
 namespace frc2 {
+
+class CommandScheduler::Impl {
+ public:
+  // A set of the currently-running commands.
+  wpi::SmallSet<Command*, 12> scheduledCommands;
+
+  // A map from required subsystems to their requiring commands.  Also used as a
+  // set of the currently-required subsystems.
+  wpi::DenseMap<Subsystem*, Command*> requirements;
+
+  // A map from subsystems registered with the scheduler to their default
+  // commands.  Also used as a list of currently-registered subsystems.
+  wpi::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+
+  frc::EventLoop defaultButtonLoop;
+  // The set of currently-registered buttons that will be polled every
+  // iteration.
+  frc::EventLoop* activeButtonLoop{&defaultButtonLoop};
+
+  bool disabled{false};
+
+  // Lists of user-supplied actions to be executed on scheduling events for
+  // every command.
+  wpi::SmallVector<Action, 4> initActions;
+  wpi::SmallVector<Action, 4> executeActions;
+  wpi::SmallVector<Action, 4> interruptActions;
+  wpi::SmallVector<Action, 4> finishActions;
+
+  // Flag and queues for avoiding concurrent modification if commands are
+  // scheduled/canceled during run
+
+  bool inRunLoop = false;
+  wpi::SmallVector<Command*, 4> toSchedule;
+  wpi::SmallVector<Command*, 4> toCancel;
+};
 
 class TestSubsystem : public SubsystemBase {};
 
@@ -105,6 +143,14 @@ class CommandTestBaseWithParam : public ::testing::TestWithParam<T> {
 
  protected:
   CommandScheduler GetScheduler() { return CommandScheduler(); }
+  
+  std::unique_ptr<CommandScheduler::Impl> GetSchedulerImpl(CommandScheduler& sched) {
+    return std::move(sched.m_impl);
+  }
+
+  void SetSchedulerImpl(CommandScheduler& sched, std::unique_ptr<CommandScheduler::Impl>&& impl) {
+    sched.m_impl = std::move(impl);
+  }
 
   void SetUp() override { frc::sim::DriverStationSim::SetEnabled(true); }
 

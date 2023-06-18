@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <iostream>
+
 #include "CommandTestBase.h"
 #include "frc2/command/Command.h"
 #include "frc2/command/CommandHelper.h"
@@ -49,6 +51,13 @@ TEST_F(SchedulingRecursionTest, CancelFromInitialize) {
   scheduler.Schedule(&selfCancels);
   scheduler.Run();
   scheduler.Schedule(&other);
+
+  std::unique_ptr<CommandScheduler::Impl> impl = GetSchedulerImpl(scheduler);
+  std::cout << "Scheduled commands:" << std::endl;
+  for (auto&& scheduledCommand : impl->scheduledCommands) {
+    std::cout << scheduledCommand->GetName() << std::endl;
+  }
+  SetSchedulerImpl(scheduler, std::move(impl));
 
   EXPECT_FALSE(scheduler.IsScheduled(&selfCancels));
   EXPECT_TRUE(scheduler.IsScheduled(&other));

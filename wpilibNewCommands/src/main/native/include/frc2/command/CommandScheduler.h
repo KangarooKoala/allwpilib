@@ -388,6 +388,8 @@ class CommandScheduler final : public nt::NTSendable,
 
   void InitSendable(nt::NTSendableBuilder& builder) override;
 
+  class Impl;
+
  private:
   // Constructor; private as this is a singleton
   CommandScheduler();
@@ -395,7 +397,6 @@ class CommandScheduler final : public nt::NTSendable,
   void SetDefaultCommandImpl(Subsystem* subsystem,
                              std::unique_ptr<Command> command);
 
-  class Impl;
   std::unique_ptr<Impl> m_impl;
 
   frc::Watchdog m_watchdog;
