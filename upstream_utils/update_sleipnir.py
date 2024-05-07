@@ -27,6 +27,7 @@ def main():
     for f in [
         "0001-Remove-using-enum-declarations.patch",
         "0002-Add-implicit-typename.patch",
+        "0003-Use-pointer-instead-of-iterator-for-FeasibilityResto.patch",
     ]:
         git_am(os.path.join(wpilib_root, "upstream_utils/sleipnir_patches", f))
 

@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <s-engjo@bsd405.org>
+Date: Mon, 6 May 2024 20:34:51 -0700
+Subject: [PATCH 3/3] Use pointer instead of iterator for
+ FeasibilityRestoration.hpp The std::span iterator constructor doesn't have
+ full support across compilers
+
+---
+ src/optimization/solver/util/FeasibilityRestoration.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/optimization/solver/util/FeasibilityRestoration.hpp b/src/optimization/solver/util/FeasibilityRestoration.hpp
+index 776bf8a2a9093e0cb68475758ea2a72c04cb3e89..a7d907f0a79c1b0462e6d4fff930f613535c6a13 100644
+--- a/src/optimization/solver/util/FeasibilityRestoration.hpp
++++ b/src/optimization/solver/util/FeasibilityRestoration.hpp
+@@ -82,7 +82,7 @@ inline void FeasibilityRestoration(
+     fr_decisionVariables.emplace_back();
+   }
+ 
+-  auto it = fr_decisionVariables.cbegin();
++  auto it = fr_decisionVariables.data();
+ 
+   VariableMatrix xAD{std::span{it, it + decisionVariables.size()}};
+   it += decisionVariables.size();
