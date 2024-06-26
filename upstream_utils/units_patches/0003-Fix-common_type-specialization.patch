@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <s-engjo@bsd405.org>
+Date: Wed, 3 Jul 2024 18:59:15 -0700
+Subject: [PATCH 3/4] Fix common_type specialization
+
+---
+ src/core/include/mp-units/framework/quantity.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/include/mp-units/framework/quantity.h b/src/core/include/mp-units/framework/quantity.h
+index 587ab2a2f97e7c348ac36352338f8b2f44bc0b43..e364407bf51e7a15586e3d53e33a80f6b322362a 100644
+--- a/src/core/include/mp-units/framework/quantity.h
++++ b/src/core/include/mp-units/framework/quantity.h
+@@ -539,8 +539,12 @@ MP_UNITS_EXPORT_END
+ 
+ }  // namespace mp_units
+ 
+-template<mp_units::Quantity Q1, mp_units::Quantity Q2>
+-  requires requires {
++template<typename Q1, typename Q2>
++  requires std::is_same_v<Q1, std::decay_t<Q1>>
++    && std::is_same_v<Q2, std::decay_t<Q2>>
++    && mp_units::Quantity<Q1>
++    && mp_units::Quantity<Q2>
++    && requires {
+     {
+       mp_units::common_reference(Q1::reference, Q2::reference)
+     } -> mp_units::Reference;

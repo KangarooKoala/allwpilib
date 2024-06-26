@@ -63,6 +63,7 @@ model {
                     return
                 }
                 it.cppCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
+                it.cppCompiler.define 'MP_UNITS_API_STD_FORMAT', '0'
                 it.cCompiler.define 'WPILIB_EXPORTS', 'SLEIPNIR_EXPORTS'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

@@ -120,6 +120,11 @@ jobs:
           cd upstream_utils
           ./stb.py clone
           ./stb.py copy-src
+      - name: Run update_units.py
+        run: |
+          cd upstream_utils
+          ./units.py clone
+          ./units.py copy-src
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

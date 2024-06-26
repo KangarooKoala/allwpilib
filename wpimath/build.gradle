@@ -41,6 +41,9 @@ cppHeadersZip {
     from('src/main/native/thirdparty/sleipnir/include') {
         into '/'
     }
+    from('src/main/native/thirdparty/mp-units/include') {
+        into '/'
+    }
 }
 
 cppHeadersZip.dependsOn generateProto
@@ -53,7 +56,8 @@ model {
                     srcDirs 'src/main/native/include',
                             'src/main/native/thirdparty/eigen/include',
                             'src/main/native/thirdparty/gcem/include',
-                            'src/main/native/thirdparty/sleipnir/include'
+                            'src/main/native/thirdparty/sleipnir/include',
+                            'src/main/native/thirdparty/mp-units/include'
                 }
             }
         }
@@ -61,6 +65,7 @@ model {
     binaries {
         all {
             it.cppCompiler.define 'SLEIPNIR_EXPORTS'
+            it.cppCompiler.define 'MP_UNITS_API_STD_FORMAT', '0'
         }
     }
 }

@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <s-engjo@bsd405.org>
+Date: Wed, 3 Jul 2024 19:39:46 -0700
+Subject: [PATCH 4/4] Fix incomplete type in requires expression
+
+---
+ src/core/include/mp-units/framework/quantity_point.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/include/mp-units/framework/quantity_point.h b/src/core/include/mp-units/framework/quantity_point.h
+index 35288afbd7193897b509a4fbb3272a55f90a12fa..af3706c1851788e6b99404ccd82f19a5762dfdc2 100644
+--- a/src/core/include/mp-units/framework/quantity_point.h
++++ b/src/core/include/mp-units/framework/quantity_point.h
+@@ -244,7 +244,7 @@ public:
+   constexpr const quantity_type&& quantity_ref_from(PO2) const&& noexcept = delete;
+ 
+   template<PointOrigin PO2>
+-    requires requires { quantity_point{} - PO2{}; }
++    requires requires (quantity_point qp) { qp - PO2{}; }
+   [[nodiscard]] constexpr Quantity auto quantity_from(PO2) const
+   {
+     return *this - PO2{};

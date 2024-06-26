@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <s-engjo@bsd405.org>
+Date: Tue, 25 Jun 2024 15:29:06 -0700
+Subject: [PATCH 1/4] Fix typename
+
+---
+ src/core/include/mp-units/bits/hacks.h      | 8 --------
+ src/core/include/mp-units/bits/sudo_cast.h  | 4 ++--
+ src/core/include/mp-units/ext/type_traits.h | 2 +-
+ 3 files changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/src/core/include/mp-units/bits/hacks.h b/src/core/include/mp-units/bits/hacks.h
+index 5030debb7c5d3504cf61406f83289a642b8cb16b..9e5222cdff6ec11f0c993f626f7ec49e43dcec13 100644
+--- a/src/core/include/mp-units/bits/hacks.h
++++ b/src/core/include/mp-units/bits/hacks.h
+@@ -77,16 +77,8 @@
+ #define MP_UNITS_HOSTED __STDC_HOSTED__
+ #endif
+ 
+-#if MP_UNITS_COMP_MSVC
+-
+ #define MP_UNITS_TYPENAME typename
+ 
+-#else
+-
+-#define MP_UNITS_TYPENAME
+-
+-#endif
+-
+ #if MP_UNITS_COMP_GCC
+ 
+ #define MP_UNITS_REMOVE_CONST(expr) std::remove_const_t<expr>
+diff --git a/src/core/include/mp-units/bits/sudo_cast.h b/src/core/include/mp-units/bits/sudo_cast.h
+index 0444f93e477d78776ff430a02e84272c41ad8d49..50f0748a10c1ba5e3334ada3ae75ccfde99a9e8c 100644
+--- a/src/core/include/mp-units/bits/sudo_cast.h
++++ b/src/core/include/mp-units/bits/sudo_cast.h
+@@ -107,12 +107,12 @@ template<Quantity To, typename From>
+     if constexpr (std::is_floating_point_v<typename traits::multiplier_type>) {
+       // this results in great assembly
+       auto res = static_cast<MP_UNITS_TYPENAME To::rep>(
+-        static_cast<traits::c_type>(q.numerical_value_is_an_implementation_detail_) * traits::ratio);
++        static_cast<MP_UNITS_TYPENAME traits::c_type>(q.numerical_value_is_an_implementation_detail_) * traits::ratio);
+       return {res, To::reference};
+     } else {
+       // this is slower but allows conversions like 2000 m -> 2 km without loosing data
+       auto res = static_cast<MP_UNITS_TYPENAME To::rep>(
+-        static_cast<traits::c_type>(q.numerical_value_is_an_implementation_detail_) * traits::num_mult /
++        static_cast<MP_UNITS_TYPENAME traits::c_type>(q.numerical_value_is_an_implementation_detail_) * traits::num_mult /
+         traits::den_mult * traits::irr_mult);
+       return {res, To::reference};
+     }
+diff --git a/src/core/include/mp-units/ext/type_traits.h b/src/core/include/mp-units/ext/type_traits.h
+index 25b47e9540a8f355a1e5e2014c1991c0b88ce19d..b804fd63add76e81134cd758f2ea9183fc5251b7 100644
+--- a/src/core/include/mp-units/ext/type_traits.h
++++ b/src/core/include/mp-units/ext/type_traits.h
+@@ -124,7 +124,7 @@ struct value_type {
+ template<typename T>
+   requires requires { typename wrapped_type_t<T>; }
+ struct value_type<T> {
+-  using type = MP_UNITS_TYPENAME wrapped_type_t<T>;
++  using type = wrapped_type_t<T>;
+ };
+ 
+ template<typename T>

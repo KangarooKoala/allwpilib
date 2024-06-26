@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <s-engjo@bsd405.org>
+Date: Tue, 25 Jun 2024 15:43:32 -0700
+Subject: [PATCH 2/4] Add missing <bit> include
+
+---
+ src/core/include/mp-units/framework/symbol_text.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/core/include/mp-units/framework/symbol_text.h b/src/core/include/mp-units/framework/symbol_text.h
+index a266cb244e755208116e5b7f5bf61a5fb01a1a78..7178b0b68c08583853eb2ab107a71f3e950303d7 100644
+--- a/src/core/include/mp-units/framework/symbol_text.h
++++ b/src/core/include/mp-units/framework/symbol_text.h
+@@ -32,6 +32,7 @@
+ 
+ #ifndef MP_UNITS_IN_MODULE_INTERFACE
+ #include <mp-units/ext/contracts.h>
++#include <bit>
+ #include <compare>  // IWYU pragma: export
+ #include <cstddef>
+ #include <cstdint>
