@@ -195,6 +195,16 @@ public:
   }
 
   // data access
+  [[nodiscard]] constexpr const rep& value() const& noexcept
+  {
+    return numerical_value_is_an_implementation_detail_;
+  }
+
+  [[nodiscard]] constexpr const rep&& value() const&& noexcept
+  {
+    return std::move(numerical_value_is_an_implementation_detail_);
+  }
+
   template<Unit U>
     requires(U{} == unit)
   [[nodiscard]] constexpr rep& numerical_value_ref_in(U) & noexcept

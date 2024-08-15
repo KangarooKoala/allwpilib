@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Joseph Eng <s-engjo@bsd405.org>
 Date: Wed, 3 Jul 2024 18:59:15 -0700
-Subject: [PATCH 3/4] Fix common_type specialization
+Subject: [PATCH 3/5] Fix common_type specialization
 
 ---
  src/core/include/mp-units/framework/quantity.h | 8 ++++++--

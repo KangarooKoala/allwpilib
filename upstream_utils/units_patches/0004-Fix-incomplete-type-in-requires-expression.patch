@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Joseph Eng <s-engjo@bsd405.org>
 Date: Wed, 3 Jul 2024 19:39:46 -0700
-Subject: [PATCH 4/4] Fix incomplete type in requires expression
+Subject: [PATCH 4/5] Fix incomplete type in requires expression
 
 ---
  src/core/include/mp-units/framework/quantity_point.h | 2 +-

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Joseph Eng <s-engjo@bsd405.org>
 Date: Tue, 25 Jun 2024 15:29:06 -0700
-Subject: [PATCH 1/4] Fix typename
+Subject: [PATCH 1/5] Fix typename
 
 ---
  src/core/include/mp-units/bits/hacks.h      | 8 --------
