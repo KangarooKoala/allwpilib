@@ -56,7 +56,7 @@ class UltrasonicPIDTest : public testing::TestWithParam<double> {
         m_rightMotorSim.GetSpeed() * frc::RobotController::GetBatteryVoltage());
     m_driveSim.Update(20_ms);
 
-    auto startingDistance = units::meter_t{GetParam()};
+    auto startingDistance = GetParam() * units::meter;
     m_distance = m_driveSim.GetLeftPosition() - startingDistance;
 
     m_ultrasonicSim.SetRange(m_distance);

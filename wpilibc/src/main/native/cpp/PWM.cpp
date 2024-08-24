@@ -65,7 +65,7 @@ units::microsecond_t PWM::GetPulseTime() const {
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return units::microsecond_t{value};
+  return value * units::microsecond;
 }
 
 void PWM::SetPosition(double pos) {
@@ -155,11 +155,11 @@ void PWM::GetBounds(units::microsecond_t* max,
   int32_t rawMax, rawDeadbandMax, rawCenter, rawDeadbandMin, rawMin;
   HAL_GetPWMConfigMicroseconds(m_handle, &rawMax, &rawDeadbandMax, &rawCenter,
                                &rawDeadbandMin, &rawMin, &status);
-  *max = units::microsecond_t{static_cast<double>(rawMax)};
-  *deadbandMax = units::microsecond_t{static_cast<double>(rawDeadbandMax)};
-  *center = units::microsecond_t{static_cast<double>(rawCenter)};
-  *deadbandMin = units::microsecond_t{static_cast<double>(rawDeadbandMin)};
-  *min = units::microsecond_t{static_cast<double>(rawMin)};
+  *max = static_cast<double>(rawMax) * units::microsecond;
+  *deadbandMax = static_cast<double>(rawDeadbandMax) * units::microsecond;
+  *center = static_cast<double>(rawCenter) * units::microsecond;
+  *deadbandMin = static_cast<double>(rawDeadbandMin) * units::microsecond;
+  *min = static_cast<double>(rawMin) * units::microsecond;
   FRC_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
@@ -179,7 +179,7 @@ void PWM::InitSendable(wpi::SendableBuilder& builder) {
   builder.SetSafeState([=, this] { SetDisabled(); });
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) { SetPulseTime(units::millisecond_t{value}); });
+      [=, this](double value) { SetPulseTime(value * units::millisecond); });
   builder.AddDoubleProperty(
       "Speed", [=, this] { return GetSpeed(); },
       [=, this](double value) { SetSpeed(value); });

@@ -13,7 +13,7 @@ using StructType = wpi::Struct<frc::DifferentialDriveKinematics>;
 frc::DifferentialDriveKinematics StructType::Unpack(
     std::span<const uint8_t> data) {
   return frc::DifferentialDriveKinematics{
-      units::meter_t{wpi::UnpackStruct<double, kTrackWidthOff>(data)},
+      wpi::UnpackStruct<double, kTrackWidthOff>(data) * units::meter,
   };
 }
 

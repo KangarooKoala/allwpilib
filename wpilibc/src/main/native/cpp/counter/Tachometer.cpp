@@ -54,7 +54,7 @@ units::second_t Tachometer::GetPeriod() const {
   int32_t status = 0;
   double period = HAL_GetCounterPeriod(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", m_source->GetChannel());
-  return units::second_t{period};
+  return period * units::second;
 }
 
 int Tachometer::GetEdgesPerRevolution() const {
@@ -74,7 +74,7 @@ units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
     return 0_tps;
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
-  return units::turns_per_second_t{rotationHz.value()};
+  return rotationHz.value() * units::turns_per_second;
 }
 
 units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute() const {

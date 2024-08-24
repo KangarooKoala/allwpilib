@@ -16,13 +16,13 @@ using ProtoType = wpi::Protobuf<frc::Trajectory>;
 const Trajectory kExpectedData = Trajectory{std::vector<frc::Trajectory::State>{
     Trajectory::State{1.1_s, 2.2_mps, 3.3_mps_sq,
                       Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
+                      6.6_rad / 1_m},
     Trajectory::State{2.1_s, 2.2_mps, 3.3_mps_sq,
                       Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
+                      6.6_rad / 1_m},
     Trajectory::State{3.1_s, 2.2_mps, 3.3_mps_sq,
                       Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}}}};
+                      6.6_rad / 1_m}}};
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {

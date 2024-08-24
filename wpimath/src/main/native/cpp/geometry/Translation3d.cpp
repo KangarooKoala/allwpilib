@@ -20,9 +20,9 @@ Translation3d::Translation3d(units::meter_t distance, const Rotation3d& angle) {
 }
 
 Translation3d::Translation3d(const Eigen::Vector3d& vector)
-    : m_x{units::meter_t{vector.x()}},
-      m_y{units::meter_t{vector.y()}},
-      m_z{units::meter_t{vector.z()}} {}
+    : m_x{vector.x() * units::meter},
+      m_y{vector.y() * units::meter},
+      m_z{vector.z() * units::meter} {}
 
 units::meter_t Translation3d::Distance(const Translation3d& other) const {
   return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
@@ -37,8 +37,8 @@ units::meter_t Translation3d::Norm() const {
 Translation3d Translation3d::RotateBy(const Rotation3d& other) const {
   Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
   auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
-  return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
-                       units::meter_t{qprime.Z()}};
+  return Translation3d{qprime.X() * units::meter, qprime.Y() * units::meter,
+                       qprime.Z() * units::meter};
 }
 
 bool Translation3d::operator==(const Translation3d& other) const {
@@ -54,7 +54,7 @@ void frc::to_json(wpi::json& json, const Translation3d& translation) {
 }
 
 void frc::from_json(const wpi::json& json, Translation3d& translation) {
-  translation = Translation3d{units::meter_t{json.at("x").get<double>()},
-                              units::meter_t{json.at("y").get<double>()},
-                              units::meter_t{json.at("z").get<double>()}};
+  translation = Translation3d{json.at("x").get<double>() * units::meter,
+                              json.at("y").get<double>() * units::meter,
+                              json.at("z").get<double>() * units::meter};
 }

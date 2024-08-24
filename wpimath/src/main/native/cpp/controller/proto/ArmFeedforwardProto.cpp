@@ -17,10 +17,10 @@ frc::ArmFeedforward wpi::Protobuf<frc::ArmFeedforward>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufArmFeedforward*>(&msg);
   return frc::ArmFeedforward{
-      units::volt_t{m->ks()},
-      units::volt_t{m->kg()},
-      units::unit_t<frc::ArmFeedforward::kv_unit>{m->kv()},
-      units::unit_t<frc::ArmFeedforward::ka_unit>{m->ka()},
+      m->ks() * units::volt,
+      m->kg() * units::volt,
+      m->kv() * frc::ArmFeedforward::kv_unit,
+      m->ka() * frc::ArmFeedforward::ka_unit,
   };
 }
 

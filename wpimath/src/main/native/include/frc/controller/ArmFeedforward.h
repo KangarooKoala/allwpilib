@@ -20,15 +20,11 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT ArmFeedforward {
  public:
-  using Angle = units::radians;
-  using Velocity = units::radians_per_second;
-  using Acceleration = units::compound_unit<units::radians_per_second,
-                                            units::inverse<units::second>>;
-  using kv_unit =
-      units::compound_unit<units::volts,
-                           units::inverse<units::radians_per_second>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+  static constexpr auto Angle = units::radian;
+  static constexpr auto Velocity = units::radians_per_second;
+  static constexpr auto Acceleration = units::radians_per_second / units::second;
+  static constexpr auto kv_unit = units::volt / units::radians_per_second;
+  static constexpr auto ka_unit = units::volt / Acceleration;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -40,18 +36,18 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    */
   constexpr ArmFeedforward(
       units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0))
+      units::unit_t<ka_unit> kA = 0 * ka_unit)
       : kS(kS), kG(kG), kV(kV), kA(kA) {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      this->kV = units::unit_t<kv_unit>{0};
+      this->kV = 0 * kv_unit;
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      this->kA = units::unit_t<ka_unit>{0};
+      this->kA = 0 * ka_unit;
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
   }
@@ -71,8 +67,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   units::volt_t Calculate(units::unit_t<Angle> angle,
                           units::unit_t<Velocity> velocity,
                           units::unit_t<Acceleration> acceleration =
-                              units::unit_t<Acceleration>(0)) const {
-    return kS * wpi::sgn(velocity) + kG * units::math::cos(angle) +
+                              0 * Acceleration) const {
+    return kS * ((0 * Velocity < velocity) - (velocity < 0 * Velocity)) + kG * units::math::cos(angle) +
            kV * velocity + kA * acceleration;
   }
 

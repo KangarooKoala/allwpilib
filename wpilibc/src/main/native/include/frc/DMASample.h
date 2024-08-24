@@ -61,7 +61,7 @@ class DMASample : public HAL_DMASample {
    * @return The DMA sample timestamp.
    */
   units::second_t GetTimeStamp() const {
-    return units::second_t{static_cast<double>(GetTime()) * 1.0e-6};
+    return static_cast<double>(GetTime()) * 1.0e-6 * units::second;
   }
 
   /**

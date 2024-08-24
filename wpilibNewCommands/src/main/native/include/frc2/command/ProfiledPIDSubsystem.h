@@ -18,11 +18,10 @@ namespace frc2 {
  *
  * @see ProfiledPIDController
  */
-template <class Distance>
+template <Unit auto Distance>
 class ProfiledPIDSubsystem : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  inline constexpr auto Velocity = Distance / units::second;
   using Velocity_t = units::unit_t<Velocity>;
   using State = typename frc::TrapezoidProfile<Distance>::State;
 
@@ -34,7 +33,7 @@ class ProfiledPIDSubsystem : public SubsystemBase {
    * @param initialPosition the initial goal position of the subsystem
    */
   explicit ProfiledPIDSubsystem(frc::ProfiledPIDController<Distance> controller,
-                                Distance_t initialPosition = Distance_t{0})
+                                Distance_t initialPosition = 0 * Distance)
       : m_controller{controller} {
     SetGoal(initialPosition);
   }

@@ -23,7 +23,7 @@ ShooterSubsystem::ShooterSubsystem()
 }
 
 void ShooterSubsystem::UseOutput(double output, double setpoint) {
-  m_shooterMotor.SetVoltage(units::volt_t{output} +
+  m_shooterMotor.SetVoltage(output * units::volt +
                             m_shooterFeedforward.Calculate(kShooterTargetRPS));
 }
 

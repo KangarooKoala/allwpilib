@@ -89,6 +89,6 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry
   }
 
  private:
-  DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
+  DifferentialDriveKinematics m_kinematicsImpl{1_m};
 };
 }  // namespace frc

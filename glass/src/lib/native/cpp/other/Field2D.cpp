@@ -49,8 +49,8 @@ enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 struct FieldFrameData {
   frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {
-        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+        (std::clamp(cursor.x, min.x, max.x) - min.x) / scale * units::meter,
+        (max.y - std::clamp(cursor.y, min.y, max.y)) / scale * units::meter};
   }
   ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
@@ -289,14 +289,14 @@ static bool InputLength(const char* label, units::meter_t* v, double step = 0.0,
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
       case kDisplayFeet:
-        *v = units::foot_t{dv};
+        *v = dv * units::foot;
         break;
       case kDisplayInches:
-        *v = units::inch_t{dv};
+        *v = dv * units::inch;
         break;
       case kDisplayMeters:
       default:
-        *v = units::meter_t{dv};
+        *v = dv * units::meter;
         break;
     }
     return true;
@@ -321,7 +321,7 @@ static bool InputAngle(const char* label, units::degree_t* v, double step = 0.0,
                        ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
-    *v = units::degree_t{dv};
+    *v = dv * units::degree;
     return true;
   }
   return false;
@@ -635,8 +635,8 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.style = static_cast<DisplayOptions::Style>(m_style.GetValue());
   rv.weight = m_weight;
   rv.color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
-  rv.width = units::meter_t{m_width};
-  rv.length = units::meter_t{m_length};
+  rv.width = m_width * units::meter;
+  rv.length = m_length * units::meter;
   rv.arrows = m_arrows;
   rv.arrowSize = m_arrowSize;
   rv.arrowWeight = m_arrowWeight;
@@ -880,7 +880,7 @@ void PoseFrameData::HandleDrag(const ImVec2& cursor) {
   } else {
     ImVec2 off = cursor - m_center;
     SetRotation(gDragState.initialAngle -
-                units::radian_t{std::atan2(off.y, off.x)});
+                std::atan2(off.y, off.x) * units::radian);
     gDragState.target.center = m_corners[gDragState.target.corner - 2];
     gDragState.target.rot = GetRotation().Radians();
   }
@@ -1072,8 +1072,8 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       gDragState.initialOffset = m_mousePos - target->poseCenter;
       if (target->corner != 1) {
         gDragState.initialAngle =
-            units::radian_t{std::atan2(gDragState.initialOffset.y,
-                                       gDragState.initialOffset.x)} +
+            std::atan2(gDragState.initialOffset.y,
+                                       gDragState.initialOffset.x) * units::radian +
             target->rot;
       }
     }

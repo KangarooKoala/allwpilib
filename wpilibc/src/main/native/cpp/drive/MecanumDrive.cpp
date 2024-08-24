@@ -109,7 +109,7 @@ MecanumDrive::WheelSpeeds MecanumDrive::DriveCartesianIK(double xSpeed,
 
   // Compensate for gyro angle.
   auto input =
-      Translation2d{units::meter_t{xSpeed}, units::meter_t{ySpeed}}.RotateBy(
+      Translation2d{xSpeed * units::meter, ySpeed * units::meter}.RotateBy(
           -gyroAngle);
 
   double wheelSpeeds[4];

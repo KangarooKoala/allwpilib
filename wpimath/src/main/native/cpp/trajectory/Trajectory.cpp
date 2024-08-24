@@ -157,10 +157,10 @@ void frc::to_json(wpi::json& json, const Trajectory::State& state) {
 
 void frc::from_json(const wpi::json& json, Trajectory::State& state) {
   state.pose = json.at("pose").get<Pose2d>();
-  state.t = units::second_t{json.at("time").get<double>()};
+  state.t = json.at("time").get<double>() * units::second;
   state.velocity =
-      units::meters_per_second_t{json.at("velocity").get<double>()};
+      json.at("velocity").get<double>() * units::meters_per_second;
   state.acceleration =
-      units::meters_per_second_squared_t{json.at("acceleration").get<double>()};
-  state.curvature = units::curvature_t{json.at("curvature").get<double>()};
+      json.at("acceleration").get<double>() * units::meters_per_second_squared;
+  state.curvature = json.at("curvature").get<double>() * 1_rad / 1_m;
 }

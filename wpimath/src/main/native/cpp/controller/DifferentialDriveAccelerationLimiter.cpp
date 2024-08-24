@@ -81,5 +81,5 @@ DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
   // u = B⁻¹(dx/dt - Ax)
   u = m_system.B().householderQr().solve(dxdt - m_system.A() * x);
 
-  return {units::volt_t{u(0)}, units::volt_t{u(1)}};
+  return {u(0) * units::volt, u(1) * units::volt};
 }

@@ -15,8 +15,8 @@ using StructType = wpi::Struct<frc::Ellipse2d>;
 frc::Ellipse2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Ellipse2d{
       wpi::UnpackStruct<frc::Pose2d, kCenterOff>(data),
-      units::meter_t{wpi::UnpackStruct<double, kXSemiAxisOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kYSemiAxisOff>(data)},
+      wpi::UnpackStruct<double, kXSemiAxisOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kYSemiAxisOff>(data) * units::meter,
   };
 }
 

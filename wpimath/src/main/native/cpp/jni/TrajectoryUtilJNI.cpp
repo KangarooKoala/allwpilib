@@ -42,13 +42,13 @@ frc::Trajectory CreateTrajectoryFromElements(std::span<const double> elements) {
 
   for (size_t i = 0; i < elements.size(); i += 7) {
     states.emplace_back(frc::Trajectory::State{
-        units::second_t{elements[i]},
-        units::meters_per_second_t{elements[i + 1]},
-        units::meters_per_second_squared_t{elements[i + 2]},
-        frc::Pose2d{units::meter_t{elements[i + 3]},
-                    units::meter_t{elements[i + 4]},
-                    units::radian_t{elements[i + 5]}},
-        units::curvature_t{elements[i + 6]}});
+        elements[i] * units::second,
+        elements[i + 1] * units::meters_per_second,
+        elements[i + 2] * units::meters_per_second_squared,
+        frc::Pose2d{elements[i + 3] * units::meter,
+                    elements[i + 4] * units::meter,
+                    elements[i + 5] * units::radian},
+        elements[i + 6] * 1_rad / 1_m});
   }
 
   return frc::Trajectory(states);

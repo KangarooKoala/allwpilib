@@ -12,7 +12,7 @@
 using namespace frc;
 
 Translation2d::Translation2d(const Eigen::Vector2d& vector)
-    : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
+    : m_x{vector.x() * units::meter}, m_y{vector.y() * units::meter} {}
 
 units::meter_t Translation2d::Norm() const {
   return units::math::hypot(m_x, m_y);
@@ -40,6 +40,6 @@ void frc::to_json(wpi::json& json, const Translation2d& translation) {
 }
 
 void frc::from_json(const wpi::json& json, Translation2d& translation) {
-  translation = Translation2d{units::meter_t{json.at("x").get<double>()},
-                              units::meter_t{json.at("y").get<double>()}};
+  translation = Translation2d{json.at("x").get<double>() * units::meter,
+                              json.at("y").get<double>() * units::meter};
 }

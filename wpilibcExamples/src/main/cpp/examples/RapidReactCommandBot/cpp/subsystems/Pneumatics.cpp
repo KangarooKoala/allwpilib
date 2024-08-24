@@ -23,5 +23,5 @@ frc2::CommandPtr Pneumatics::DisableCompressorCommand() {
 units::pounds_per_square_inch_t Pneumatics::GetPressure() {
   // Get the pressure (in PSI) from an analog pressure sensor connected to
   // the RIO.
-  return units::pounds_per_square_inch_t{m_pressureTransducer.Get()};
+  return m_pressureTransducer.Get() * units::pounds_per_square_inch;
 }

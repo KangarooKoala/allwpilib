@@ -14,8 +14,8 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   ImplicitModelFollower<2, 2> imf{plant, plant};
 
@@ -59,12 +59,12 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   // Linear acceleration is slower, but angular acceleration is the same
   auto plantRef = LinearSystemId::IdentifyDrivetrainSystem(
-      Kv_t{1.0}, Ka_t{2.0}, Kv_t{1.0}, Ka_t{1.0});
+      1.0 * Kv_t::unit, 2.0 * Ka_t::unit, 1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   ImplicitModelFollower<2, 2> imf{plant, plantRef};
 

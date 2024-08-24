@@ -27,10 +27,10 @@ Java_edu_wpi_first_math_jni_Ellipse2dJNI_findNearestPoint
 {
   auto point =
       frc::Ellipse2d{
-          frc::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
-                      units::radian_t{centerHeading}},
-          units::meter_t{xSemiAxis}, units::meter_t{ySemiAxis}}
-          .FindNearestPoint({units::meter_t{pointX}, units::meter_t{pointY}});
+          frc::Pose2d{centerX * units::meter, centerY * units::meter,
+                      centerHeading * units::radian},
+          xSemiAxis * units::meter, ySemiAxis * units::meter}
+          .FindNearestPoint({pointX * units::meter, pointY * units::meter});
 
   wpi::array buf{point.X().value(), point.Y().value()};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());

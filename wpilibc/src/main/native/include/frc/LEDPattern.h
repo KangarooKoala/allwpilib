@@ -108,11 +108,11 @@ class LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our
-   * particular LED strip units::meter_t LED_SPACING = units::meter_t{1 /60.0};
+   * particular LED strip units::meter_t LED_SPACING = 1_m / 60.0;
    *
    *   frc::LEDPattern rainbow = frc::LEDPattern::Rainbow();
    *   frc::LEDPattern scrollingRainbow =
-   *     rainbow.ScrollAtAbsoluteSpeed(units::feet_per_second_t{1 / 3.0},
+   *     rainbow.ScrollAtAbsoluteSpeed(1_fps / 3.0,
    * LED_SPACING);
    * </pre>
    *

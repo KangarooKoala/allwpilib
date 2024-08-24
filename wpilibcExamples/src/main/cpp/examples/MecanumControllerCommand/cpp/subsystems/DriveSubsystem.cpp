@@ -96,18 +96,18 @@ frc::Encoder& DriveSubsystem::GetRearRightEncoder() {
 
 frc::MecanumDriveWheelSpeeds DriveSubsystem::getCurrentWheelSpeeds() {
   return (frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-      units::meters_per_second_t{m_rearLeftEncoder.GetRate()},
-      units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-      units::meters_per_second_t{m_rearRightEncoder.GetRate()}});
+      m_frontLeftEncoder.GetRate() * units::meters_per_second,
+      m_rearLeftEncoder.GetRate() * units::meters_per_second,
+      m_frontRightEncoder.GetRate() * units::meters_per_second,
+      m_rearRightEncoder.GetRate() * units::meters_per_second});
 }
 
 frc::MecanumDriveWheelPositions DriveSubsystem::getCurrentWheelDistances() {
   return (frc::MecanumDriveWheelPositions{
-      units::meter_t{m_frontLeftEncoder.GetDistance()},
-      units::meter_t{m_rearLeftEncoder.GetDistance()},
-      units::meter_t{m_frontRightEncoder.GetDistance()},
-      units::meter_t{m_rearRightEncoder.GetDistance()}});
+      m_frontLeftEncoder.GetDistance() * units::meter,
+      m_rearLeftEncoder.GetDistance() * units::meter,
+      m_frontRightEncoder.GetDistance() * units::meter,
+      m_rearRightEncoder.GetDistance() * units::meter});
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {

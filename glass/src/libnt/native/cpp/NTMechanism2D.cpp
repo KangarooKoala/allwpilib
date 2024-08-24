@@ -166,11 +166,11 @@ bool NTMechanismObjectModel::NTUpdate(const nt::Event& event,
       }
     } else if (valueData->topic == m_angleTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
-        m_angleValue = units::degree_t{valueData->value.GetDouble()};
+        m_angleValue = valueData->value.GetDouble() * units::degree;
       }
     } else if (valueData->topic == m_lengthTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
-        m_lengthValue = units::meter_t{valueData->value.GetDouble()};
+        m_lengthValue = valueData->value.GetDouble() * units::meter;
       }
     } else {
       m_group.NTUpdate(event, childName);
@@ -218,13 +218,13 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const nt::Event& event,
   } else if (auto valueData = event.GetValueEventData()) {
     if (valueData->topic == m_xTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
-        m_pos = frc::Translation2d{units::meter_t{valueData->value.GetDouble()},
+        m_pos = frc::Translation2d{valueData->value.GetDouble() * units::meter,
                                    m_pos.Y()};
       }
     } else if (valueData->topic == m_yTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
         m_pos = frc::Translation2d{
-            m_pos.X(), units::meter_t{valueData->value.GetDouble()}};
+            m_pos.X(), valueData->value.GetDouble() * units::meter};
       }
     } else {
       m_group.NTUpdate(event, childName);
@@ -296,8 +296,8 @@ void NTMechanism2DModel::Update() {
         if (valueData->value && valueData->value.IsDoubleArray()) {
           auto arr = valueData->value.GetDoubleArray();
           if (arr.size() == 2) {
-            m_dimensionsValue = frc::Translation2d{units::meter_t{arr[0]},
-                                                   units::meter_t{arr[1]}};
+            m_dimensionsValue = frc::Translation2d{arr[0] * units::meter,
+                                                   arr[1] * units::meter};
           }
         }
       } else if (valueData->topic == m_bgColorTopic.GetHandle()) {

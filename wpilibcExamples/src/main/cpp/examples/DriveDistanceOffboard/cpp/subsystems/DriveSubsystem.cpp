@@ -61,11 +61,11 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
-  return units::meter_t{m_leftLeader.GetEncoderDistance()};
+  return m_leftLeader.GetEncoderDistance() * units::meter;
 }
 
 units::meter_t DriveSubsystem::GetRightEncoderDistance() {
-  return units::meter_t{m_rightLeader.GetEncoderDistance()};
+  return m_rightLeader.GetEncoderDistance() * units::meter;
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {

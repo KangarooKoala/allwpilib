@@ -66,7 +66,7 @@ Twist2d Pose2d::Log(const Pose2d& end) const {
           {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
       std::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
-  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
+  return {translationPart.X(), translationPart.Y(), dtheta * units::radian};
 }
 
 Pose2d Pose2d::Nearest(std::span<const Pose2d> poses) const {

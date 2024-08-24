@@ -41,7 +41,7 @@ class WPILIB_DLLEXPORT Trajectory {
     Pose2d pose;
 
     /// The curvature at that point of the trajectory.
-    units::curvature_t curvature{0.0};
+    units::curvature_t curvature{units::curvature_t::zero()};
 
     /**
      * Checks equality between this State and another object.

@@ -106,7 +106,7 @@ void FieldObject2d::UpdateFromEntry() const {
   m_poses.resize(size / 3);
   for (size_t i = 0; i < size / 3; ++i) {
     m_poses[i] =
-        Pose2d{units::meter_t{arr[i * 3 + 0]}, units::meter_t{arr[i * 3 + 1]},
-               units::degree_t{arr[i * 3 + 2]}};
+        Pose2d{arr[i * 3 + 0] * units::meter, arr[i * 3 + 1] * units::meter,
+               arr[i * 3 + 2] * units::degree};
   }
 }

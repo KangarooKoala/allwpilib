@@ -7,5 +7,5 @@
 using namespace frc;
 
 units::meter_t XRPRangefinder::GetDistance() const {
-  return units::meter_t{m_rangefinder.GetVoltage() / 5.0 * 4.0};
+  return m_rangefinder.GetVoltage() / 5.0 * 4.0 * units::meter;
 }

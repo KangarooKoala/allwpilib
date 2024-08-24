@@ -184,7 +184,7 @@ ADIS16470_IMU::ADIS16470_IMU(IMUAxis yaw_axis, IMUAxis pitch_axis,
 
     // Wait for samples to accumulate internal to the IMU (110% of user-defined
     // time)
-    Wait(units::second_t{pow(2, m_calibration_time) / 2000 * 64 * 1.1});
+    Wait(pow(2, m_calibration_time) / 2000 * 64 * 1.1 * units::second);
 
     // Write offset calibration command to IMU
     WriteRegister(GLOB_CMD, 0x0001);
@@ -792,27 +792,27 @@ units::degree_t ADIS16470_IMU::GetAngle(IMUAxis axis) const {
   switch (axis) {
     case kX:
       if (m_simGyroAngleX) {
-        return units::degree_t{m_simGyroAngleX.Get()};
+        return m_simGyroAngleX.Get() * units::degree;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_x};
+        return m_integ_angle_x * units::degree;
       }
     case kY:
       if (m_simGyroAngleY) {
-        return units::degree_t{m_simGyroAngleY.Get()};
+        return m_simGyroAngleY.Get() * units::degree;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_y};
+        return m_integ_angle_y * units::degree;
       }
     case kZ:
       if (m_simGyroAngleZ) {
-        return units::degree_t{m_simGyroAngleZ.Get()};
+        return m_simGyroAngleZ.Get() * units::degree;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degree_t{m_integ_angle_z};
+        return m_integ_angle_z * units::degree;
       }
     default:
       break;
@@ -839,27 +839,27 @@ units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
   switch (axis) {
     case kX:
       if (m_simGyroRateX) {
-        return units::degrees_per_second_t{m_simGyroRateX.Get()};
+        return m_simGyroRateX.Get() * units::degrees_per_second;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degrees_per_second_t{m_gyro_rate_x};
+        return m_gyro_rate_x * units::degrees_per_second;
       }
     case kY:
       if (m_simGyroRateY) {
-        return units::degrees_per_second_t{m_simGyroRateY.Get()};
+        return m_simGyroRateY.Get() * units::degrees_per_second;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degrees_per_second_t{m_gyro_rate_y};
+        return m_gyro_rate_y * units::degrees_per_second;
       }
     case kZ:
       if (m_simGyroRateZ) {
-        return units::degrees_per_second_t{m_simGyroRateZ.Get()};
+        return m_simGyroRateZ.Get() * units::degrees_per_second;
       }
       {
         std::scoped_lock sync(m_mutex);
-        return units::degrees_per_second_t{m_gyro_rate_z};
+        return m_gyro_rate_z * units::degrees_per_second;
       }
     default:
       break;
@@ -870,46 +870,46 @@ units::degrees_per_second_t ADIS16470_IMU::GetRate(IMUAxis axis) const {
 
 units::meters_per_second_squared_t ADIS16470_IMU::GetAccelX() const {
   if (m_simAccelX) {
-    return units::meters_per_second_squared_t{m_simAccelX.Get()};
+    return m_simAccelX.Get() * units::meters_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
-  return units::meters_per_second_squared_t{m_accel_x};
+  return m_accel_x * units::meters_per_second_squared;
 }
 
 units::meters_per_second_squared_t ADIS16470_IMU::GetAccelY() const {
   if (m_simAccelY) {
-    return units::meters_per_second_squared_t{m_simAccelY.Get()};
+    return m_simAccelY.Get() * units::meters_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
-  return units::meters_per_second_squared_t{m_accel_y};
+  return m_accel_y * units::meters_per_second_squared;
 }
 
 units::meters_per_second_squared_t ADIS16470_IMU::GetAccelZ() const {
   if (m_simAccelZ) {
-    return units::meters_per_second_squared_t{m_simAccelZ.Get()};
+    return m_simAccelZ.Get() * units::meters_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
-  return units::meters_per_second_squared_t{m_accel_z};
+  return m_accel_z * units::meters_per_second_squared;
 }
 
 units::degree_t ADIS16470_IMU::GetXComplementaryAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_compAngleX};
+  return m_compAngleX * units::degree;
 }
 
 units::degree_t ADIS16470_IMU::GetYComplementaryAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_compAngleY};
+  return m_compAngleY * units::degree;
 }
 
 units::degree_t ADIS16470_IMU::GetXFilteredAccelAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_accelAngleX};
+  return m_accelAngleX * units::degree;
 }
 
 units::degree_t ADIS16470_IMU::GetYFilteredAccelAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_accelAngleY};
+  return m_accelAngleY * units::degree;
 }
 
 ADIS16470_IMU::IMUAxis ADIS16470_IMU::GetYawAxis() const {

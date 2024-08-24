@@ -158,7 +158,7 @@ TEST(LEDPatternTest, ScrollRelativeForward) {
 
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
-  auto scroll = pattern.ScrollAtRelativeSpeed(units::hertz_t{1 / 256.0});
+  auto scroll = pattern.ScrollAtRelativeSpeed(1_s / 256.0);
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -201,7 +201,7 @@ TEST(LEDPatternTest, ScrollRelativeBackward) {
 
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
-  auto scroll = pattern.ScrollAtRelativeSpeed(units::hertz_t{-1 / 256.0});
+  auto scroll = pattern.ScrollAtRelativeSpeed(-1_s / 256.0);
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });

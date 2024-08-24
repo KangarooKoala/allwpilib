@@ -158,9 +158,9 @@ class SimpleMotorFeedforward {
       double A_d = gcem::exp(A * m_dt.value());
       double B_d = 1.0 / A * (A_d - 1.0) * B;
       return kS * wpi::sgn(currentVelocity) +
-             units::volt_t{
                  1.0 / B_d *
-                 (nextVelocity.value() - A_d * currentVelocity.value())};
+                 (nextVelocity.value() - A_d * currentVelocity.value())
+                 * units::volt;
     }
   }
 

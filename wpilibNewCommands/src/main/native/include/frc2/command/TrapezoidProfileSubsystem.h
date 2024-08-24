@@ -17,11 +17,10 @@ namespace frc2 {
  *
  * This class is provided by the NewCommands VendorDep
  */
-template <class Distance>
+template <Unit auto Distance>
 class TrapezoidProfileSubsystem : public SubsystemBase {
   using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  inline constexpr auto Velocity = Distance / units::second;
   using Velocity_t = units::unit_t<Velocity>;
   using State = typename frc::TrapezoidProfile<Distance>::State;
   using Constraints = typename frc::TrapezoidProfile<Distance>::Constraints;
@@ -37,11 +36,11 @@ class TrapezoidProfileSubsystem : public SubsystemBase {
    * @param period          The period of the main robot loop, in seconds.
    */
   explicit TrapezoidProfileSubsystem(Constraints constraints,
-                                     Distance_t initialPosition = Distance_t{0},
+                                     Distance_t initialPosition = 0 * Distance,
                                      units::second_t period = 20_ms)
       : m_profile(constraints),
-        m_state{initialPosition, Velocity_t(0)},
-        m_goal{initialPosition, Velocity_t{0}},
+        m_state{initialPosition, 0 * Velocity},
+        m_goal{initialPosition, 0 * Velocity},
         m_period(period) {}
 
   void Periodic() override {

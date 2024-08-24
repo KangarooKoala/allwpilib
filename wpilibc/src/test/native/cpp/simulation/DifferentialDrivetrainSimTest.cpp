@@ -51,7 +51,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         feedforward.Calculate(frc::Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
-    sim.SetInputs(units::volt_t{voltages(0, 0)}, units::volt_t{voltages(1, 0)});
+    sim.SetInputs(voltages(0, 0) * units::volt, voltages(1, 0) * units::volt);
     sim.Update(20_ms);
 
     // Update ground truth.

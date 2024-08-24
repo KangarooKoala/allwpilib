@@ -121,7 +121,7 @@ class Drivetrain {
 
   frc::Transform3d m_robotToCamera{
       frc::Translation3d{1_m, 1_m, 1_m},
-      frc::Rotation3d{0_rad, 0_rad, units::radian_t{std::numbers::pi / 2}}};
+      frc::Rotation3d{0_rad, 0_rad, 90_deg}};
 
   nt::NetworkTableInstance m_inst{nt::NetworkTableInstance::GetDefault()};
   nt::DoubleArrayTopic m_cameraToObjectTopic{
@@ -154,8 +154,8 @@ class Drivetrain {
   frc::DifferentialDrivePoseEstimator m_poseEstimator{
       m_kinematics,
       m_gyro.GetRotation2d(),
-      units::meter_t{m_leftEncoder.GetDistance()},
-      units::meter_t{m_rightEncoder.GetDistance()},
+      m_leftEncoder.GetDistance() * units::meter,
+      m_rightEncoder.GetDistance() * units::meter,
       frc::Pose2d{},
       {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};

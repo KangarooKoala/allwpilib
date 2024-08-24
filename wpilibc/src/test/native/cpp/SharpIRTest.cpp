@@ -15,9 +15,9 @@ TEST(SharpIRTest, SimDevices) {
 
   EXPECT_EQ(20, s.GetRange().value());
 
-  sim.SetRange(units::centimeter_t{30});
+  sim.SetRange(30_cm);
   EXPECT_EQ(30, s.GetRange().value());
 
-  sim.SetRange(units::centimeter_t{300});
+  sim.SetRange(300_cm);
   EXPECT_EQ(150, s.GetRange().value());
 }

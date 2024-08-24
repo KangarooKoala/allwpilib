@@ -96,7 +96,7 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       360_deg_per_s};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
   EXPECT_NEAR(fl.speed.value(), 106.63, kEpsilon);
@@ -112,7 +112,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
 
 TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       360_deg_per_s};
   m_kinematics.ToSwerveModuleStates(speeds);
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
@@ -174,7 +174,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       units::radians_per_second_t{2 * std::numbers::pi}};
+                       360_deg_per_s};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
   EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);

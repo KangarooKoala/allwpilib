@@ -71,8 +71,8 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
       AutoConstants::kPThetaController, 0, 0,
       AutoConstants::kThetaControllerConstraints};
 
-  thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
-                                        units::radian_t{std::numbers::pi});
+  thetaController.EnableContinuousInput(-180_deg,
+                                        180_deg;
 
   frc2::CommandPtr swerveControllerCommand =
       frc2::SwerveControllerCommand<4>(

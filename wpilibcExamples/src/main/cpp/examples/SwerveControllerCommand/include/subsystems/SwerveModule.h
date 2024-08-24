@@ -37,9 +37,9 @@ class SwerveModule {
   // meters per second squared.
 
   static constexpr auto kModuleMaxAngularVelocity =
-      units::radians_per_second_t{std::numbers::pi};
+      180_deg_p_s;
   static constexpr auto kModuleMaxAngularAcceleration =
-      units::radians_per_second_squared_t{std::numbers::pi * 2.0};
+      360_deg_per_s_sq;
 
   frc::Spark m_driveMotor;
   frc::Spark m_turningMotor;

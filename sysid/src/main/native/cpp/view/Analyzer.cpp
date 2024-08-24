@@ -82,7 +82,7 @@ void Analyzer::UpdateFeedbackGains() {
   const auto& Ka = m_feedforwardGains.Ka;
   if (Kv.isValidGain && Ka.isValidGain) {
     const auto& fb = m_manager->CalculateFeedback(Kv, Ka);
-    m_timescale = units::second_t{Ka.gain / Kv.gain};
+    m_timescale = Ka.gain / Kv.gain * units::second;
     m_timescaleValid = true;
     m_Kp = fb.Kp;
     m_Kd = fb.Kd;
@@ -454,7 +454,7 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     if (ImGui::SliderFloat("Test Duration", &m_stepTestDuration,
                            m_manager->GetMinStepTime().value(),
                            m_manager->GetMaxStepTime().value(), "%.2f")) {
-      m_settings.stepTestDuration = units::second_t{m_stepTestDuration};
+      m_settings.stepTestDuration = m_stepTestDuration * units::second;
       PrepareData();
     }
   }

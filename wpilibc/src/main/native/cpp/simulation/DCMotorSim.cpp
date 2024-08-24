@@ -30,19 +30,19 @@ void DCMotorSim::SetState(units::radian_t angularPosition,
 }
 
 units::radian_t DCMotorSim::GetAngularPosition() const {
-  return units::radian_t{GetOutput(0)};
+  return GetOutput(0) * units::radian;
 }
 
 units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
-  return units::radians_per_second_t{GetOutput(1)};
+  return GetOutput(1) * units::radians_per_second;
 }
 
 units::ampere_t DCMotorSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(units::radians_per_second_t{m_x(1)} * m_gearing,
-                           units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(m_x(1) * units::radians_per_second * m_gearing,
+                           m_u(0) * units::volt) *
          wpi::sgn(m_u(0));
 }
 

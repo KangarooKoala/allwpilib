@@ -123,6 +123,6 @@ double Joystick::GetMagnitude() const {
 }
 
 units::radian_t Joystick::GetDirection() const {
-  return units::math::atan2(units::dimensionless::scalar_t{GetX()},
-                            units::dimensionless::scalar_t{-GetY()});
+  return units::math::atan2(GetX() * units::scalar,
+                            -GetY() * units::scalar);
 }

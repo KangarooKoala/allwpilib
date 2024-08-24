@@ -94,5 +94,5 @@ units::volt_t ArmFeedforward::Calculate(units::unit_t<Angle> currentAngle,
     }
   }
 
-  return units::volt_t{u_k.Value()};
+  return u_k.Value() * units::volt;
 }

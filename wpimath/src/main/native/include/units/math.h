@@ -2,28 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// Copyright (c) 2016 Nic Holthaus
-//
-// The MIT License (MIT)
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 #pragma once
 
 #include <cmath>
@@ -34,17 +12,31 @@
 #include "units/base.h"
 #include "units/dimensionless.h"
 
-//----------------------------------
-// UNIT-ENABLED CMATH FUNCTIONS
-//----------------------------------
-
 /**
  * @brief namespace for unit-enabled versions of the `<cmath>` library
  * @details Includes trigonometric functions, exponential/log functions,
  *          rounding functions, etc.
- * @sa See `unit_t` for more information on unit type containers.
  */
 namespace units::math {
+
+//----------------------------------
+// MIN/MAX FUNCTIONS
+//----------------------------------
+
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+constexpr UnitTypeLhs min(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) {
+  UnitTypeLhs r{rhs};
+  return lhs < r ? lhs : r;
+}
+
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+constexpr UnitTypeLhs max(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) {
+  UnitTypeLhs r{rhs};
+  return lhs > r ? lhs : r;
+}
+
 //----------------------------------
 // TRIGONOMETRIC FUNCTIONS
 //----------------------------------
@@ -54,59 +46,42 @@ namespace units::math {
  * @brief Compute cosine
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit any angle `quantity` type.
  * @param[in] angle angle to compute the cosine of
  * @returns Returns the cosine of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t cos(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::cos(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t cos(AngleUnit angle) noexcept {
+  return gcem::cos(radian_t{angle}.value()) * scalar;
 }
-#endif
 
 /**
  * @ingroup UnitMath
  * @brief Compute sine
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit  any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit  any angle `quantity` type.
  * @param[in] angle angle to compute the since of
  * @returns Returns the sine of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t sin(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::sin(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t sin(AngleUnit angle) noexcept {
+  return gcem::sin(radian_t{angle}.value()) * scalar;
 }
-#endif
+
 /**
  * @ingroup UnitMath
  * @brief Compute tangent
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit  any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit  any angle `quantity` type.
  * @param[in] angle angle to compute the tangent of
  * @returns Returns the tangent of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t tan(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::tan(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t tan(AngleUnit angle) noexcept {
+  return gcem::tan(radian_t{angle}.value()) * scalar;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -116,15 +91,10 @@ constexpr dimensionless::scalar_t tan(const AngleUnit angle) noexcept {
  * @param[in] x Value whose arc cosine is computed, in the interval [-1,+1].
  * @returns Principal arc cosine of x, in the interval [0,pi] radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t acos(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::acos(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t acos(ScalarUnit x) noexcept {
+  return gcem::acos(x.value()) * radian;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -134,15 +104,10 @@ constexpr angle::radian_t acos(const ScalarUnit x) noexcept {
  * @param[in] x Value whose arc sine is computed, in the interval [-1,+1].
  * @returns Principal arc sine of x, in the interval [-pi/2,+pi/2] radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t asin(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::asin(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t asin(ScalarUnit x) noexcept {
+  return gcem::asin(x.value()) * radian;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -152,19 +117,14 @@ constexpr angle::radian_t asin(const ScalarUnit x) noexcept {
  *          cannot determine with certainty in which quadrant the angle falls
  *          only by its tangent value. See atan2 for an alternative that takes a
  *          fractional argument instead.
- * @tparam AngleUnit  any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit  any angle `quantity` type.
  * @param[in] x Value whose arc tangent is computed, in the interval [-1,+1].
  * @returns Principal arc tangent of x, in the interval [-pi/2,+pi/2] radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t atan(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::atan(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t atan(ScalarUnit x) noexcept {
+  return gcem::atan(x.value()) * radian;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -176,19 +136,13 @@ constexpr angle::radian_t atan(const ScalarUnit x) noexcept {
  * @returns Returns the principal value of the arc tangent of <i>y/x</i>,
  *          expressed in radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class Y, class X>
-constexpr angle::radian_t atan2(const Y y, const X x) noexcept {
-  static_assert(traits::is_dimensionless_unit<decltype(y / x)>::value,
-                "The quantity y/x must yield a dimensionless ratio.");
-
-  // X and Y could be different length units, so normalize them
-  return angle::radian_t(
-      gcem::atan2(y.template convert<
-                      typename units::traits::unit_t_traits<X>::unit_type>()(),
-                  x()));
+template <UnitT X, UnitT Y>
+  requires requires(Y y, X x) {
+    { y / x } -> dimensionless_unit;
+  }
+constexpr radian_t atan2(Y y, X x) noexcept {
+  return gcem::atan2(X{y}.value(), x.value()) * radian;
 }
-#endif
 
 //----------------------------------
 // HYPERBOLIC TRIG FUNCTIONS
@@ -199,60 +153,42 @@ constexpr angle::radian_t atan2(const Y y, const X x) noexcept {
  * @brief Compute hyperbolic cosine
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit any angle `quantity` type.
  * @param[in] angle angle to compute the hyperbolic cosine of
  * @returns Returns the hyperbolic cosine of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t cosh(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::cosh(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t cosh(AngleUnit angle) noexcept {
+  return gcem::cosh(radian_t{angle}.value()) * scalar;
 }
-#endif
 
 /**
  * @ingroup UnitMath
  * @brief Compute hyperbolic sine
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit any angle `quantity` type.
  * @param[in] angle angle to compute the hyperbolic sine of
  * @returns Returns the hyperbolic sine of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t sinh(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::sinh(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t sinh(AngleUnit angle) noexcept {
+  return gcem::sinh(radian_t{angle}.value()) * scalar;
 }
-#endif
 
 /**
  * @ingroup UnitMath
  * @brief Compute hyperbolic tangent
  * @details The input value can be in any unit of angle, including radians or
  *          degrees.
- * @tparam AngleUnit any `unit_t` type of `category::angle_unit`.
+ * @tparam AngleUnit any angle `quantity` type.
  * @param[in] angle angle to compute the hyperbolic tangent of
  * @returns Returns the hyperbolic tangent of <i>angle</i>
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class AngleUnit>
-constexpr dimensionless::scalar_t tanh(const AngleUnit angle) noexcept {
-  static_assert(
-      traits::is_angle_unit<AngleUnit>::value,
-      "Type `AngleUnit` must be a unit of angle derived from `unit_t`.");
-  return dimensionless::scalar_t(
-      gcem::tanh(angle.template convert<angle::radian>()()));
+template <angle_unit AngleUnit>
+constexpr scalar_t tanh(AngleUnit angle) noexcept {
+  return gcem::tanh(radian_t{angle}.value()) * scalar;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -264,15 +200,10 @@ constexpr dimensionless::scalar_t tanh(const AngleUnit angle) noexcept {
  * @returns Nonnegative arc hyperbolic cosine of x, in the interval
  *          [0,+INFINITY] radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t acosh(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::acosh(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t acosh(ScalarUnit x) noexcept {
+  return gcem::acosh(x.value()) * radian;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -281,15 +212,10 @@ constexpr angle::radian_t acosh(const ScalarUnit x) noexcept {
  * @param[in] x Value whose arc hyperbolic sine is computed.
  * @returns Arc hyperbolic sine of x, in radians.
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t asinh(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::asinh(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t asinh(ScalarUnit x) noexcept {
+  return gcem::asinh(x.value()) * radian;
 }
-#endif
 
 /**
  * @ingroup UnitMath
@@ -298,17 +224,12 @@ constexpr angle::radian_t asinh(const ScalarUnit x) noexcept {
  * @param[in] x Value whose arc hyperbolic tangent is computed, in the interval
  *              [-1,+1]. If the argument is out of this interval, a domain error
  *              occurs. For values of -1 and +1, a pole error may occur.
- * @returns units::angle::radian_t
+ * @returns units::radian_t
  */
-#if !defined(DISABLE_PREDEFINED_UNITS) || defined(ENABLE_PREDEFINED_ANGLE_UNITS)
-template <class ScalarUnit>
-constexpr angle::radian_t atanh(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return angle::radian_t(gcem::atanh(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr radian_t atanh(ScalarUnit x) noexcept {
+  return gcem::atanh(x.value()) * radian;
 }
-#endif
 
 //----------------------------------
 // TRANSCENDENTAL FUNCTIONS
@@ -322,7 +243,7 @@ constexpr angle::radian_t atanh(const ScalarUnit x) noexcept {
  * @ingroup UnitMath
  * @brief Compute exponential function
  * @details Returns the base-e exponential function of x, which is e raised to
- *          the power x: ex.
+ *          the power x: e^x.
  * @param[in] x scalar value of the exponent.
  * @returns Exponential value of x.
  *          If the magnitude of the result is too large to be represented by a
@@ -330,12 +251,9 @@ constexpr angle::radian_t atanh(const ScalarUnit x) noexcept {
  *          HUGE_VALF or HUGE_VALL) with the proper sign, and an overflow range
  *          error occurs.
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t exp(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::exp(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr scalar_t exp(ScalarUnit x) noexcept {
+  return gcem::exp(x.value()) * scalar;
 }
 
 /**
@@ -347,12 +265,9 @@ constexpr dimensionless::scalar_t exp(const ScalarUnit x) noexcept {
  * @sa log10 for more common base-10 logarithms
  * @returns Natural logarithm of x.
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t log(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::log(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr scalar_t log(ScalarUnit x) noexcept {
+  return gcem::log(x.value()) * scalar;
 }
 
 /**
@@ -363,12 +278,9 @@ constexpr dimensionless::scalar_t log(const ScalarUnit x) noexcept {
  *              negative, a domain error occurs.
  * @returns Common logarithm of x.
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t log10(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::log10(x()));
+template <dimensionless_unit ScalarUnit>
+constexpr scalar_t log10(ScalarUnit x) noexcept {
+  return gcem::log10(x.value()) * scalar;
 }
 
 /**
@@ -382,15 +294,10 @@ constexpr dimensionless::scalar_t log10(const ScalarUnit x) noexcept {
  *                    integral part is stored with the same sign as x.
  * @returns The fractional part of x, with the same sign.
  */
-template <class ScalarUnit>
-dimensionless::scalar_t modf(const ScalarUnit x, ScalarUnit* intpart) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-
-  UNIT_LIB_DEFAULT_TYPE intp;
-  dimensionless::scalar_t fracpart =
-      dimensionless::scalar_t(std::modf(x(), &intp));
+template <dimensionless_unit ScalarUnit>
+scalar_t modf(ScalarUnit x, ScalarUnit* intpart) noexcept {
+  typename ScalarUnit::rep intp;
+  scalar_t fracpart = std::modf(x.value(), &intp) * scalar;
   *intpart = intp;
   return fracpart;
 }
@@ -399,15 +306,13 @@ dimensionless::scalar_t modf(const ScalarUnit x, ScalarUnit* intpart) noexcept {
  * @ingroup UnitMath
  * @brief Compute binary exponential function
  * @details Returns the base-2 exponential function of x, which is 2 raised to
- *          the power x: 2^x. 2param[in]  x  Value of the exponent.
+ *          the power x: 2^x.
+ * param[in]  x  Value of the exponent.
  * @returns 2 raised to the power of x.
  */
-template <class ScalarUnit>
-dimensionless::scalar_t exp2(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(std::exp2(x()));
+template <dimensionless_unit ScalarUnit>
+scalar_t exp2(ScalarUnit x) noexcept {
+  return std::exp2(x.value()) * scalar;
 }
 
 /**
@@ -418,12 +323,9 @@ dimensionless::scalar_t exp2(const ScalarUnit x) noexcept {
  * @param[in] x Value of the exponent.
  * @returns e raised to the power of x, minus one.
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t expm1(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::expm1(x()));
+template <dimensionless_unit ScalarUnit>
+scalar_t expm1(ScalarUnit x) noexcept {
+  return gcem::expm1(x.value()) * scalar;
 }
 
 /**
@@ -435,12 +337,9 @@ constexpr dimensionless::scalar_t expm1(const ScalarUnit x) noexcept {
  *              than -1, a domain error occurs.
  * @returns The natural logarithm of (1+x).
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t log1p(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::log1p(x()));
+template <dimensionless_unit ScalarUnit>
+scalar_t log1p(ScalarUnit x) noexcept {
+  return gcem::log1p(x.value()) * scalar;
 }
 
 /**
@@ -451,12 +350,9 @@ constexpr dimensionless::scalar_t log1p(const ScalarUnit x) noexcept {
  *              negative, a domain error occurs.
  * @returns The binary logarithm of x: log2x.
  */
-template <class ScalarUnit>
-constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
-  static_assert(
-      traits::is_dimensionless_unit<ScalarUnit>::value,
-      "Type `ScalarUnit` must be a dimensionless unit derived from `unit_t`.");
-  return dimensionless::scalar_t(gcem::log2(x()));
+template <dimensionless_unit ScalarUnit>
+scalar_t log2(ScalarUnit x) noexcept {
+  return gcem::log2(x.value()) * scalar;
 }
 
 //----------------------------------
@@ -469,7 +365,6 @@ constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
 /**
  * @ingroup UnitMath
  * @brief computes the square root of <i>value</i>
- * @details Only implemented for linear_scale units.
  * @param[in] value `unit_t` derived type to compute the square root of.
  * @returns new unit_t, whose units are the square root of value's.
  *          E.g. if values had units of `square_meter`, then the return type
@@ -479,39 +374,22 @@ constexpr dimensionless::scalar_t log2(const ScalarUnit x) noexcept {
  *       factor of the returned unit type may have errors no larger than
  *       `1e-10`.
  */
-template <
-    class UnitType,
-    std::enable_if_t<units::traits::has_linear_scale<UnitType>::value, int> = 0>
-inline constexpr auto sqrt(const UnitType& value) noexcept
-    -> unit_t<
-        square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
-        typename units::traits::unit_t_traits<UnitType>::underlying_type,
-        linear_scale> {
-  return unit_t<
-      square_root<typename units::traits::unit_t_traits<UnitType>::unit_type>,
-      typename units::traits::unit_t_traits<UnitType>::underlying_type,
-      linear_scale>(gcem::sqrt(value()));
+template <UnitT UnitType>
+inline constexpr auto sqrt(const UnitType& value) noexcept {
+  return gcem::sqrt(value.value()) * mp_units::sqrt(UnitType::unit);
 }
 
 /**
  * @ingroup UnitMath
  * @brief Computes the square root of the sum-of-squares of x and y.
- * @details Only implemented for linear_scale units.
  * @param[in] x unit_t type value
  * @param[in] y unit_t type value
  * @returns square root of the sum-of-squares of x and y in the same units as x.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          std::enable_if_t<
-              units::traits::has_linear_scale<UnitTypeLhs, UnitTypeRhs>::value,
-              int> = 0>
-inline constexpr UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
-  static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
-                "Parameters of hypot() function are not compatible units.");
-  return UnitTypeLhs(gcem::hypot(
-      x(),
-      y.template convert<
-          typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+inline constexpr auto hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
+  return gcem::hypot(x.value(), UnitTypeLhs{y}.value()) * UnitTypeLhs::unit;
 }
 
 //----------------------------------
@@ -526,10 +404,9 @@ inline constexpr UnitTypeLhs hypot(const UnitTypeLhs& x, const UnitTypeRhs& y) {
  * @param[in] x Unit value to round up.
  * @returns The smallest integral value that is not less than x.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-constexpr UnitType ceil(const UnitType x) noexcept {
-  return UnitType(gcem::ceil(x()));
+template <UnitT UnitType>
+constexpr UnitType ceil(UnitType x) noexcept {
+  return gcem::ceil(x.value()) * UnitType::unit;
 }
 
 /**
@@ -540,10 +417,9 @@ constexpr UnitType ceil(const UnitType x) noexcept {
  * @param[in] x Unit value to round down.
  * @returns The value of x rounded downward.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-constexpr UnitType floor(const UnitType x) noexcept {
-  return UnitType(gcem::floor(x()));
+template <UnitT UnitType>
+constexpr UnitType floor(UnitType x) {
+  return gcem::floor(x.value()) * UnitType::unit;
 }
 
 /**
@@ -555,17 +431,10 @@ constexpr UnitType floor(const UnitType x) noexcept {
  * @param[in] denom Value of the quotient denominator.
  * @returns The remainder of dividing the arguments.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitTypeRhs>::value>>
-constexpr UnitTypeLhs fmod(const UnitTypeLhs numer,
-                           const UnitTypeRhs denom) noexcept {
-  static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
-                "Parameters of fmod() function are not compatible units.");
-  return UnitTypeLhs(gcem::fmod(
-      numer(),
-      denom.template convert<
-          typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+constexpr UnitTypeLhs fmod(UnitTypeLhs numer, UnitTypeRhs denom) noexcept {
+  return gcem::fmod(numer.value(), UnitTypeLhs{numer}.value()) *
+         UnitTypeLhs::unit;
 }
 
 /**
@@ -576,10 +445,9 @@ constexpr UnitTypeLhs fmod(const UnitTypeLhs numer,
  * @param[in] x Value to truncate
  * @returns The nearest integral value that is not larger in magnitude than x.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-constexpr UnitType trunc(const UnitType x) noexcept {
-  return UnitType(gcem::trunc(x()));
+template <UnitT UnitType>
+constexpr UnitType trunc(UnitType x) noexcept {
+  return gcem::trunc(x.value()) * UnitType::unit;
 }
 
 /**
@@ -590,10 +458,9 @@ constexpr UnitType trunc(const UnitType x) noexcept {
  * @param[in] x value to round.
  * @returns The value of x rounded to the nearest integral.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
-constexpr UnitType round(const UnitType x) noexcept {
-  return UnitType(gcem::round(x()));
+template <UnitT UnitType>
+constexpr UnitType round(UnitType x) noexcept {
+  return gcem::round(x.value()) * UnitType::unit;
 }
 
 //----------------------------------
@@ -609,21 +476,15 @@ constexpr UnitType round(const UnitType x) noexcept {
  * @param[in] y Value with the sign of the resulting value.
  * @returns value with the magnitude and dimension of x, and the sign of y.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitTypeRhs>::value>>
-constexpr UnitTypeLhs copysign(const UnitTypeLhs x,
-                               const UnitTypeRhs y) noexcept {
-  return UnitTypeLhs(gcem::copysign(
-      x(), y()));  // no need for conversion to get the correct sign.
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+constexpr UnitTypeLhs copysign(UnitTypeLhs x, UnitTypeRhs y) noexcept {
+  return gcem::copysign(x.value(), y.value()) * UnitTypeLhs::unit;
 }
 
 /// Overload to copy the sign from a raw double
-template <class UnitTypeLhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value>>
-constexpr UnitTypeLhs copysign(const UnitTypeLhs x,
-                               const UNIT_LIB_DEFAULT_TYPE y) noexcept {
-  return UnitTypeLhs(gcem::copysign(x(), y));
+template <UnitT UnitTypeLhs>
+constexpr UnitTypeLhs copysign(UnitTypeLhs x, double y) noexcept {
+  return gcem::copysign(x.value(), y) * UnitTypeLhs::unit;
 }
 
 //----------------------------------
@@ -640,16 +501,10 @@ constexpr UnitTypeLhs copysign(const UnitTypeLhs x,
  * @param[in] y Values whose difference is calculated.
  * @returns The positive difference between x and y.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitTypeRhs>::value>>
-UnitTypeLhs fdim(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
-  static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
-                "Parameters of fdim() function are not compatible units.");
-  return UnitTypeLhs(std::fdim(
-      x(),
-      y.template convert<
-          typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+UnitTypeLhs fdim(UnitTypeLhs x, UnitTypeRhs y) noexcept {
+  return std::fdim(x.value(), UnitTypeRhs{y}.value()) * UnitTypeLhs::unit;
 }
 
 /**
@@ -662,16 +517,10 @@ UnitTypeLhs fdim(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
  * @param[in] y Values among which the function selects a maximum.
  * @returns The maximum numeric value of its arguments.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitTypeRhs>::value>>
-constexpr UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
-  static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
-                "Parameters of fmax() function are not compatible units.");
-  return UnitTypeLhs(gcem::max<double, double>(
-      x(),
-      y.template convert<
-          typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+constexpr UnitTypeLhs fmax(UnitTypeLhs x, UnitTypeRhs y) noexcept {
+  return gcem::max(x.value(), UnitTypeLhs{y}.value()) * UnitTypeLhs::unit;
 }
 
 /**
@@ -685,16 +534,10 @@ constexpr UnitTypeLhs fmax(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
  * @param[in] y Values among which the function selects a minimum.
  * @returns The minimum numeric value of its arguments.
  */
-template <class UnitTypeLhs, class UnitTypeRhs,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitTypeRhs>::value>>
-constexpr UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
-  static_assert(traits::is_convertible_unit_t<UnitTypeLhs, UnitTypeRhs>::value,
-                "Parameters of fmin() function are not compatible units.");
-  return UnitTypeLhs(gcem::min<double, double>(
-      x(),
-      y.template convert<
-          typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type>()()));
+template <UnitT UnitTypeLhs, UnitT UnitTypeRhs>
+  requires std::is_convertible_v<UnitTypeRhs, UnitTypeLhs>
+constexpr UnitTypeLhs fmin(UnitTypeLhs x, const UnitTypeRhs y) noexcept {
+  return gcem::min(x.value(), UnitTypeLhs{y}.value()) * UnitTypeLhs::unit;
 }
 
 //----------------------------------
@@ -708,10 +551,9 @@ constexpr UnitTypeLhs fmin(const UnitTypeLhs x, const UnitTypeRhs y) noexcept {
  * @param[in] x Value whose absolute value is returned.
  * @returns The absolute value of x.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
+template <UnitT UnitType>
 constexpr UnitType fabs(const UnitType x) noexcept {
-  return UnitType(gcem::abs(x()));
+  return gcem::abs(x.value()) * UnitType::unit;
 }
 
 /**
@@ -721,10 +563,9 @@ constexpr UnitType fabs(const UnitType x) noexcept {
  * @param[in] x Value whose absolute value is returned.
  * @returns The absolute value of x.
  */
-template <class UnitType,
-          class = std::enable_if_t<traits::is_unit_t<UnitType>::value>>
+template <UnitT UnitType>
 constexpr UnitType abs(const UnitType x) noexcept {
-  return UnitType(gcem::abs(x()));
+  return gcem::abs(x.value()) * UnitType::unit;
 }
 
 /**
@@ -738,20 +579,24 @@ constexpr UnitType abs(const UnitType x) noexcept {
  * @param[in] z Value to be added.
  * @returns The result of x*y+z
  */
-template <class UnitTypeLhs, class UnitMultiply, class UnitAdd,
-          class = std::enable_if_t<traits::is_unit_t<UnitTypeLhs>::value &&
-                                   traits::is_unit_t<UnitMultiply>::value &&
-                                   traits::is_unit_t<UnitAdd>::value>>
+template <UnitT UnitTypeLhs, UnitT UnitMultiply, UnitT UnitAdd>
+  requires requires(UnitTypeLhs x, UnitMultiply y, UnitAdd z) {
+    requires std::is_convertible_v<UnitAdd, decltype(x * y)>;
+  }
 auto fma(const UnitTypeLhs x, const UnitMultiply y,
          const UnitAdd z) noexcept -> decltype(x * y) {
   using resultType = decltype(x * y);
-  static_assert(
-      traits::is_convertible_unit_t<
-          compound_unit<
-              typename units::traits::unit_t_traits<UnitTypeLhs>::unit_type,
-              typename units::traits::unit_t_traits<UnitMultiply>::unit_type>,
-          typename units::traits::unit_t_traits<UnitAdd>::unit_type>::value,
-      "Unit types are not compatible.");
-  return resultType(std::fma(x(), y(), resultType(z)()));
+  return std::fma(x.value(), y.value(), resultType{z}.value()) *
+         resultType::unit;
 }
+
 }  // namespace units::math
+
+namespace wpi {
+
+template <units::UnitT T>
+constexpr int sgn(T val) {
+  return (T::zero() < val) - (val < T::zero());
+}
+
+}  // namespace wpi

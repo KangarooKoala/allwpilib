@@ -20,10 +20,10 @@ std::vector<CubicHermiteSpline> SplineHelper::CubicSplinesFromControlVectors(
 
   if (waypoints.size() > 1) {
     waypoints.emplace(waypoints.begin(),
-                      Translation2d{units::meter_t{xInitial[0]},
-                                    units::meter_t{yInitial[0]}});
+                      Translation2d{xInitial[0] * units::meter,
+                                    yInitial[0] * units::meter});
     waypoints.emplace_back(
-        Translation2d{units::meter_t{xFinal[0]}, units::meter_t{yFinal[0]}});
+        Translation2d{xFinal[0] * units::meter, yFinal[0] * units::meter});
 
     // Populate tridiagonal system for clamped cubic
     /* See:

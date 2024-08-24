@@ -50,7 +50,7 @@ void Elevator::ReachGoal(units::meter_t goal) {
   auto feedforwardOutput =
       m_feedforward.Calculate(m_setpoint.velocity, next.velocity, 20_ms);
 
-  m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
+  m_motor.SetVoltage(pidOutput * units::volt + feedforwardOutput);
 
   m_setpoint = next;
 }

@@ -24,12 +24,12 @@ Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculate
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)
 {
-  return frc::ArmFeedforward{units::volt_t{ks}, units::volt_t{kg},
-                             units::unit_t<frc::ArmFeedforward::kv_unit>{kv},
-                             units::unit_t<frc::ArmFeedforward::ka_unit>{ka}}
-      .Calculate(units::radian_t{currentAngle},
-                 units::radians_per_second_t{currentVelocity},
-                 units::radians_per_second_t{nextVelocity}, units::second_t{dt})
+  return frc::ArmFeedforward{ks * units::volt, kg * units::volt,
+                             kv * frc::ArmFeedforward::kv_unit,
+                             ka * frc::ArmFeedforward::ka_unit}
+      .Calculate(currentAngle * units::radian,
+                 currentVelocity * units::radians_per_second,
+                 nextVelocity * units::radians_per_second, dt * units::second)
       .value();
 }
 

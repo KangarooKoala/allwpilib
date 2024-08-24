@@ -25,12 +25,11 @@ namespace frc2 {
  *
  * @see ProfiledPIDController<Distance>
  */
-template <class Distance>
+template <Unit auto Distance>
 class ProfiledPIDCommand
     : public CommandHelper<Command, ProfiledPIDCommand<Distance>> {
   using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  inline constexpr auto Velocity = Distance / units::second;
   using Velocity_t = units::unit_t<Velocity>;
   using State = typename frc::TrapezoidProfile<Distance>::State;
 
@@ -75,7 +74,7 @@ class ProfiledPIDCommand
       : ProfiledPIDCommand(
             controller, measurementSource,
             [goalSource = std::move(goalSource)]() {
-              return State{goalSource(), Velocity_t{0}};
+              return State{goalSource(), 0 * Velocity};
             },
             useOutput, requirements) {}
 

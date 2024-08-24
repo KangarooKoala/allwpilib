@@ -89,9 +89,9 @@ ChassisSpeeds SwerveDriveKinematics<NumModules>::ToChassisSpeeds(
   Eigen::Vector3d chassisSpeedsVector =
       m_forwardKinematics.solve(moduleStateMatrix);
 
-  return {units::meters_per_second_t{chassisSpeedsVector(0)},
-          units::meters_per_second_t{chassisSpeedsVector(1)},
-          units::radians_per_second_t{chassisSpeedsVector(2)}};
+  return {chassisSpeedsVector(0) * units::meters_per_second,
+          chassisSpeedsVector(1) * units::meters_per_second,
+          chassisSpeedsVector(2) * units::radians_per_second};
 }
 
 template <size_t NumModules>
@@ -109,9 +109,9 @@ Twist2d SwerveDriveKinematics<NumModules>::ToTwist2d(
   Eigen::Vector3d chassisDeltaVector =
       m_forwardKinematics.solve(moduleDeltaMatrix);
 
-  return {units::meter_t{chassisDeltaVector(0)},
-          units::meter_t{chassisDeltaVector(1)},
-          units::radian_t{chassisDeltaVector(2)}};
+  return {chassisDeltaVector(0) * units::meter,
+          chassisDeltaVector(1) * units::meter,
+          chassisDeltaVector(2) * units::radian};
 }
 
 template <size_t NumModules>
@@ -166,7 +166,7 @@ void SwerveDriveKinematics<NumModules>::DesaturateWheelSpeeds(
   auto k = units::math::max(translationalK, rotationalK);
 
   auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                units::scalar_t{1});
+                                1 * units::scalar);
   for (auto& module : states) {
     module.speed = module.speed * scale;
   }

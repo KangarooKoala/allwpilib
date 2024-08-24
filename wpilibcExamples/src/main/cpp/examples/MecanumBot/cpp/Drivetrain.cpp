@@ -5,17 +5,17 @@
 #include "Drivetrain.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+  return {m_frontLeftEncoder.GetRate() * units::meters_per_second,
+          m_frontRightEncoder.GetRate() * units::meters_per_second,
+          m_backLeftEncoder.GetRate() * units::meters_per_second,
+          m_backRightEncoder.GetRate() * units::meters_per_second};
 }
 
 frc::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances() const {
-  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
-          units::meter_t{m_frontRightEncoder.GetDistance()},
-          units::meter_t{m_backLeftEncoder.GetDistance()},
-          units::meter_t{m_backRightEncoder.GetDistance()}};
+  return {m_frontLeftEncoder.GetDistance() * units::meter,
+          m_frontRightEncoder.GetDistance() * units::meter,
+          m_backLeftEncoder.GetDistance() * units::meter,
+          m_backRightEncoder.GetDistance() * units::meter};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
@@ -37,13 +37,13 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
   const double backRightOutput = m_backRightPIDController.Calculate(
       m_backRightEncoder.GetRate(), wheelSpeeds.rearRight.value());
 
-  m_frontLeftMotor.SetVoltage(units::volt_t{frontLeftOutput} +
+  m_frontLeftMotor.SetVoltage(frontLeftOutput * units::volt +
                               frontLeftFeedforward);
-  m_frontRightMotor.SetVoltage(units::volt_t{frontRightOutput} +
+  m_frontRightMotor.SetVoltage(frontRightOutput * units::volt +
                                frontRightFeedforward);
-  m_backLeftMotor.SetVoltage(units::volt_t{backLeftOutput} +
+  m_backLeftMotor.SetVoltage(backLeftOutput * units::volt +
                              backLeftFeedforward);
-  m_backRightMotor.SetVoltage(units::volt_t{backRightOutput} +
+  m_backRightMotor.SetVoltage(backRightOutput * units::volt +
                               backRightFeedforward);
 }
 

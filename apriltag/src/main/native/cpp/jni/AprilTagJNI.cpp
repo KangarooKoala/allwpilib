@@ -162,8 +162,8 @@ static AprilTagDetector::QuadThresholdParameters FromJavaDetectorQTP(
   return {
       FIELD(int, Int, minClusterPixels),
       FIELD(int, Int, maxNumMaxima),
-      .criticalAngle = units::radian_t{static_cast<double>(
-          env->GetDoubleField(jparams, criticalAngleField))},
+      .criticalAngle = static_cast<double>(
+          env->GetDoubleField(jparams, criticalAngleField)) * units::radian_t,
       FIELD(float, Float, maxLineFitMSE),
       FIELD(int, Int, minWhiteBlackDiff),
       FIELD(bool, Boolean, deglitch),
@@ -517,7 +517,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseHomography
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({tagSize * units::meter, fx, fy, cx, cy});
   return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
@@ -553,7 +553,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({tagSize * units::meter, fx, fy, cx, cy});
   return MakeJObject(env,
                      estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
@@ -590,7 +590,7 @@ Java_edu_wpi_first_apriltag_jni_AprilTagJNI_estimatePose
     return nullptr;
   }
 
-  AprilTagPoseEstimator estimator({units::meter_t{tagSize}, fx, fy, cx, cy});
+  AprilTagPoseEstimator estimator({tagSize * units::meter, fx, fy, cx, cy});
   return MakeJObject(env, estimator.Estimate(harr, carr));
 }
 

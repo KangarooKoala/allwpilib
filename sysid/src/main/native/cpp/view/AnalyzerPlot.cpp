@@ -57,7 +57,7 @@ static std::vector<std::vector<ImPlotPoint>> PopulateTimeDomainSim(
       continue;
     }
 
-    model.Update(units::volt_t{pre.voltage}, now.timestamp - pre.timestamp);
+    model.Update(pre.voltage * units::volt, now.timestamp - pre.timestamp);
     tmp.emplace_back((startTime + t).value(), model.GetVelocity());
     *simSquaredErrorSum += std::pow(now.velocity - model.GetVelocity(), 2);
     *squaredVariationSum += std::pow(now.velocity, 2);

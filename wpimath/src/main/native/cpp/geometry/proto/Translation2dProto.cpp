@@ -17,8 +17,8 @@ frc::Translation2d wpi::Protobuf<frc::Translation2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTranslation2d*>(&msg);
   return frc::Translation2d{
-      units::meter_t{m->x()},
-      units::meter_t{m->y()},
+      m->x() * units::meter,
+      m->y() * units::meter,
   };
 }
 

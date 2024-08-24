@@ -15,8 +15,8 @@ using StructType = wpi::Struct<frc::Rectangle2d>;
 frc::Rectangle2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rectangle2d{
       wpi::UnpackStruct<frc::Pose2d, kCenterOff>(data),
-      units::meter_t{wpi::UnpackStruct<double, kXWidthOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kYWidthOff>(data)},
+      wpi::UnpackStruct<double, kXWidthOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kYWidthOff>(data) * units::meter,
   };
 }
 

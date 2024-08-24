@@ -17,9 +17,9 @@ frc::Translation3d wpi::Protobuf<frc::Translation3d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTranslation3d*>(&msg);
   return frc::Translation3d{
-      units::meter_t{m->x()},
-      units::meter_t{m->y()},
-      units::meter_t{m->z()},
+      m->x() * units::meter,
+      m->y() * units::meter,
+      m->z() * units::meter,
   };
 }
 

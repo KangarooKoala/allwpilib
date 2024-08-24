@@ -75,8 +75,8 @@ class Drivetrain {
 
   frc::DifferentialDriveKinematics m_kinematics{kTrackWidth};
   frc::DifferentialDriveOdometry m_odometry{
-      m_gyro.GetRotation2d(), units::meter_t{m_leftEncoder.GetDistance()},
-      units::meter_t{m_rightEncoder.GetDistance()}};
+      m_gyro.GetRotation2d(), m_leftEncoder.GetDistance() * units::meter,
+      m_rightEncoder.GetDistance() * units::meter};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!

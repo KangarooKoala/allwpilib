@@ -9,17 +9,17 @@
 #include "ExampleGlobalMeasurementSensor.h"
 
 frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+  return {m_frontLeftEncoder.GetRate() * units::meters_per_second,
+          m_frontRightEncoder.GetRate() * units::meters_per_second,
+          m_backLeftEncoder.GetRate() * units::meters_per_second,
+          m_backRightEncoder.GetRate() * units::meters_per_second};
 }
 
 frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
-  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
-          units::meter_t{m_frontRightEncoder.GetDistance()},
-          units::meter_t{m_backLeftEncoder.GetDistance()},
-          units::meter_t{m_backRightEncoder.GetDistance()}};
+  return {m_frontLeftEncoder.GetDistance() * units::meter,
+          m_frontRightEncoder.GetDistance() * units::meter,
+          m_backLeftEncoder.GetDistance() * units::meter,
+          m_backRightEncoder.GetDistance() * units::meter};
 }
 
 void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
@@ -31,7 +31,7 @@ void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
                              auto& motor) {
         auto feedforward = m_feedforward.Calculate(speed);
         double output = controller.Calculate(encoder.GetRate(), speed.value());
-        motor.SetVoltage(units::volt_t{output} + feedforward);
+        motor.SetVoltage(output * units::volt + feedforward);
       };
 
   calcAndSetSpeeds(wheelSpeeds.frontLeft, m_frontLeftEncoder,

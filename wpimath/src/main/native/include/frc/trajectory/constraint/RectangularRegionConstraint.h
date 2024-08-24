@@ -53,8 +53,7 @@ class RectangularRegionConstraint : public TrajectoryConstraint {
     if (m_rectangle.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return units::meters_per_second_t{
-          std::numeric_limits<double>::infinity()};
+      return std::numeric_limits<double>::infinity() * units::meters_per_second;
     }
   }
 

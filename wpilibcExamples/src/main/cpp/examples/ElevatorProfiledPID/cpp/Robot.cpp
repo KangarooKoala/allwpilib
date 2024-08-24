@@ -34,8 +34,7 @@ class Robot : public frc::TimedRobot {
 
     // Run controller and update motor output
     m_motor.SetVoltage(
-        units::volt_t{
-            m_controller.Calculate(units::meter_t{m_encoder.GetDistance()})} +
+         m_controller.Calculate(m_encoder.GetDistance() * units::meter) * units::volt +
         m_feedforward.Calculate(m_controller.GetSetpoint().velocity));
   }
 

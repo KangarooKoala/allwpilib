@@ -15,14 +15,14 @@ static units::second_t now = 0_s;
 class SlewRateLimiterTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return static_cast<uint64_t>(units::microsecond_t{now}.value()); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
-  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+  WPI_SetNowImpl([] { return static_cast<uint64_t>(units::microsecond_t{now}.value()); });
 
   frc::SlewRateLimiter<units::meters> limiter(1_mps);
 

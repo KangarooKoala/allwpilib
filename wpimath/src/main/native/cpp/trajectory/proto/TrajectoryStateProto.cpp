@@ -17,11 +17,11 @@ frc::Trajectory::State wpi::Protobuf<frc::Trajectory::State>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTrajectoryState*>(&msg);
   return frc::Trajectory::State{
-      units::second_t{m->time()},
-      units::meters_per_second_t{m->velocity()},
-      units::meters_per_second_squared_t{m->acceleration()},
+      m->time() * units::second,
+      m->velocity() * units::meters_per_second,
+      m->acceleration() * units::meters_per_second_squared,
       wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_pose()),
-      units::curvature_t{m->curvature()},
+      m->curvature() * 1_rad / 1_m,
   };
 }
 

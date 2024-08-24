@@ -17,12 +17,12 @@ using StructType = wpi::Struct<frc::Twist3d>;
 
 frc::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Twist3d{
-      units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kDzOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRxOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRyOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRzOff>(data)},
+      wpi::UnpackStruct<double, kDxOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kDyOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kDzOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kRxOff>(data) * units::radian,
+      wpi::UnpackStruct<double, kRyOff>(data) * units::radian,
+      wpi::UnpackStruct<double, kRzOff>(data) * units::radian,
   };
 }
 

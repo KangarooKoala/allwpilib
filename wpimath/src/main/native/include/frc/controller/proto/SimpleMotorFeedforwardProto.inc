@@ -21,12 +21,10 @@ frc::SimpleMotorFeedforward<Distance>
 wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufSimpleMotorFeedforward*>(&msg);
-  return {units::volt_t{m->ks()},
-          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-              m->kv()},
-          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-              m->ka()},
-          units::second_t{m->dt()}};
+  return {m->ks() * units::volt,
+          m->kv() * frc::SimpleMotorFeedforward<units::meters>::kv_unit,
+          m->ka() * frc::SimpleMotorFeedforward<units::meters>::ka_unit,
+          m->dt() * units::second};
 }
 
 template <class Distance>

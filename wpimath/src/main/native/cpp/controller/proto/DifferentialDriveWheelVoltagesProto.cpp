@@ -21,8 +21,8 @@ wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Unpack(
       static_cast<const wpi::proto::ProtobufDifferentialDriveWheelVoltages*>(
           &msg);
   return frc::DifferentialDriveWheelVoltages{
-      units::volt_t{m->left()},
-      units::volt_t{m->right()},
+      m->left() * units::volt,
+      m->right() * units::volt,
   };
 }
 

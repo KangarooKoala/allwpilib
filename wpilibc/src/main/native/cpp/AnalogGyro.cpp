@@ -134,7 +134,7 @@ void AnalogGyro::Calibrate() {
 }
 
 Rotation2d AnalogGyro::GetRotation2d() const {
-  return units::degree_t{-GetAngle()};
+  return -GetAngle() * units::degree;
 }
 
 std::shared_ptr<AnalogInput> AnalogGyro::GetAnalogInput() const {

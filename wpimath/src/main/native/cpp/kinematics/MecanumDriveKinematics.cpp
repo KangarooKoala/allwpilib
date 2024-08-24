@@ -28,10 +28,10 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
   Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
 
   MecanumDriveWheelSpeeds wheelSpeeds;
-  wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsVector(0)};
-  wheelSpeeds.frontRight = units::meters_per_second_t{wheelsVector(1)};
-  wheelSpeeds.rearLeft = units::meters_per_second_t{wheelsVector(2)};
-  wheelSpeeds.rearRight = units::meters_per_second_t{wheelsVector(3)};
+  wheelSpeeds.frontLeft = wheelsVector(0) * units::meters_per_second;
+  wheelSpeeds.frontRight = wheelsVector(1) * units::meters_per_second;
+  wheelSpeeds.rearLeft = wheelsVector(2) * units::meters_per_second;
+  wheelSpeeds.rearRight = wheelsVector(3) * units::meters_per_second;
   return wheelSpeeds;
 }
 

@@ -77,7 +77,7 @@ units::second_t DutyCycle::GetHighTime() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
   FRC_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return units::nanosecond_t{static_cast<double>(retVal)};
+  return static_cast<double>(retVal) * units::nanosecond;
 }
 
 unsigned int DutyCycle::GetOutputScaleFactor() const {

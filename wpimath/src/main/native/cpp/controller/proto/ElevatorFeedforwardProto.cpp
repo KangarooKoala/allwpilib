@@ -17,10 +17,10 @@ frc::ElevatorFeedforward wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufElevatorFeedforward*>(&msg);
   return frc::ElevatorFeedforward{
-      units::volt_t{m->ks()},
-      units::volt_t{m->kg()},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{m->kv()},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{m->ka()},
+      m->ks() * units::volt,
+      m->kg() * units::volt,
+      m->kv() * frc::ElevatorFeedforward::kv_unit,
+      m->ka() * frc::ElevatorFeedforward::ka_unit,
   };
 }
 

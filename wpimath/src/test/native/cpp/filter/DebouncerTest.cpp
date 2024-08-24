@@ -13,7 +13,7 @@ static units::second_t now = 0_s;
 class DebouncerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return static_cast<uint64_t>(units::microsecond_t{now}.value()); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }

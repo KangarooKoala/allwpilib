@@ -40,8 +40,8 @@ void Drivetrain::SetSpeeds(const frc::DifferentialDriveWheelSpeeds& speeds) {
   const double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.value());
 
-  m_leftLeader.SetVoltage(units::volt_t{leftOutput} + leftFeedforward);
-  m_rightLeader.SetVoltage(units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(leftOutput * units::volt + leftFeedforward);
+  m_rightLeader.SetVoltage(rightOutput * units::volt + rightFeedforward);
 }
 
 void Drivetrain::Drive(units::meters_per_second_t xSpeed,
@@ -75,8 +75,8 @@ frc::Pose3d Drivetrain::ObjectToRobotPose(
   std::vector<double> val{cameraToObjectEntry.Get()};
 
   // Reconstruct cameraToObject Transform3D from networktables.
-  frc::Translation3d translation{units::meter_t{val[0]}, units::meter_t{val[1]},
-                                 units::meter_t{val[2]}};
+  frc::Translation3d translation{val[0] * units::meter, val[1] * units::meter,
+                                 val[2] * units::meter};
   frc::Rotation3d rotation{frc::Quaternion{val[3], val[4], val[5], val[6]}};
   frc::Transform3d cameraToObject{translation, rotation};
 
@@ -85,8 +85,8 @@ frc::Pose3d Drivetrain::ObjectToRobotPose(
 
 void Drivetrain::UpdateOdometry() {
   m_poseEstimator.Update(m_gyro.GetRotation2d(),
-                         units::meter_t{m_leftEncoder.GetDistance()},
-                         units::meter_t{m_rightEncoder.GetDistance()});
+                         m_leftEncoder.GetDistance() * units::meter,
+                         m_rightEncoder.GetDistance() * units::meter);
 
   // Publish cameraToObject transformation to networktables --this would
   // normally be handled by the computer vision solution.
@@ -113,9 +113,9 @@ void Drivetrain::SimulationPeriodic() {
   // To update our simulation, we set motor voltage inputs, update the
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro.
-  m_drivetrainSimulator.SetInputs(units::volt_t{m_leftLeader.Get()} *
+  m_drivetrainSimulator.SetInputs(m_leftLeader.Get() * units::volt *
                                       frc::RobotController::GetInputVoltage(),
-                                  units::volt_t{m_rightLeader.Get()} *
+                                  m_rightLeader.Get() * units::volt *
                                       frc::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 

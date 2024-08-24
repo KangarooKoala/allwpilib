@@ -17,9 +17,9 @@ frc::Twist2d wpi::Protobuf<frc::Twist2d>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufTwist2d*>(&msg);
   return frc::Twist2d{
-      units::meter_t{m->dx()},
-      units::meter_t{m->dy()},
-      units::radian_t{m->dtheta()},
+      m->dx() * units::meter,
+      m->dy() * units::meter,
+      m->dtheta() * units::radian,
   };
 }
 

@@ -67,7 +67,7 @@ units::volt_t RobotController::GetBatteryVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
   FRC_CheckErrorStatus(status, "GetBatteryVoltage");
-  return units::volt_t{retVal};
+  return retVal * units::volt;
 }
 
 bool RobotController::IsSysActive() {
@@ -231,7 +231,7 @@ units::volt_t RobotController::GetBrownoutVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetBrownoutVoltage(&status);
   FRC_CheckErrorStatus(status, "GetBrownoutVoltage");
-  return units::volt_t{retVal};
+  return retVal * units::volt;
 }
 
 void RobotController::SetBrownoutVoltage(units::volt_t brownoutVoltage) {
@@ -244,7 +244,7 @@ units::celsius_t RobotController::GetCPUTemp() {
   int32_t status = 0;
   double retVal = HAL_GetCPUTemp(&status);
   FRC_CheckErrorStatus(status, "GetCPUTemp");
-  return units::celsius_t{retVal};
+  return retVal * units::celsius;
 }
 
 static_assert(RadioLEDState::kOff ==

@@ -25,14 +25,11 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
-  template <typename Distance>
-  using Velocity_t = units::unit_t<
-      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+  template <Unit auto Distance>
+  using Velocity_t = units::unit_t<Distance / units::second>;
 
-  template <typename Distance>
-  using Acceleration_t = units::unit_t<units::compound_unit<
-      units::compound_unit<Distance, units::inverse<units::seconds>>,
-      units::inverse<units::seconds>>>;
+  template <Unit auto Distance>
+  using Acceleration_t = units::unit_t<Distance / units::second / units::second>;
 
   /**
    * Create a state-space model of the elevator system. The states of the system
@@ -89,10 +86,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+    if (kV < 0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
@@ -132,10 +129,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 1> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+    if (kV < 0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
@@ -259,10 +256,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
   static LinearSystem<2, 1, 2> DCMotorSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+    if (kV < 0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 

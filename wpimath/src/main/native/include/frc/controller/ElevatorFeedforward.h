@@ -110,7 +110,7 @@ class ElevatorFeedforward {
     Vectord<1> nextR{nextVelocity.value()};
 
     return kG + kS * wpi::sgn(currentVelocity.value()) +
-           units::volt_t{feedforward.Calculate(r, nextR)(0)};
+           feedforward.Calculate(r, nextR)(0) * units::volt;
   }
 
   // Rearranging the main equation from the calculate() method yields the

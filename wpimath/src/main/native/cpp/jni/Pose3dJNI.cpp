@@ -26,11 +26,11 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_exp
    jdouble twistRy, jdouble twistRz)
 {
   frc::Pose3d pose{
-      units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
+      poseX * units::meter, poseY * units::meter, poseZ * units::meter,
       frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
-  frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
-                     units::meter_t{twistDz},  units::radian_t{twistRx},
-                     units::radian_t{twistRy}, units::radian_t{twistRz}};
+  frc::Twist3d twist{twistDx * units::meter,  twistDy * units::meter,
+                     twistDz * units::meter,  twistRx * units::radian,
+                     twistRy * units::radian, twistRz * units::radian};
 
   frc::Pose3d result = pose.Exp(twist);
 
@@ -54,10 +54,10 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_log
    jdouble endQy, jdouble endQz)
 {
   frc::Pose3d startPose{
-      units::meter_t{startX}, units::meter_t{startY}, units::meter_t{startZ},
+      startX * units::meter, startY * units::meter, startZ * units::meter,
       frc::Rotation3d{frc::Quaternion{startQw, startQx, startQy, startQz}}};
   frc::Pose3d endPose{
-      units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
+      endX * units::meter, endY * units::meter, endZ * units::meter,
       frc::Rotation3d{frc::Quaternion{endQw, endQx, endQy, endQz}}};
 
   frc::Twist3d result = startPose.Log(endPose);

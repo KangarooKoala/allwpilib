@@ -131,7 +131,7 @@ units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{result};
+  return result * units::ampere;
 }
 
 bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {

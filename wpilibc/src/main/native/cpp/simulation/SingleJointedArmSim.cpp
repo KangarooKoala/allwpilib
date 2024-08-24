@@ -56,26 +56,26 @@ bool SingleJointedArmSim::WouldHitUpperLimit(units::radian_t armAngle) const {
 }
 
 bool SingleJointedArmSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::radian_t{m_y(0)});
+  return WouldHitLowerLimit(m_y(0) * units::radian);
 }
 
 bool SingleJointedArmSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::radian_t{m_y(0)});
+  return WouldHitUpperLimit(m_y(0) * units::radian);
 }
 
 units::radian_t SingleJointedArmSim::GetAngle() const {
-  return units::radian_t{m_y(0)};
+  return m_y(0) * units::radian;
 }
 
 units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
-  return units::radians_per_second_t{m_x(1)};
+  return m_x(1) * units::radians_per_second;
 }
 
 units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output
   units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(motorVelocity, m_u(0) * units::volt) *
          wpi::sgn(m_u(0));
 }
 
@@ -124,9 +124,9 @@ Vectord<2> SingleJointedArmSim::UpdateX(const Vectord<2>& currentXhat,
       currentXhat, u, dt);
 
   // Check for collisions.
-  if (WouldHitLowerLimit(units::radian_t{updatedXhat(0)})) {
+  if (WouldHitLowerLimit(updatedXhat(0) * units::radian)) {
     return Vectord<2>{m_minAngle.value(), 0.0};
-  } else if (WouldHitUpperLimit(units::radian_t{updatedXhat(0)})) {
+  } else if (WouldHitUpperLimit(updatedXhat(0) * units::radian)) {
     return Vectord<2>{m_maxAngle.value(), 0.0};
   }
   return updatedXhat;

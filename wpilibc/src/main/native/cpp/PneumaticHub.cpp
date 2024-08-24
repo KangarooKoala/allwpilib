@@ -23,15 +23,15 @@ using namespace frc;
 /** Converts volts to PSI per the REV Analog Pressure Sensor datasheet. */
 units::pounds_per_square_inch_t VoltsToPSI(units::volt_t sensorVoltage,
                                            units::volt_t supplyVoltage) {
-  return units::pounds_per_square_inch_t{
-      250 * (sensorVoltage.value() / supplyVoltage.value()) - 25};
+  return (250 * (sensorVoltage.value() / supplyVoltage.value()) - 25)
+      * units::pounds_per_square_inch;
 }
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
 units::volt_t PSIToVolts(units::pounds_per_square_inch_t pressure,
                          units::volt_t supplyVoltage) {
-  return units::volt_t{supplyVoltage.value() *
-                       (0.004 * pressure.value() + 0.1)};
+  return supplyVoltage.value() *
+                       (0.004 * pressure.value() + 0.1) * units::volt;
 }
 
 wpi::mutex PneumaticHub::m_handleLock;
@@ -221,7 +221,7 @@ units::ampere_t PneumaticHub::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetREVPHCompressorCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{result};
+  return result * units::ampere;
 }
 
 void PneumaticHub::SetSolenoids(int mask, int values) {
@@ -384,35 +384,35 @@ units::volt_t PneumaticHub::GetInputVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return voltage * units::volt;
 }
 
 units::volt_t PneumaticHub::Get5VRegulatedVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPH5VVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return voltage * units::volt;
 }
 
 units::ampere_t PneumaticHub::GetSolenoidsTotalCurrent() const {
   int32_t status = 0;
   auto current = HAL_GetREVPHSolenoidCurrent(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::ampere_t{current};
+  return current * units::ampere;
 }
 
 units::volt_t PneumaticHub::GetSolenoidsVoltage() const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHSolenoidVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return voltage * units::volt;
 }
 
 units::volt_t PneumaticHub::GetAnalogVoltage(int channel) const {
   int32_t status = 0;
   auto voltage = HAL_GetREVPHAnalogVoltage(m_handle, channel, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return units::volt_t{voltage};
+  return voltage * units::volt;
 }
 
 units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
@@ -421,7 +421,7 @@ units::pounds_per_square_inch_t PneumaticHub::GetPressure(int channel) const {
   FRC_ReportError(status, "Module {}", m_module);
   auto supplyVoltage = HAL_GetREVPH5VVoltage(m_handle, &status);
   FRC_ReportError(status, "Module {}", m_module);
-  return VoltsToPSI(units::volt_t{sensorVoltage}, units::volt_t{supplyVoltage});
+  return VoltsToPSI(sensorVoltage * units::volt, supplyVoltage * units::volt);
 }
 
 Solenoid PneumaticHub::MakeSolenoid(int channel) {

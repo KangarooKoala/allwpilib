@@ -14,9 +14,9 @@ using StructType = wpi::Struct<frc::Translation3d>;
 
 frc::Translation3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Translation3d{
-      units::meter_t{wpi::UnpackStruct<double, kXOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kYOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kZOff>(data)},
+      wpi::UnpackStruct<double, kXOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kYOff>(data) * units::meter,
+      wpi::UnpackStruct<double, kZOff>(data) * units::meter,
   };
 }
 

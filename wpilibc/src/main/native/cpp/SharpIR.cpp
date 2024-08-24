@@ -54,7 +54,7 @@ units::centimeter_t SharpIR::GetRange() const {
   }
 
   // Always constrain output
-  return units::centimeter_t{std::max(std::min(distance, m_maxCM), m_minCM)};
+  return std::max(std::min(distance, m_maxCM), m_minCM) * units::centimeter;
 }
 
 void SharpIR::InitSendable(wpi::SendableBuilder& builder) {

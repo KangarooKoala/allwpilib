@@ -14,12 +14,10 @@ wpi::Struct<frc::SimpleMotorFeedforward<Distance>>::Unpack(
   constexpr size_t kKvOff = kKsOff + 8;
   constexpr size_t kKaOff = kKvOff + 8;
   constexpr size_t kDtOff = kKaOff + 8;
-  return {units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::kv_unit>{
-              wpi::UnpackStruct<double, kKvOff>(data)},
-          units::unit_t<frc::SimpleMotorFeedforward<units::meters>::ka_unit>{
-              wpi::UnpackStruct<double, kKaOff>(data)},
-          units::second_t{wpi::UnpackStruct<double, kDtOff>(data)}};
+  return {wpi::UnpackStruct<double, kKsOff>(data) * units::volt,
+          wpi::UnpackStruct<double, kKvOff>(data) * frc::SimpleMotorFeedforward<units::meters>::kv_unit,
+          wpi::UnpackStruct<double, kKaOff>(data) * frc::SimpleMotorFeedforward<units::meters>::ka_unit,
+          wpi::UnpackStruct<double, kDtOff>(data) * units::second};
 }
 
 template <class Distance>

@@ -41,53 +41,53 @@ TEST_F(ProfiledPIDInputOutputTest, ContinuousInput1) {
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput2) {
   controller->SetP(1);
-  controller->EnableContinuousInput(-units::radian_t{std::numbers::pi},
-                                    units::radian_t{std::numbers::pi});
+  controller->EnableContinuousInput(-180_deg,
+                                    180_deg);
 
-  static constexpr units::radian_t kSetpoint{-3.4826633343199735};
-  static constexpr units::radian_t kMeasurement{-3.1352207333939606};
-  static constexpr units::radian_t kGoal{-3.534162788601621};
+  static constexpr units::radian_t kSetpoint = -3.4826633343199735_rad;
+  static constexpr units::radian_t kMeasurement = -3.1352207333939606_rad;
+  static constexpr units::radian_t kGoal = -3.534162788601621_rad;
 
   controller->Reset(kSetpoint);
   EXPECT_LT(controller->Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{std::numbers::pi});
+            180_deg);
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput3) {
   controller->SetP(1);
-  controller->EnableContinuousInput(-units::radian_t{std::numbers::pi},
-                                    units::radian_t{std::numbers::pi});
+  controller->EnableContinuousInput(-180_deg,
+                                    180_deg);
 
-  static constexpr units::radian_t kSetpoint{-3.5176604690006377};
-  static constexpr units::radian_t kMeasurement{3.1191729343822456};
-  static constexpr units::radian_t kGoal{2.709680418117445};
+  static constexpr units::radian_t kSetpoint = -3.5176604690006377_rad;
+  static constexpr units::radian_t kMeasurement = 3.1191729343822456_rad;
+  static constexpr units::radian_t kGoal = 2.709680418117445_rad;
 
   controller->Reset(kSetpoint);
   EXPECT_LT(controller->Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{std::numbers::pi});
+            180_deg);
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ContinuousInput4) {
   controller->SetP(1);
   controller->EnableContinuousInput(0_rad,
-                                    units::radian_t{2.0 * std::numbers::pi});
+                                    360_deg);
 
-  static constexpr units::radian_t kSetpoint{2.78};
-  static constexpr units::radian_t kMeasurement{3.12};
-  static constexpr units::radian_t kGoal{2.71};
+  static constexpr units::radian_t kSetpoint = 2.78_rad;
+  static constexpr units::radian_t kMeasurement = 3.12_rad;
+  static constexpr units::radian_t kGoal = 2.71_rad;
 
   controller->Reset(kSetpoint);
   EXPECT_LT(controller->Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
   EXPECT_LT(units::math::abs(controller->GetSetpoint().position - kMeasurement),
-            units::radian_t{std::numbers::pi});
+            180_deg);
 }
 
 TEST_F(ProfiledPIDInputOutputTest, ProportionalGainOutput) {

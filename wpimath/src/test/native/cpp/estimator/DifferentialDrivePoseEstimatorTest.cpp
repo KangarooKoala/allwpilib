@@ -308,8 +308,8 @@ TEST(DifferentialDrivePoseEstimatorTest, TestSampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
-                             units::meter_t{time}, units::meter_t{time});
+    estimator.UpdateWithTime(time * units::second, frc::Rotation2d{},
+                             time * units::meter, time * units::meter);
   }
 
   // Sample at an added time

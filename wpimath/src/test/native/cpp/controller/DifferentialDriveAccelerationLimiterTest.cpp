@@ -18,8 +18,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, maxA,
                                                     maxAlpha};
@@ -47,9 +47,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -67,9 +67,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -87,9 +87,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -110,8 +110,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   // Limits are so high, they don't get hit, so states of constrained and
   // unconstrained systems should match
@@ -126,9 +126,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -143,9 +143,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -160,9 +160,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -180,8 +180,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, minA,
                                                     maxA, maxAlpha};
@@ -204,9 +204,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -222,9 +222,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
+        accelLimiter.Calculate(xAccelLimiter(0) * units::meters_per_second,
+                               xAccelLimiter(1) * units::meters_per_second,
+                               u(0) * units::volt, u(1) * units::volt);
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -239,8 +239,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
 TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(1.0 * Kv_t::unit, 1.0 * Ka_t::unit,
+                                                        1.0 * Kv_t::unit, 1.0 * Ka_t::unit);
   EXPECT_NO_THROW({
     DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps_sq,
                                                       1_rad_per_s_sq);

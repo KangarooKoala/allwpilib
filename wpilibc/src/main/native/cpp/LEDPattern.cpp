@@ -96,8 +96,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
 }
 
 LEDPattern LEDPattern::Blink(units::second_t onTime, units::second_t offTime) {
-  auto totalMicros = units::microsecond_t{onTime + offTime}.to<uint64_t>();
-  auto onMicros = units::microsecond_t{onTime}.to<uint64_t>();
+  auto totalMicros = static_cast<uint64_t>(units::microsecond_t{onTime + offTime}.value());
+  auto onMicros = static_cast<uint64_t>(units::microsecond_t{onTime}.value());
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     if (wpi::Now() % totalMicros < onMicros) {
@@ -127,8 +127,8 @@ LEDPattern LEDPattern::Breathe(units::second_t period) {
 
   return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&writer, periodMicros](int i, Color color) {
-      double t = (wpi::Now() % periodMicros.to<uint64_t>()) /
-                 periodMicros.to<double>();
+      double t = (wpi::Now() % static_cast<uint64_t>(periodMicros.value())) /
+                 static_cast<double>(periodMicros.value());
       double phase = t * 2 * std::numbers::pi;
 
       // Apply the cosine function and shift its output from [-1, 1] to [0, 1]

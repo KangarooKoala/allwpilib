@@ -16,12 +16,11 @@ using StructType = wpi::Struct<frc::DCMotor>;
 
 frc::DCMotor StructType::Unpack(std::span<const uint8_t> data) {
   return frc::DCMotor{
-      units::volt_t{wpi::UnpackStruct<double, kNominalVoltageOff>(data)},
-      units::newton_meter_t{wpi::UnpackStruct<double, kStallTorqueOff>(data)},
-      units::ampere_t{wpi::UnpackStruct<double, kStallCurrentOff>(data)},
-      units::ampere_t{wpi::UnpackStruct<double, kFreeCurrentOff>(data)},
-      units::radians_per_second_t{
-          wpi::UnpackStruct<double, kFreeSpeedOff>(data)},
+      wpi::UnpackStruct<double, kNominalVoltageOff>(data) * units::volt,
+      wpi::UnpackStruct<double, kStallTorqueOff>(data) * units::newton_meter,
+      wpi::UnpackStruct<double, kStallCurrentOff>(data) * units::ampere,
+      wpi::UnpackStruct<double, kFreeCurrentOff>(data) * units::ampere,
+          wpi::UnpackStruct<double, kFreeSpeedOff>(data) * units::radians_per_second,
   };
 }
 

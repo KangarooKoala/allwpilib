@@ -201,9 +201,9 @@ void PoseEstimator<WheelSpeeds, WheelPositions>::AddVisionMeasurement(
       Eigen::Vector3d{twist.dx.value(), twist.dy.value(), twist.dtheta.value()};
 
   // Step 6: Convert back to Twist2d.
-  Twist2d scaledTwist{units::meter_t{k_times_twist(0)},
-                      units::meter_t{k_times_twist(1)},
-                      units::radian_t{k_times_twist(2)}};
+  Twist2d scaledTwist{k_times_twist(0) * units::meter,
+                      k_times_twist(1) * units::meter,
+                      k_times_twist(2) * units::radian};
 
   // Step 7: Calculate and record the vision update.
   VisionUpdate visionUpdate{visionSample->Exp(scaledTwist), *odometrySample};

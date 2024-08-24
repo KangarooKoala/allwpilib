@@ -16,9 +16,8 @@
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(units::math::abs(val1 - val2), eps)
 
-static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
-                                                   180.0};
+static constexpr units::meter_t kTolerance{1_m / 12.0};
+static constexpr units::radian_t kAngularTolerance{2.0_deg};
 
 TEST(HolonomicDriveControllerTest, ReachesReference) {
   frc::HolonomicDriveController controller{
@@ -26,8 +25,8 @@ TEST(HolonomicDriveControllerTest, ReachesReference) {
       frc::ProfiledPIDController<units::radian>{
           1.0, 0.0, 0.0,
           frc::TrapezoidProfile<units::radian>::Constraints{
-              units::radians_per_second_t{2.0 * std::numbers::pi},
-              units::radians_per_second_squared_t{std::numbers::pi}}}};
+              360_deg_per_s,
+              180_deg_per_s_sq}}};
 
   frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
 

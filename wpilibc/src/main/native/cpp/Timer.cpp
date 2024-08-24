@@ -17,13 +17,13 @@ void Wait(units::second_t seconds) {
 }
 
 units::second_t GetTime() {
-  using std::chrono::duration;
-  using std::chrono::duration_cast;
-  using std::chrono::system_clock;
+  return units::second_t{system_clock::now().time_since_epoch()};
+  // using std::chrono::duration;
+  // using std::chrono::duration_cast;
+  // using std::chrono::system_clock;
 
-  return units::second_t{
-      duration_cast<duration<double>>(system_clock::now().time_since_epoch())
-          .count()};
+  // return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
+  //         .count() * units::second;
 }
 
 }  // namespace frc
@@ -86,7 +86,7 @@ bool Timer::AdvanceIfElapsed(units::second_t period) {
 
 units::second_t Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  return units::second_t{frc::RobotController::GetFPGATime() * 1.0e-6};
+  return frc::RobotController::GetFPGATime() * 1.0e-6 * units::second;
 }
 
 units::second_t Timer::GetMatchTime() {

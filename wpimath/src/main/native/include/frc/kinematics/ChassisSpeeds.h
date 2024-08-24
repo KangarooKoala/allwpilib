@@ -128,10 +128,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
     // CW rotation into chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
+        Translation2d{vx.value() * units::meter, vy.value() * units::meter}
             .RotateBy(-robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {rotated.X().value() * units::meters_per_second,
+            rotated.Y().value() * units::meters_per_second, omega};
   }
 
   /**
@@ -176,10 +176,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
       units::radians_per_second_t omega, const Rotation2d& robotAngle) {
     // CCW rotation out of chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
+        Translation2d{vx.value() * units::meter, vy.value() * units::meter}
             .RotateBy(robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {rotated.X().value() * units::meters_per_second_t,
+            rotated.Y().value() * units::meters_per_second_t}, omega};
   }
 
   /**

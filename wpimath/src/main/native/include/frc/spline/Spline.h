@@ -98,7 +98,7 @@ class Spline {
 
     return PoseWithCurvature{
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
-        units::curvature_t{curvature}};
+        curvature * 1_rad / 1_s};
   }
 
   /**
@@ -140,7 +140,7 @@ class Spline {
    * @return The Translation2d.
    */
   static Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
+    return Translation2d{vector(0) * units::meter, vector(1) * units::meter};
   }
 };
 }  // namespace frc

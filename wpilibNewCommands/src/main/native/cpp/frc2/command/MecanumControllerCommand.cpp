@@ -10,8 +10,7 @@
 #include <units/voltage.h>
 
 using namespace frc2;
-using kv_unit = units::compound_unit<units::volts,
-                                     units::inverse<units::meters_per_second>>;
+inline constexpr auto kv_unit = units::volt / units::meters_per_second;
 
 MecanumControllerCommand::MecanumControllerCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -186,21 +185,21 @@ void MecanumControllerCommand::Execute() {
     auto rearRightFeedforward =
         m_feedforward.Calculate(m_prevSpeeds.rearRight, rearRightSpeedSetpoint);
 
-    auto frontLeftOutput = units::volt_t{m_frontLeftController->Calculate(
+    auto frontLeftOutput = m_frontLeftController->Calculate(
                                m_currentWheelSpeeds().frontLeft.value(),
-                               frontLeftSpeedSetpoint.value())} +
+                               frontLeftSpeedSetpoint.value()) * units::volt +
                            frontLeftFeedforward;
-    auto rearLeftOutput = units::volt_t{m_rearLeftController->Calculate(
+    auto rearLeftOutput = m_rearLeftController->Calculate(
                               m_currentWheelSpeeds().rearLeft.value(),
-                              rearLeftSpeedSetpoint.value())} +
+                              rearLeftSpeedSetpoint.value()) * units::volt +
                           rearLeftFeedforward;
-    auto frontRightOutput = units::volt_t{m_frontRightController->Calculate(
+    auto frontRightOutput = m_frontRightController->Calculate(
                                 m_currentWheelSpeeds().frontRight.value(),
-                                frontRightSpeedSetpoint.value())} +
+                                frontRightSpeedSetpoint.value()) * units::volt +
                             frontRightFeedforward;
-    auto rearRightOutput = units::volt_t{m_rearRightController->Calculate(
+    auto rearRightOutput = m_rearRightController->Calculate(
                                m_currentWheelSpeeds().rearRight.value(),
-                               rearRightSpeedSetpoint.value())} +
+                               rearRightSpeedSetpoint.value()) * units::volt +
                            rearRightFeedforward;
 
     m_outputVolts(frontLeftOutput, rearLeftOutput, frontRightOutput,

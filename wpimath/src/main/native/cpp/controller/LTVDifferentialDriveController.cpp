@@ -146,15 +146,15 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
                rightVelocityRef.value()};
   m_error = r - x;
   m_error(State::kHeading) =
-      frc::AngleModulus(units::radian_t{m_error(State::kHeading)}).value();
+      frc::AngleModulus(m_error(State::kHeading) * units::radian).value();
 
   units::meters_per_second_t velocity{(leftVelocity + rightVelocity) / 2.0};
   const auto& K = m_table[velocity];
 
   Vectord<2> u = K * inRobotFrame * m_error;
 
-  return DifferentialDriveWheelVoltages{units::volt_t{u(0)},
-                                        units::volt_t{u(1)}};
+  return DifferentialDriveWheelVoltages{u(0) * units::volt,
+                                        u(1) * units::volt};
 }
 
 DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(

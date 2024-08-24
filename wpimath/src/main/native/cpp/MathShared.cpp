@@ -19,7 +19,7 @@ class DefaultMathShared : public MathShared {
   }
   void ReportUsage(MathUsageId id, int count) override {}
   units::second_t GetTimestamp() override {
-    return units::second_t{wpi::Now() * 1.0e-6};
+    return wpi::Now() * 1.0e-6 * units::second;
   }
 };
 }  // namespace

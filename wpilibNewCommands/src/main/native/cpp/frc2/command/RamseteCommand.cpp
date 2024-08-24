@@ -11,8 +11,7 @@
 #include <wpi/sendable/SendableBuilder.h>
 
 using namespace frc2;
-using kv_unit = units::compound_unit<units::volts,
-                                     units::inverse<units::meters_per_second>>;
+inline constexpr auto kv_unit = units::volt / units::meters_per_second;
 
 RamseteCommand::RamseteCommand(
     frc::Trajectory trajectory, std::function<frc::Pose2d()> pose,
@@ -91,13 +90,13 @@ void RamseteCommand::Execute() {
         m_feedforward.Calculate(m_prevSpeeds.right, targetWheelSpeeds.right);
 
     auto leftOutput =
-        units::volt_t{m_leftController->Calculate(
-            m_speeds().left.value(), targetWheelSpeeds.left.value())} +
+        m_leftController->Calculate(
+            m_speeds().left.value(), targetWheelSpeeds.left.value()) * units::volt +
         leftFeedforward;
 
     auto rightOutput =
-        units::volt_t{m_rightController->Calculate(
-            m_speeds().right.value(), targetWheelSpeeds.right.value())} +
+        m_rightController->Calculate(
+            m_speeds().right.value(), targetWheelSpeeds.right.value()) * units::volt +
         rightFeedforward;
 
     m_outputVolts(leftOutput, rightOutput);

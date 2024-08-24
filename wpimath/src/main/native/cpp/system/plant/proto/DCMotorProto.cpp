@@ -17,11 +17,11 @@ frc::DCMotor wpi::Protobuf<frc::DCMotor>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufDCMotor*>(&msg);
   return frc::DCMotor{
-      units::volt_t{m->nominal_voltage()},
-      units::newton_meter_t{m->stall_torque()},
-      units::ampere_t{m->stall_current()},
-      units::ampere_t{m->free_current()},
-      units::radians_per_second_t{m->free_speed()},
+      m->nominal_voltage() * units::volt,
+      m->stall_torque() * units::newton_meter,
+      m->stall_current() * units::ampere,
+      m->free_current() * units::ampere,
+      m->free_speed() * units::radians_per_second,
   };
 }
 

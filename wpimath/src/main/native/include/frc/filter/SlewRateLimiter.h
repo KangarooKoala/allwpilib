@@ -21,11 +21,11 @@ namespace frc {
  *
  * @see TrapezoidProfile
  */
-template <class Unit>
+template <Unit auto Unit>
 class SlewRateLimiter {
  public:
   using Unit_t = units::unit_t<Unit>;
-  using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
+  inline constexpr auto Rate = Unit / units::second;
   using Rate_t = units::unit_t<Rate>;
 
   /**
@@ -41,12 +41,12 @@ class SlewRateLimiter {
    * @param initialValue The initial value of the input.
    */
   SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
-                  Unit_t initialValue = Unit_t{0})
+                  Unit_t initialValue = 0 * Unit)
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
         m_prevTime{
-            units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
+            wpi::math::MathSharedStore::GetTimestamp() * units::microsecond} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and

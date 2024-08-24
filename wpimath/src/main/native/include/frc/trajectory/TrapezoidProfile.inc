@@ -50,10 +50,10 @@ TrapezoidProfile<Distance>::Calculate(units::second_t t, State current,
       accelerationTime * accelerationTime * m_constraints.maxAcceleration;
 
   // Handle the case where the profile never reaches full speed
-  if (fullSpeedDist < Distance_t{0}) {
+  if (fullSpeedDist < 0 * Distance) {
     accelerationTime =
         units::math::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-    fullSpeedDist = Distance_t{0};
+    fullSpeedDist = 0 * Distance;
   }
 
   m_endAccel = accelerationTime - cutoffBegin;
@@ -109,7 +109,7 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
 
   Distance_t distToTarget = units::math::abs(target - position);
 
-  if (distToTarget < Distance_t{1e-6}) {
+  if (distToTarget < 1e-6 * Distance) {
     return 0_s;
   }
 
@@ -129,11 +129,11 @@ units::second_t TrapezoidProfile<Distance>::TimeLeftUntil(
 
   if (accelDist > distToTarget) {
     accelDist = distToTarget;
-    fullSpeedDist = Distance_t{0};
-    decelDist = Distance_t{0};
+    fullSpeedDist = 0 * Distance;
+    decelDist = 0 * Distance;
   } else if (accelDist + fullSpeedDist > distToTarget) {
     fullSpeedDist = distToTarget - accelDist;
-    decelDist = Distance_t{0};
+    decelDist = 0 * Distance;
   } else {
     decelDist = distToTarget - fullSpeedDist - accelDist;
   }

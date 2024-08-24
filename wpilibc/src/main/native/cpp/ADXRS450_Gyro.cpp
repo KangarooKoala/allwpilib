@@ -141,7 +141,7 @@ void ADXRS450_Gyro::Calibrate() {
 }
 
 Rotation2d ADXRS450_Gyro::GetRotation2d() const {
-  return units::degree_t{-GetAngle()};
+  return -GetAngle() * units::degree;
 }
 
 int ADXRS450_Gyro::GetPort() const {

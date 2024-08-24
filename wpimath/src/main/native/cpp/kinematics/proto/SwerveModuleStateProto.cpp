@@ -17,7 +17,7 @@ frc::SwerveModuleState wpi::Protobuf<frc::SwerveModuleState>::Unpack(
     const google::protobuf::Message& msg) {
   auto m = static_cast<const wpi::proto::ProtobufSwerveModuleState*>(&msg);
   return frc::SwerveModuleState{
-      units::meters_per_second_t{m->speed()},
+      m->speed() * units::meters_per_second,
       wpi::UnpackProtobuf<frc::Rotation2d>(m->wpi_angle()),
   };
 }

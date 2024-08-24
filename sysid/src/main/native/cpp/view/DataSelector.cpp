@@ -235,7 +235,7 @@ static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
       [](const auto& datapoint, double val) { return datapoint.first < val; });
 
   for (auto it = begin; it != end; ++it) {
-    samples.emplace_back(units::second_t{it->first * 1.0e-6}, T{it->second});
+    samples.emplace_back(it->first * units::microsecond, T{it->second});
   }
 }
 

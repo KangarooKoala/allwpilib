@@ -334,11 +334,11 @@ TEST(SwerveDrivePoseEstimatorTest, TestSampleAt) {
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
     wpi::array<frc::SwerveModulePosition, 4> wheelPositions{
-        {frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}},
-         frc::SwerveModulePosition{units::meter_t{time}, frc::Rotation2d{}}}};
-    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
+        {frc::SwerveModulePosition{time * units::meter, frc::Rotation2d{}},
+         frc::SwerveModulePosition{time * units::meter, frc::Rotation2d{}},
+         frc::SwerveModulePosition{time * units::meter, frc::Rotation2d{}},
+         frc::SwerveModulePosition{time * units::meter, frc::Rotation2d{}}}};
+    estimator.UpdateWithTime(time * units::second, frc::Rotation2d{},
                              wheelPositions);
   }
 

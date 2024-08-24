@@ -33,23 +33,23 @@ SwerveModule::SwerveModule(const int driveMotorChannel,
   // Limit the PID Controller's input range between -pi and pi and set the input
   // to be continuous.
   m_turningPIDController.EnableContinuousInput(
-      -units::radian_t{std::numbers::pi}, units::radian_t{std::numbers::pi});
+      -180_deg, 180_deg);
 }
 
 frc::SwerveModuleState SwerveModule::GetState() const {
-  return {units::meters_per_second_t{m_driveEncoder.GetRate()},
-          units::radian_t{m_turningEncoder.GetDistance()}};
+  return {m_driveEncoder.GetRate() * units::meters_per_second,
+          m_turningEncoder.GetDistance() * units::radian};
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() const {
-  return {units::meter_t{m_driveEncoder.GetDistance()},
-          units::radian_t{m_turningEncoder.GetDistance()}};
+  return {m_driveEncoder.GetDistance() * units::meter,
+          m_turningEncoder.GetDistance() * units::radian};
 }
 
 void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
   frc::Rotation2d encoderRotation{
-      units::radian_t{m_turningEncoder.GetDistance()}};
+      m_turningEncoder.GetDistance() * units::radian};
 
   // Optimize the reference state to avoid spinning further than 90 degrees
   auto state =
@@ -68,12 +68,12 @@ void SwerveModule::SetDesiredState(
 
   // Calculate the turning motor output from the turning PID controller.
   const auto turnOutput = m_turningPIDController.Calculate(
-      units::radian_t{m_turningEncoder.GetDistance()}, state.angle.Radians());
+      m_turningEncoder.GetDistance() * units::radian, state.angle.Radians());
 
   const auto turnFeedforward = m_turnFeedforward.Calculate(
       m_turningPIDController.GetSetpoint().velocity);
 
   // Set the motor outputs.
-  m_driveMotor.SetVoltage(units::volt_t{driveOutput} + driveFeedforward);
-  m_turningMotor.SetVoltage(units::volt_t{turnOutput} + turnFeedforward);
+  m_driveMotor.SetVoltage(driveOutput * units::volt + driveFeedforward);
+  m_turningMotor.SetVoltage(turnOutput * units::volt + turnFeedforward);
 }

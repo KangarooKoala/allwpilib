@@ -49,13 +49,13 @@ class Drive : public frc2::SubsystemBase {
             log->Motor("drive-left")
                 .voltage(m_leftMotor.Get() *
                          frc::RobotController::GetBatteryVoltage())
-                .position(units::meter_t{m_leftEncoder.GetDistance()})
-                .velocity(units::meters_per_second_t{m_leftEncoder.GetRate()});
+                .position(m_leftEncoder.GetDistance() * units::meter)
+                .velocity(m_leftEncoder.GetRate() * units::meters_per_second);
             log->Motor("drive-right")
                 .voltage(m_rightMotor.Get() *
                          frc::RobotController::GetBatteryVoltage())
-                .position(units::meter_t{m_rightEncoder.GetDistance()})
-                .velocity(units::meters_per_second_t{m_rightEncoder.GetRate()});
+                .position(m_rightEncoder.GetDistance() * units::meter)
+                .velocity(m_rightEncoder.GetRate() * units::meters_per_second);
           },
           this}};
 };

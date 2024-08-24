@@ -594,7 +594,7 @@ bool DriverStation::WaitForDsConnection(units::second_t timeout) {
 
 units::second_t DriverStation::GetMatchTime() {
   int32_t status = 0;
-  return units::second_t{HAL_GetMatchTime(&status)};
+  return HAL_GetMatchTime(&status) * units::second;
 }
 
 double DriverStation::GetBatteryVoltage() {

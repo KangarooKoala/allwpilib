@@ -18,8 +18,8 @@ frc::Ellipse2d wpi::Protobuf<frc::Ellipse2d>::Unpack(
   auto m = static_cast<const wpi::proto::ProtobufEllipse2d*>(&msg);
   return frc::Ellipse2d{
       wpi::UnpackProtobuf<frc::Pose2d>(m->wpi_center()),
-      units::meter_t{m->xsemiaxis()},
-      units::meter_t{m->ysemiaxis()},
+      m->xsemiaxis() * units::meter,
+      m->ysemiaxis() * units::meter,
   };
 }
 

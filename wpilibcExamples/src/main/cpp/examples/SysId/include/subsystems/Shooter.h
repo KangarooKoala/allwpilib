@@ -42,9 +42,9 @@ class Shooter : public frc2::SubsystemBase {
             log->Motor("shooter-wheel")
                 .voltage(m_shooterMotor.Get() *
                          frc::RobotController::GetBatteryVoltage())
-                .position(units::turn_t{m_shooterEncoder.GetDistance()})
+                .position(m_shooterEncoder.GetDistance() * units::turn)
                 .velocity(
-                    units::turns_per_second_t{m_shooterEncoder.GetRate()});
+                    m_shooterEncoder.GetRate() * units::turns_per_second);
           },
           this}};
   frc::PIDController m_shooterFeedback{constants::shooter::kP, 0, 0};

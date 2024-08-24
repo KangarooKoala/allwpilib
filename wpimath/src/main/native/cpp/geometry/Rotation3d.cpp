@@ -40,7 +40,7 @@ Rotation3d::Rotation3d(units::radian_t roll, units::radian_t pitch,
 }
 
 Rotation3d::Rotation3d(const Eigen::Vector3d& rvec)
-    : Rotation3d{rvec, units::radian_t{rvec.norm()}} {}
+    : Rotation3d{rvec, rvec.norm() * units::radian} {}
 
 Rotation3d::Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
   double norm = axis.norm();
@@ -164,10 +164,10 @@ Rotation3d Rotation3d::operator*(double scalar) const {
   // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
   if (m_q.W() >= 0.0) {
     return Rotation3d{{m_q.X(), m_q.Y(), m_q.Z()},
-                      2.0 * units::radian_t{scalar * std::acos(m_q.W())}};
+                      2.0 * scalar * std::acos(m_q.W()) * units::radian};
   } else {
     return Rotation3d{{-m_q.X(), -m_q.Y(), -m_q.Z()},
-                      2.0 * units::radian_t{scalar * std::acos(-m_q.W())}};
+                      2.0 * scalar * std::acos(-m_q.W()) * units::radian};
   }
 }
 
@@ -199,7 +199,7 @@ units::radian_t Rotation3d::X() const {
   double sxcy = 2.0 * (w * x + y * z);
   double cy_sq = cxcy * cxcy + sxcy * sxcy;
   if (cy_sq > 1e-20) {
-    return units::radian_t{std::atan2(sxcy, cxcy)};
+    return std::atan2(sxcy, cxcy) * units::radian;
   } else {
     return 0_rad;
   }
@@ -214,9 +214,9 @@ units::radian_t Rotation3d::Y() const {
   // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
   double ratio = 2.0 * (w * y - z * x);
   if (std::abs(ratio) >= 1.0) {
-    return units::radian_t{std::copysign(std::numbers::pi / 2.0, ratio)};
+    return std::copysign(std::numbers::pi / 2.0, ratio) * units::radian;
   } else {
-    return units::radian_t{std::asin(ratio)};
+    return std::asin(ratio) * units::radian;
   }
 }
 
@@ -231,9 +231,9 @@ units::radian_t Rotation3d::Z() const {
   double cysz = 2.0 * (w * z + x * y);
   double cy_sq = cycz * cycz + cysz * cysz;
   if (cy_sq > 1e-20) {
-    return units::radian_t{std::atan2(cysz, cycz)};
+    return std::atan2(cysz, cycz) * units::radian;
   } else {
-    return units::radian_t{std::atan2(2.0 * w * z, w * w - z * z)};
+    return std::atan2(2.0 * w * z, w * w - z * z) * units::radian;
   }
 }
 
@@ -248,7 +248,7 @@ Eigen::Vector3d Rotation3d::Axis() const {
 
 units::radian_t Rotation3d::Angle() const {
   double norm = std::hypot(m_q.X(), m_q.Y(), m_q.Z());
-  return units::radian_t{2.0 * std::atan2(norm, m_q.W())};
+  return 2.0 * std::atan2(norm, m_q.W()) * units::radian;
 }
 
 Rotation2d Rotation3d::ToRotation2d() const {

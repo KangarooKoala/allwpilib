@@ -83,14 +83,10 @@ frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
 
           [this]() {
             return frc::MecanumDriveWheelSpeeds{
-                units::meters_per_second_t{
-                    m_drive.GetFrontLeftEncoder().GetRate()},
-                units::meters_per_second_t{
-                    m_drive.GetFrontRightEncoder().GetRate()},
-                units::meters_per_second_t{
-                    m_drive.GetRearLeftEncoder().GetRate()},
-                units::meters_per_second_t{
-                    m_drive.GetRearRightEncoder().GetRate()}};
+                 m_drive.GetFrontLeftEncoder().GetRate() * units::meters_per_second,
+                 m_drive.GetFrontRightEncoder().GetRate() * units::meters_per_second,
+                 m_drive.GetRearLeftEncoder().GetRate() * units::meters_per_second,
+                 m_drive.GetRearRightEncoder().GetRate() * units::meters_per_second};
           },
 
           frc::PIDController{DriveConstants::kPFrontLeftVel, 0, 0},

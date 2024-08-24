@@ -313,9 +313,9 @@ TEST(MecanumDrivePoseEstimatorTest, TestSampleAt) {
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
     frc::MecanumDriveWheelPositions wheelPositions{
-        units::meter_t{time}, units::meter_t{time}, units::meter_t{time},
-        units::meter_t{time}};
-    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation2d{},
+        time * units::meter, time * units::meter, time * units::meter,
+        time * units::meter};
+    estimator.UpdateWithTime(time * units::second, frc::Rotation2d{},
                              wheelPositions);
   }
 

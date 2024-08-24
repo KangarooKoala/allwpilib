@@ -82,11 +82,11 @@ TEST(LTVDifferentialDriveControllerTest, ReachesReference) {
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
     auto state = trajectory.Sample(kDt * i);
     robotPose =
-        frc::Pose2d{units::meter_t{x(State::kX)}, units::meter_t{x(State::kY)},
-                    units::radian_t{x(State::kHeading)}};
+        frc::Pose2d{x(State::kX) * units::meter, x(State::kY) * units::meter,
+                    x(State::kHeading) * units::radian};
     auto [leftVoltage, rightVoltage] = controller.Calculate(
-        robotPose, units::meters_per_second_t{x(State::kLeftVelocity)},
-        units::meters_per_second_t{x(State::kRightVelocity)}, state);
+        robotPose, x(State::kLeftVelocity) * units::meters_per_second,
+        x(State::kRightVelocity) * units::meters_per_second, state);
 
     x = frc::RKDP(&Dynamics, x,
                   frc::Vectord<2>{leftVoltage.value(), rightVoltage.value()},

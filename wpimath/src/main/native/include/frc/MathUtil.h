@@ -27,7 +27,7 @@ namespace frc {
  * @return The value after the deadband is applied.
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || units::UnitT<T>
 T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
@@ -165,8 +165,8 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
 WPILIB_DLLEXPORT
 constexpr units::radian_t AngleModulus(units::radian_t angle) {
   return InputModulus<units::radian_t>(angle,
-                                       units::radian_t{-std::numbers::pi},
-                                       units::radian_t{std::numbers::pi});
+                                       -180_deg,
+                                       180_deg);
 }
 
 // floorDiv and floorMod algorithms taken from Java

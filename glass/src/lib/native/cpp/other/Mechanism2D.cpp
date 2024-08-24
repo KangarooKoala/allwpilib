@@ -39,8 +39,8 @@ namespace {
 struct FrameData {
   frc::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {
-        units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) / scale},
-        units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) / scale}};
+        (std::clamp(cursor.x, min.x, max.x) - min.x) / scale * units::meter,
+        (max.y - std::clamp(cursor.y, min.y, max.y)) / scale * units::meter};
   }
   ImVec2 GetScreenFromPos(const frc::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),

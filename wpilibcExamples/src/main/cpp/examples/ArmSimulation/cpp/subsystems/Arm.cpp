@@ -43,8 +43,7 @@ void Arm::SimulationPeriodic() {
 
 void Arm::LoadPreferences() {
   // Read Preferences for Arm setpoint and kP on entering Teleop
-  m_armSetpoint = units::degree_t{
-      frc::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value())};
+  m_armSetpoint =  frc::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value()) * units::degree;
   if (m_armKp != frc::Preferences::GetDouble(kArmPKey, m_armKp)) {
     m_armKp = frc::Preferences::GetDouble(kArmPKey, m_armKp);
     m_controller.SetP(m_armKp);
@@ -56,7 +55,7 @@ void Arm::ReachSetpoint() {
   // preferences in degrees.
   double pidOutput = m_controller.Calculate(
       m_encoder.GetDistance(), (units::radian_t{m_armSetpoint}.value()));
-  m_motor.SetVoltage(units::volt_t{pidOutput});
+  m_motor.SetVoltage(pidOutput * units::volt);
 }
 
 void Arm::Stop() {

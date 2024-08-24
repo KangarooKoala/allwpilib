@@ -18,8 +18,8 @@ namespace frc {
 
 constexpr Rotation2d::Rotation2d(units::angle_unit auto value)
     : m_value{value},
-      m_cos{gcem::cos(value.template convert<units::radian>().value())},
-      m_sin{gcem::sin(value.template convert<units::radian>().value())} {}
+      m_cos{gcem::cos(units::radian_t{value}.value())},
+      m_sin{gcem::sin(units::radian_t{value}.value())} {}
 
 constexpr Rotation2d::Rotation2d(double x, double y) {
   double magnitude = gcem::hypot(x, y);
@@ -35,7 +35,7 @@ constexpr Rotation2d::Rotation2d(double x, double y) {
           wpi::GetStackTrace(1));
     }
   }
-  m_value = units::radian_t{gcem::atan2(m_sin, m_cos)};
+  m_value = gcem::atan2(m_sin, m_cos) * units::radian;
 }
 
 constexpr Rotation2d Rotation2d::operator-() const {

@@ -135,7 +135,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
 units::meter_t Ultrasonic::GetRange() const {
   if (IsRangeValid()) {
     if (m_simRange) {
-      return units::inch_t{m_simRange.Get()};
+      return m_simRange.Get() * units::inch;
     }
     return m_counter.GetPeriod() * kSpeedOfSound / 2.0;
   } else {

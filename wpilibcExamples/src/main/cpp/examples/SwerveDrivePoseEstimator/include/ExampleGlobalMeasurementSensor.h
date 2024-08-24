@@ -16,9 +16,9 @@ class ExampleGlobalMeasurementSensor {
   static frc::Pose2d GetEstimatedGlobalPose(
       const frc::Pose2d& estimatedRobotPose) {
     auto randVec = frc::MakeWhiteNoiseVector(0.1, 0.1, 0.1);
-    return frc::Pose2d{estimatedRobotPose.X() + units::meter_t{randVec(0)},
-                       estimatedRobotPose.Y() + units::meter_t{randVec(1)},
+    return frc::Pose2d{estimatedRobotPose.X() + randVec(0) * units::meter,
+                       estimatedRobotPose.Y() + randVec(1) * units::meter,
                        estimatedRobotPose.Rotation() +
-                           frc::Rotation2d{units::radian_t{randVec(2)}}};
+                           frc::Rotation2d{randVec(2) * units::radian}};
   }
 };

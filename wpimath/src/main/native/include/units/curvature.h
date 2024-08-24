@@ -9,6 +9,7 @@
 #include "units/length.h"
 
 namespace units {
-using curvature_t = units::unit_t<
-    units::compound_unit<units::radians, units::inverse<units::meters>>>;
+
+using curvature_t = mp_units::quantity<radian / meter>;
+
 }  // namespace units

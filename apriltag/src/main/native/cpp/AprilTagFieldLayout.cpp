@@ -27,8 +27,8 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
     m_apriltags[tag.ID] = tag;
   }
-  m_fieldWidth = units::meter_t{json.at("field").at("width").get<double>()};
-  m_fieldLength = units::meter_t{json.at("field").at("length").get<double>()};
+  m_fieldWidth = json.at("field").at("width").get<double>() * units::meter;
+  m_fieldLength = json.at("field").at("length").get<double>() * units::meter;
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
@@ -121,9 +121,9 @@ void frc::from_json(const wpi::json& json, AprilTagFieldLayout& layout) {
   }
 
   layout.m_fieldLength =
-      units::meter_t{json.at("field").at("length").get<double>()};
+      json.at("field").at("length").get<double>() * units::meter;
   layout.m_fieldWidth =
-      units::meter_t{json.at("field").at("width").get<double>()};
+      json.at("field").at("width").get<double>() * units::meter;
 }
 
 // Use namespace declaration for forward declaration

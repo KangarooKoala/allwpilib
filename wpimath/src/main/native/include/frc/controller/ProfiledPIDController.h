@@ -29,17 +29,15 @@ int IncrementAndGetProfiledPIDControllerInstances();
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
  * profile.
  */
-template <class Distance>
+template <Unit auto Distance>
 class ProfiledPIDController
     : public wpi::Sendable,
       public wpi::SendableHelper<ProfiledPIDController<Distance>> {
  public:
   using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  inline constexpr auto Velocity = Distance / units::second;
   using Velocity_t = units::unit_t<Velocity>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
+  inline constexpr auto Acceleration = Velocity / units::second;
   using Acceleration_t = units::unit_t<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
@@ -196,7 +194,7 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  void SetGoal(Distance_t goal) { m_goal = {goal, 0 * Velocity}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -288,8 +286,8 @@ class ProfiledPIDController
    * @param velocityTolerance Velocity error which is tolerable.
    */
   void SetTolerance(Distance_t positionTolerance,
-                    Velocity_t velocityTolerance = Velocity_t{
-                        std::numeric_limits<double>::infinity()}) {
+                    Velocity_t velocityTolerance =
+                        std::numeric_limits<double>::infinity() * Velocity) {
     m_controller.SetTolerance(positionTolerance.value(),
                               velocityTolerance.value());
   }
@@ -300,14 +298,14 @@ class ProfiledPIDController
    * @return The error.
    */
   Distance_t GetPositionError() const {
-    return Distance_t{m_controller.GetPositionError()};
+    return m_controller.GetPositionError() * Distance;
   }
 
   /**
    * Returns the change in error per second.
    */
   Velocity_t GetVelocityError() const {
-    return Velocity_t{m_controller.GetVelocityError()};
+    return m_controller.GetVelocityError() * Velocity;
   }
 
   /**
@@ -401,7 +399,7 @@ class ProfiledPIDController
    * velocity is assumed to be zero.
    */
   void Reset(Distance_t measuredPosition) {
-    Reset(measuredPosition, Velocity_t{0});
+    Reset(measuredPosition, 0 * Velocity);
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -419,18 +417,18 @@ class ProfiledPIDController
         "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
         [this](double value) {
           SetConstraints(
-              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
+              Constraints{value * Velocity, GetConstraints().maxAcceleration});
         });
     builder.AddDoubleProperty(
         "maxAcceleration",
         [this] { return GetConstraints().maxAcceleration.value(); },
         [this](double value) {
           SetConstraints(
-              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
+              Constraints{GetConstraints().maxVelocity, value * Acceleration});
         });
     builder.AddDoubleProperty(
         "goal", [this] { return GetGoal().position.value(); },
-        [this](double value) { SetGoal(Distance_t{value}); });
+        [this](double value) { SetGoal(value * Distance); });
   }
 
  private:

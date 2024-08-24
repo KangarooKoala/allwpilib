@@ -797,55 +797,55 @@ units::degrees_per_second_t ADIS16448_IMU::GetRate() const {
 
 units::degree_t ADIS16448_IMU::GetGyroAngleX() const {
   if (m_simGyroAngleX) {
-    return units::degree_t{m_simGyroAngleX.Get()};
+    return m_simGyroAngleX.Get() * units::degree;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_angle_x};
+  return m_integ_gyro_angle_x * units::degree;
 }
 
 units::degree_t ADIS16448_IMU::GetGyroAngleY() const {
   if (m_simGyroAngleY) {
-    return units::degree_t{m_simGyroAngleY.Get()};
+    return m_simGyroAngleY.Get() * units::degree;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_angle_y};
+  return m_integ_gyro_angle_y * units::degree;
 }
 
 units::degree_t ADIS16448_IMU::GetGyroAngleZ() const {
   if (m_simGyroAngleZ) {
-    return units::degree_t{m_simGyroAngleZ.Get()};
+    return m_simGyroAngleZ.Get() * units::degree;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_integ_gyro_angle_z};
+  return m_integ_gyro_angle_z * units::degree;
 }
 
 units::degrees_per_second_t ADIS16448_IMU::GetGyroRateX() const {
   if (m_simGyroRateX) {
-    return units::degrees_per_second_t{m_simGyroRateX.Get()};
+    return m_simGyroRateX.Get() * units::degrees_per_second;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degrees_per_second_t{m_gyro_rate_x};
+  return m_gyro_rate_x * units::degrees_per_second;
 }
 
 units::degrees_per_second_t ADIS16448_IMU::GetGyroRateY() const {
   if (m_simGyroRateY) {
-    return units::degrees_per_second_t{m_simGyroRateY.Get()};
+    return m_simGyroRateY.Get() * units::degrees_per_second;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degrees_per_second_t{m_gyro_rate_y};
+  return m_gyro_rate_y * units::degrees_per_second;
 }
 
 units::degrees_per_second_t ADIS16448_IMU::GetGyroRateZ() const {
   if (m_simGyroRateZ) {
-    return units::degrees_per_second_t{m_simGyroRateZ.Get()};
+    return m_simGyroRateZ.Get() * units::degrees_per_second;
   }
   std::scoped_lock sync(m_mutex);
-  return units::degrees_per_second_t{m_gyro_rate_z};
+  return m_gyro_rate_z * units::degrees_per_second;
 }
 
 units::meters_per_second_squared_t ADIS16448_IMU::GetAccelX() const {
   if (m_simAccelX) {
-    return units::meters_per_second_squared_t{m_simAccelX.Get()};
+    return m_simAccelX.Get() * units::degrees_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
   return m_accel_x * 9.81_mps_sq;
@@ -853,7 +853,7 @@ units::meters_per_second_squared_t ADIS16448_IMU::GetAccelX() const {
 
 units::meters_per_second_squared_t ADIS16448_IMU::GetAccelY() const {
   if (m_simAccelY) {
-    return units::meters_per_second_squared_t{m_simAccelY.Get()};
+    return m_simAccelY.Get() * units::meters_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
   return m_accel_y * 9.81_mps_sq;
@@ -861,7 +861,7 @@ units::meters_per_second_squared_t ADIS16448_IMU::GetAccelY() const {
 
 units::meters_per_second_squared_t ADIS16448_IMU::GetAccelZ() const {
   if (m_simAccelZ) {
-    return units::meters_per_second_squared_t{m_simAccelZ.Get()};
+    return m_simAccelZ.Get() * units::meters_per_second_squared;
   }
   std::scoped_lock sync(m_mutex);
   return m_accel_z * 9.81_mps_sq;
@@ -869,47 +869,47 @@ units::meters_per_second_squared_t ADIS16448_IMU::GetAccelZ() const {
 
 units::tesla_t ADIS16448_IMU::GetMagneticFieldX() const {
   std::scoped_lock sync(m_mutex);
-  return units::gauss_t{m_mag_x * 1e-3};
+  return m_mag_x * 1e-3 * units::gauss;
 }
 
 units::tesla_t ADIS16448_IMU::GetMagneticFieldY() const {
   std::scoped_lock sync(m_mutex);
-  return units::gauss_t{m_mag_y * 1e-3};
+  return m_mag_y * 1e-3 * units::gauss;
 }
 
 units::tesla_t ADIS16448_IMU::GetMagneticFieldZ() const {
   std::scoped_lock sync(m_mutex);
-  return units::gauss_t{m_mag_z * 1e-3};
+  return m_mag_z * 1e-3 * units::gauss;
 }
 
 units::degree_t ADIS16448_IMU::GetXComplementaryAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_compAngleX};
+  return m_compAngleX * units::degree;
 }
 
 units::degree_t ADIS16448_IMU::GetYComplementaryAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_compAngleY};
+  return m_compAngleY * units::degree;
 }
 
 units::degree_t ADIS16448_IMU::GetXFilteredAccelAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_accelAngleX};
+  return m_accelAngleX * units::degree;
 }
 
 units::degree_t ADIS16448_IMU::GetYFilteredAccelAngle() const {
   std::scoped_lock sync(m_mutex);
-  return units::degree_t{m_accelAngleY};
+  return m_accelAngleY * units::degree;
 }
 
 units::pounds_per_square_inch_t ADIS16448_IMU::GetBarometricPressure() const {
   std::scoped_lock sync(m_mutex);
-  return units::mbar_t{m_baro};
+  return m_baro * units::mbar;
 }
 
 units::celsius_t ADIS16448_IMU::GetTemperature() const {
   std::scoped_lock sync(m_mutex);
-  return units::celsius_t{m_temp};
+  return m_temp * units::celsius;
 }
 
 ADIS16448_IMU::IMUAxis ADIS16448_IMU::GetYawAxis() const {

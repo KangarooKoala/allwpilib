@@ -64,19 +64,19 @@ bool ElevatorSim::WouldHitUpperLimit(units::meter_t elevatorHeight) const {
 }
 
 bool ElevatorSim::HasHitLowerLimit() const {
-  return WouldHitLowerLimit(units::meter_t{m_y(0)});
+  return WouldHitLowerLimit(m_y(0) * units::meter);
 }
 
 bool ElevatorSim::HasHitUpperLimit() const {
-  return WouldHitUpperLimit(units::meter_t{m_y(0)});
+  return WouldHitUpperLimit(m_y(0) * units::meter);
 }
 
 units::meter_t ElevatorSim::GetPosition() const {
-  return units::meter_t{m_y(0)};
+  return m_y(0) * units::meter;
 }
 
 units::meters_per_second_t ElevatorSim::GetVelocity() const {
-  return units::meters_per_second_t{m_x(1)};
+  return m_x(1) * units::meters_per_second;
 }
 
 units::ampere_t ElevatorSim::GetCurrentDraw() const {
@@ -85,14 +85,13 @@ units::ampere_t ElevatorSim::GetCurrentDraw() const {
   // is spinning 10x faster than the output.
 
   double kA = 1.0 / m_plant.B(1, 0);
-  using Kv_t = units::unit_t<units::compound_unit<
-      units::volt, units::inverse<units::meters_per_second>>>;
-  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+  using Kv_t = units::unit_t<units::volt / units::meters_per_second>;
+  Kv_t Kv = kA * m_plant.A(1, 1) * Kv_t::unit;
   units::meters_per_second_t velocity{m_x(1)};
   units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
 
   // Perform calculation and return.
-  return m_gearbox.Current(motorVelocity, units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(motorVelocity, m_u(0) * units::volt) *
          wpi::sgn(m_u(0));
 }
 
@@ -114,10 +113,10 @@ Vectord<2> ElevatorSim::UpdateX(const Vectord<2>& currentXhat,
       },
       currentXhat, u, dt);
   // Check for collision after updating x-hat.
-  if (WouldHitLowerLimit(units::meter_t{updatedXhat(0)})) {
+  if (WouldHitLowerLimit(updatedXhat(0) * units::meter)) {
     return Vectord<2>{m_minHeight.value(), 0.0};
   }
-  if (WouldHitUpperLimit(units::meter_t{updatedXhat(0)})) {
+  if (WouldHitUpperLimit(updatedXhat(0) * units::meter)) {
     return Vectord<2>{m_maxHeight.value(), 0.0};
   }
   return updatedXhat;

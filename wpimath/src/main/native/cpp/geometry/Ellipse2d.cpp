@@ -48,8 +48,8 @@ Translation2d Ellipse2d::FindNearestPoint(const Translation2d& point) const {
 
     problem.Solve();
 
-    rotPoint = frc::Translation2d{units::meter_t{x.Value()},
-                                  units::meter_t{y.Value()}};
+    rotPoint = frc::Translation2d{x.Value() * units::meter,
+                                  y.Value() * units::meter};
   }
 
   // Undo rotation

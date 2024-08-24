@@ -19,12 +19,8 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT DCMotor {
  public:
-  using radians_per_second_per_volt_t =
-      units::unit_t<units::compound_unit<units::radians_per_second,
-                                         units::inverse<units::volt>>>;
-  using newton_meters_per_ampere_t =
-      units::unit_t<units::compound_unit<units::newton_meters,
-                                         units::inverse<units::ampere>>>;
+  using radians_per_second_per_volt_t = units::unit_t<units::radians_per_second / units::volt>;
+  using newton_meters_per_ampere_t = units::unit_t<units::newton_meters / units::ampere>;
 
   /// Voltage at which the motor constants were measured.
   units::volt_t nominalVoltage;

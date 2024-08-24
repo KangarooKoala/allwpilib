@@ -43,10 +43,10 @@ void Elevator::ReachGoal(units::meter_t goal) {
   m_controller.SetGoal(goal);
   // With the setpoint value we run PID control like normal
   double pidOutput =
-      m_controller.Calculate(units::meter_t{m_encoder.GetDistance()});
+      m_controller.Calculate(m_encoder.GetDistance() * units::meter);
   units::volt_t feedforwardOutput =
       m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
-  m_motor.SetVoltage(units::volt_t{pidOutput} + feedforwardOutput);
+  m_motor.SetVoltage(pidOutput * units::volt + feedforwardOutput);
 }
 
 void Elevator::Stop() {

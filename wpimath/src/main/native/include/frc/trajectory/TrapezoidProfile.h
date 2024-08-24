@@ -39,15 +39,13 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
-template <class Distance>
+template <Unit auto Distance>
 class TrapezoidProfile {
  public:
   using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
+  static constexpr auto Velocity = Distance / units::second;
   using Velocity_t = units::unit_t<Velocity>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
+  static constexpr auto Acceleration = Velocity / units::second;
   using Acceleration_t = units::unit_t<Acceleration>;
 
   /**

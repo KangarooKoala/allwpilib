@@ -15,12 +15,10 @@ using StructType = wpi::Struct<frc::ElevatorFeedforward>;
 
 frc::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
   return frc::ElevatorFeedforward{
-      units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-      units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{
-          wpi::UnpackStruct<double, kKvOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{
-          wpi::UnpackStruct<double, kKaOff>(data)},
+      wpi::UnpackStruct<double, kKsOff>(data) * units::volt,
+      wpi::UnpackStruct<double, kKgOff>(data) * units::volt,
+      wpi::UnpackStruct<double, kKvOff>(data) * frc::ElevatorFeedforward::kv_unit,
+      wpi::UnpackStruct<double, kKaOff>(data) * frc::ElevatorFeedforward::ka_unit,
   };
 }
 

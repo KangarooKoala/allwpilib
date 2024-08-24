@@ -46,9 +46,9 @@ static Transform3d MakePose(const apriltag_pose_t& pose) {
   if (!pose.R || !pose.t) {
     return {};
   }
-  return {Translation3d{units::meter_t{pose.t->data[0]},
-                        units::meter_t{pose.t->data[1]},
-                        units::meter_t{pose.t->data[2]}},
+  return {Translation3d{pose.t->data[0] * units::meter,
+                        pose.t->data[1] * units::meter,
+                        pose.t->data[2] * units::meter},
           Rotation3d{OrthogonalizeRotationMatrix(
               Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{
                   pose.R->data})}};

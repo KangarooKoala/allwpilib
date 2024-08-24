@@ -58,13 +58,13 @@ TEST(Mechanism2dTest, Ligament) {
       "/SmartDashboard/mechanism/root/ligament/weight");
   frc::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
   frc::MechanismLigament2d* ligament = root->Append<frc::MechanismLigament2d>(
-      "ligament", 3, units::degree_t{90}, 1, frc::Color8Bit{255, 255, 255});
+      "ligament", 3, 90_deg, 1, frc::Color8Bit{255, 255, 255});
   frc::SmartDashboard::PutData("mechanism", &mechanism);
   EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
   EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));
   EXPECT_EQ(ligament->GetLength(), lengthEntry.GetDouble(0.0));
   EXPECT_EQ(ligament->GetLineWeight(), weightEntry.GetDouble(0.0));
-  ligament->SetAngle(units::degree_t{45});
+  ligament->SetAngle(45_deg);
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);

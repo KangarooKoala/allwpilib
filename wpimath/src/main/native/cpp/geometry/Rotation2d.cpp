@@ -18,5 +18,5 @@ void frc::to_json(wpi::json& json, const Rotation2d& rotation) {
 }
 
 void frc::from_json(const wpi::json& json, Rotation2d& rotation) {
-  rotation = Rotation2d{units::radian_t{json.at("radians").get<double>()}};
+  rotation = Rotation2d{json.at("radians").get<double>() * units::radian};
 }

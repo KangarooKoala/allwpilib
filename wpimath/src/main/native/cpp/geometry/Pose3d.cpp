@@ -118,9 +118,9 @@ Pose3d Pose3d::Exp(const Twist3d& twist) const {
 
   auto translation_component = V * u;
   const Transform3d transform{
-      Translation3d{units::meter_t{translation_component(0)},
-                    units::meter_t{translation_component(1)},
-                    units::meter_t{translation_component(2)}},
+      Translation3d{translation_component(0) * units::meter,
+                    translation_component(1) * units::meter,
+                    translation_component(2) * units::meter},
       Rotation3d{R}};
 
   return *this + transform;
@@ -168,12 +168,12 @@ Twist3d Pose3d::Log(const Pose3d& end) const {
 
   Eigen::Vector3d translation_component = V_inv * u;
 
-  return Twist3d{units::meter_t{translation_component(0)},
-                 units::meter_t{translation_component(1)},
-                 units::meter_t{translation_component(2)},
-                 units::radian_t{rvec(0)},
-                 units::radian_t{rvec(1)},
-                 units::radian_t{rvec(2)}};
+  return Twist3d{translation_component(0) * units::meter,
+                 translation_component(1) * units::meter,
+                 translation_component(2) * units::meter,
+                 rvec(0) * units::radian,
+                 rvec(1) * units::radian,
+                 rvec(2) * units::radian};
 }
 
 Pose2d Pose3d::ToPose2d() const {
