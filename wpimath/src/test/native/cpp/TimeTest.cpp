@@ -115,8 +115,12 @@ template <size_t N>
 void Time(
     std::function<void()> action, std::function<void()> setup = [] {},
     std::string_view prefix = "") {
+  fmt::print("Initializing Time() arr\n");
+  std::fflush(stdout);
   wpi::array<units::nanosecond_t, N> durations(wpi::empty_array);
 
+  fmt::print("Filling durations\n");
+  std::fflush(stdout);
   for (size_t i = 0; i < N; ++i) {
     setup();
     auto start = std::chrono::steady_clock::now();
@@ -125,6 +129,8 @@ void Time(
     durations[i] = end - start;
   }
 
+  fmt::print("Processing durations\n");
+  std::fflush(stdout);
   ProcessDurations(durations, prefix);
 }
 
@@ -133,21 +139,19 @@ void TimeSuite(
     std::function<void()> setup = [] {}) {
   fmt::print("{}:\n", name);
   fmt::print("  Warmup: (100,000 iterations):\n");
+  std::fflush(stdout);
   Time<100'000>(action, setup, "    ");
   for (size_t i = 0; i < 5; ++i) {
     fmt::print("  Run {}:\n", i);
+    std::fflush(stdout);
     Time<1'000>(action, setup, "    ");
   }
 }
 
 TEST(TimeTest, Time) {
   {
-    wpi::print("Initializing odometry\n");
-    std::fflush(stdout);
     frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}, 0_m, 0_m,
                                             frc::Pose2d{}};
-    wpi::print("Initializing other values\n");
-    std::fflush(stdout);
     frc::Rotation2d gyroAngle{};
     auto leftDistance = 0_m;
     auto rightDistance = 0_m;
