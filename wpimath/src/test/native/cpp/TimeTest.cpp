@@ -88,6 +88,12 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   }
 
   wpi::print("{}First 10: {}\n", prefix, buffer);
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = durations[N - 10 + i];
+  }
+
+  wpi::print("{}Last 10: {}\n", prefix, buffer);
 }
 
 template <size_t N>
