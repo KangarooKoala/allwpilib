@@ -57,8 +57,12 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
 template <size_t N>
 void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
                       std::string_view prefix = "") {
-  wpi::print("ProcessDurations()\n");
+  wpi::print("Summing durations\n");
   std::fflush(stdout);
+  units::nanosecond_t total_duration = 0_ns;
+  for (auto duration : durations) {
+    total_duration += duration;
+  }
 }
 
 template <size_t N>
