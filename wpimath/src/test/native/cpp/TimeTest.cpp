@@ -115,12 +115,8 @@ template <size_t N>
 void Time(
     std::function<void()> action, std::function<void()> setup = [] {},
     std::string_view prefix = "") {
-  fmt::print("Initializing Time() arr\n");
-  std::fflush(stdout);
   wpi::array<units::nanosecond_t, N> durations(wpi::empty_array);
 
-  fmt::print("Filling durations\n");
-  std::fflush(stdout);
   for (size_t i = 0; i < N; ++i) {
     setup();
     auto start = std::chrono::steady_clock::now();
@@ -131,7 +127,7 @@ void Time(
 
   fmt::print("Processing durations\n");
   std::fflush(stdout);
-  ProcessDurations(durations, prefix);
+  ProcessDurations<N>(durations, prefix);
 }
 
 void TimeSuite(
