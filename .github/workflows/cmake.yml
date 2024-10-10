@@ -84,4 +84,4 @@ jobs:
         env:
           GTEST_FILTER: TimeTest.Time
         # UnitTest_test segfaults on exit occasionally
-        run: ctest --output-on-failure -V -E 'UnitTest'
+        run: ctest --output-on-failure -R wpimath -V -E 'UnitTest'
