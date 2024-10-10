@@ -28,7 +28,7 @@ jobs:
           - os: windows-2022
             name: Windows
             container: ""
-            flags: '--preset with-sccache -DWITH_JAVA=OFF -DWITH_CSCORE=OFF -DWITH_NTCORE=OFF -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=OFF -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
+            flags: '--preset with-sccache -DWITH_JAVA=OFF -DWITH_CSCORE=OFF -DWITH_NTCORE=OFF -DCMAKE_BUILD_TYPE=Release -DWITH_EXAMPLES=OFF -DWITH_SIMULATION_MODULES=OFF -DUSE_SYSTEM_FMTLIB=ON -DUSE_SYSTEM_LIBUV=ON -DUSE_SYSTEM_EIGEN=OFF -DCMAKE_TOOLCHAIN_FILE="$Env:RUNNER_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_INSTALL_OPTIONS=--clean-after-build -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_HOST_TRIPLET=x64-windows-release'
 
     name: "Build - ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
