@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <cstdio>
 
 #include <gtest/gtest.h>
 #include <wpi/array.h>
@@ -57,21 +58,25 @@ template <size_t N>
 void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
                       std::string_view prefix = "") {
   wpi::print("Summing durations\n");
+  std::fflush(stdout);
   units::nanosecond_t total_duration = 0_ns;
   for (auto duration : durations) {
     total_duration += duration;
   }
 
   wpi::print("Calculating mean\n");
+  std::fflush(stdout);
   units::nanosecond_t mean = total_duration / N;
 
   wpi::print("Calculating sum squares\n");
+  std::fflush(stdout);
   auto sum_squares = 0_ns * 0_ns;
   for (auto duration : durations) {
     sum_squares += (duration - mean) * (duration - mean);
   }
 
   wpi::print("Calculating std dev\n");
+  std::fflush(stdout);
   units::nanosecond_t std_dev = units::math::sqrt(sum_squares / N);
 
   wpi::print("{}Mean: {}, Std dev: {}\n", prefix, mean, std_dev);
@@ -136,5 +141,69 @@ void TimeSuite(
 }
 
 TEST(TimeTest, Time) {
-  wpi::print("Hello?\n");
+  {
+    wpi::print("Initializing odometry\n");
+    std::fflush(stdout);
+    frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}, 0_m, 0_m,
+                                            frc::Pose2d{}};
+    wpi::print("Initializing other values\n");
+    std::fflush(stdout);
+    frc::Rotation2d gyroAngle{};
+    auto leftDistance = 0_m;
+    auto rightDistance = 0_m;
+    wpi::print("Running time suite\n");
+    std::fflush(stdout);
+    TimeSuite(
+        "Odometry update (2d)",
+        [&] { odometry.Update(gyroAngle, leftDistance, rightDistance); },
+        [&] {
+          odometry.ResetPosition(frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{});
+        });
+  }
+
+  {
+    frc::DifferentialDriveOdometry3d odometry{frc::Rotation3d{}, 0_m, 0_m,
+                                              frc::Pose3d{}};
+    frc::Rotation3d gyroAngle{};
+    auto leftDistance = 0_m;
+    auto rightDistance = 0_m;
+    TimeSuite(
+        "Odometry update (3d)",
+        [&] { odometry.Update(gyroAngle, leftDistance, rightDistance); },
+        [&] {
+          odometry.ResetPosition(frc::Rotation3d{}, 0_m, 0_m, frc::Pose3d{});
+        });
+  }
+
+  {
+    frc::DifferentialDriveKinematics kinematics{1_m};
+    frc::DifferentialDrivePoseEstimator poseEstimator{
+        kinematics, frc::Rotation2d{}, 0_m, 0_m, frc::Pose2d{}};
+    frc::Rotation2d gyroAngle{};
+    auto leftDistance = 0_m;
+    auto rightDistance = 0_m;
+    TimeSuite(
+        "Pose estimator update (2d)",
+        [&] { poseEstimator.Update(gyroAngle, leftDistance, rightDistance); },
+        [&] {
+          poseEstimator.ResetPosition(frc::Rotation2d{}, 0_m, 0_m,
+                                      frc::Pose2d{});
+        });
+  }
+
+  {
+    frc::DifferentialDriveKinematics kinematics{1_m};
+    frc::DifferentialDrivePoseEstimator3d poseEstimator{
+        kinematics, frc::Rotation3d{}, 0_m, 0_m, frc::Pose3d{}};
+    frc::Rotation3d gyroAngle{};
+    auto leftDistance = 0_m;
+    auto rightDistance = 0_m;
+    TimeSuite(
+        "Pose estimator update (3d)",
+        [&] { poseEstimator.Update(gyroAngle, leftDistance, rightDistance); },
+        [&] {
+          poseEstimator.ResetPosition(frc::Rotation3d{}, 0_m, 0_m,
+                                      frc::Pose3d{});
+        });
+  }
 }
