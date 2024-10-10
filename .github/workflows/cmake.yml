@@ -81,5 +81,7 @@ jobs:
       - name: test (windows)
         if: runner.os == 'Windows'
         working-directory: build-cmake
+        env:
+          GTEST_FILTER: TimeTest.Time
         # UnitTest_test segfaults on exit occasionally
-        run: GTEST_FILTER="TimeTest.Time" ctest --output-on-failure -V -E 'UnitTest'
+        run: ctest --output-on-failure -V -E 'UnitTest'
