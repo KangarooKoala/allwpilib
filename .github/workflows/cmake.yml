@@ -82,4 +82,4 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: build-cmake
         # UnitTest_test segfaults on exit occasionally
-        run: ctest --output-on-failure -E 'UnitTest'
+        run: ctest --output-on-failure -V -E 'UnitTest'
