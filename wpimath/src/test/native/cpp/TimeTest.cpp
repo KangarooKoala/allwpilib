@@ -96,6 +96,18 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   wpi::print("{}Last 10: {}\n", prefix, buffer);
 
   wpi::array<units::nanosecond_t, N> sorted{durations};
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[i];
+  }
+
+  wpi::print("{}Fastest 10: {}\n", prefix, buffer);
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[N - 10 + i];
+  }
+
+  wpi::print("{}Slowest 10: {}\n", prefix, buffer);
 }
 
 template <size_t N>
