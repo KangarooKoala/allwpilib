@@ -98,7 +98,7 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
 
   wpi::array<units::nanosecond_t, N> sorted{durations};
 
-  [[ maybe_unused ]] auto foo = sorted[0];
+  wpi::print("{}\n", sorted[0]);
 }
 
 template <size_t N>
