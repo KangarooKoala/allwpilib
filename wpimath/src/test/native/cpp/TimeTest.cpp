@@ -31,6 +31,7 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
 
   template <typename FmtContext>
   auto format(const wpi::array<T, N>& arr, FmtContext& ctx) const {
+    wpi::print("Formatting wpi::array\n");
     auto out = ctx.out();
 
     out = fmt::format_to(out, "[");
@@ -44,6 +45,7 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
 
     out = fmt::format_to(out, "]");
 
+    wpi::print("Done formatting wpi::array\n");
     return out;
   }
 
@@ -54,18 +56,22 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
 template <size_t N>
 void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
                       std::string_view prefix = "") {
+  wpi::print("Summing durations\n");
   units::nanosecond_t total_duration = 0_ns;
   for (auto duration : durations) {
     total_duration += duration;
   }
 
+  wpi::print("Calculating mean\n");
   units::nanosecond_t mean = total_duration / N;
 
+  wpi::print("Calculating sum squares\n");
   auto sum_squares = 0_ns * 0_ns;
   for (auto duration : durations) {
     sum_squares += (duration - mean) * (duration - mean);
   }
 
+  wpi::print("Calculating std dev\n");
   units::nanosecond_t std_dev = units::math::sqrt(sum_squares / N);
 
   wpi::print("{}Mean: {}, Std dev: {}\n", prefix, mean, std_dev);
@@ -131,11 +137,14 @@ void TimeSuite(
 
 TEST(TimeTest, Time) {
   {
+    wpi::print("Initializing odometry\n");
     frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}, 0_m, 0_m,
                                             frc::Pose2d{}};
+    wpi::print("Initializing other values\n");
     frc::Rotation2d gyroAngle{};
     auto leftDistance = 0_m;
     auto rightDistance = 0_m;
+    wpi::print("Running time suite\n");
     TimeSuite(
         "Odometry update (2d)",
         [&] { odometry.Update(gyroAngle, leftDistance, rightDistance); },
