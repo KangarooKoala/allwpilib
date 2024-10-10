@@ -63,6 +63,52 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   for (auto duration : durations) {
     total_duration += duration;
   }
+
+  wpi::print("Calculating mean\n");
+  std::fflush(stdout);
+  units::nanosecond_t mean = total_duration / N;
+
+  wpi::print("Calculating sum squares\n");
+  std::fflush(stdout);
+  auto sum_squares = 0_ns * 0_ns;
+  for (auto duration : durations) {
+    sum_squares += (duration - mean) * (duration - mean);
+  }
+
+  wpi::print("Calculating std dev\n");
+  std::fflush(stdout);
+  units::nanosecond_t std_dev = units::math::sqrt(sum_squares / N);
+
+  wpi::print("{}Mean: {}, Std dev: {}\n", prefix, mean, std_dev);
+
+  wpi::array<units::nanosecond_t, 10> buffer{wpi::empty_array};
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = durations[i];
+  }
+
+  wpi::print("{}First 10: {}\n", prefix, buffer);
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = durations[N - 10 + i];
+  }
+
+  wpi::print("{}Last 10: {}\n", prefix, buffer);
+
+  wpi::array<units::nanosecond_t, N> sorted{durations};
+  std::sort(sorted.begin(), sorted.end());
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[i];
+  }
+
+  wpi::print("{}Fastest 10: {}\n", prefix, buffer);
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[N - 10 + i];
+  }
+
+  wpi::print("{}Slowest 10: {}\n", prefix, buffer);
 }
 
 template <size_t N>
