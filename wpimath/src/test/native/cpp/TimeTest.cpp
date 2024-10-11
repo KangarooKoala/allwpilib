@@ -95,15 +95,6 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
 
   wpi::print("{}Last 10: {}\n", prefix, buffer);
   std::fflush(stdout);
-
-  wpi::array<units::nanosecond_t, 1025> array_a(wpi::empty_array);
-  for (size_t i = 0; i < 1025; ++i) {
-    array_a[i] = 0_ns;
-  }
-
-  [[ maybe_unused ]] std::array<units::nanosecond_t, 1025> array_b{array_a};
-
-  wpi::print("{}\n", array_b[0]);
 }
 
 template <size_t N>
@@ -139,7 +130,32 @@ void TimeSuite(
   }
 }
 
+template <size_t N>
+void TestArray() {
+  fmt::print("TestArray: N = {}\n", N);
+  std::fflush(stdout);
+  wpi::array<units::nanosecond_t, N> array_a(wpi::empty_array);
+  for (size_t i = 0; i < N; ++i) {
+    array_a[i] = 0_ns;
+  }
+
+  [[ maybe_unused ]] std::array<units::nanosecond_t, N> array_b{array_a};
+
+  wpi::print("{}\n", array_b[0]);
+}
+
 TEST(TimeTest, Time) {
+  fmt::print("Testing 2**10 + 1\n");
+  std::fflush(stdout);
+  TestArray<(1 << 10) + 1>();
+
+  fmt::print("Testing 2**12 + 1\n");
+  std::fflush(stdout);
+  TestArray<(1 << 12) + 1>();
+
+  fmt::print("Testing 2**16 + 1\n");
+  std::fflush(stdout);
+  TestArray<(1 << 16) + 1>();
   {
     frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}, 0_m, 0_m,
                                             frc::Pose2d{}};
