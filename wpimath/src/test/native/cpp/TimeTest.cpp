@@ -98,7 +98,7 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
 
   wpi::print("{}\n", durations[0]);
 
-  std::array<units::nanosecond_t, N> sorted{durations};
+  [[ maybe_unused ]] std::array<units::nanosecond_t, N> sorted{durations};
 
   wpi::print("{}\n", durations[0]);
   // wpi::print("{}\n", sorted[0]);
