@@ -96,12 +96,12 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   wpi::print("{}Last 10: {}\n", prefix, buffer);
   std::fflush(stdout);
 
-  wpi::array<units::nanosecond_t, 100'000> array_a(wpi::empty_array);
-  for (size_t i = 0; i < 100'000; ++i) {
+  wpi::array<units::nanosecond_t, 1025> array_a(wpi::empty_array);
+  for (size_t i = 0; i < 1025; ++i) {
     array_a[i] = 0_ns;
   }
 
-  [[ maybe_unused ]] std::array<units::nanosecond_t, 100'000> array_b{array_a};
+  [[ maybe_unused ]] std::array<units::nanosecond_t, 1025> array_b{array_a};
 
   wpi::print("{}\n", array_b[0]);
 }
