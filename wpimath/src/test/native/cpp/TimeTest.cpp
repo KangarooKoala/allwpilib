@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdio>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <wpi/array.h>
@@ -55,7 +56,7 @@ struct fmt::formatter<wpi::array<T, N>, CharT> {
 };
 
 template <size_t N>
-void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
+void ProcessDurations(const std::vector<units::nanosecond_t>& durations,
                       std::string_view prefix = "") {
   wpi::print("Summing durations\n");
   std::fflush(stdout);
@@ -94,14 +95,28 @@ void ProcessDurations(const wpi::array<units::nanosecond_t, N>& durations,
   }
 
   wpi::print("{}Last 10: {}\n", prefix, buffer);
-  std::fflush(stdout);
+
+  std::vector<units::nanosecond_t> sorted{durations};
+  std::sort(sorted.begin(), sorted.end());
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[i];
+  }
+
+  wpi::print("{}Fastest 10: {}\n", prefix, buffer);
+
+  for (size_t i = 0; i < 10; ++i) {
+    buffer[i] = sorted[N - 10 + i];
+  }
+
+  wpi::print("{}Slowest 10: {}\n", prefix, buffer);
 }
 
 template <size_t N>
 void Time(
     std::function<void()> action, std::function<void()> setup = [] {},
     std::string_view prefix = "") {
-  wpi::array<units::nanosecond_t, N> durations(wpi::empty_array);
+  std::vector<units::nanosecond_t> durations{N};
 
   for (size_t i = 0; i < N; ++i) {
     setup();
@@ -130,32 +145,7 @@ void TimeSuite(
   }
 }
 
-template <size_t N>
-void TestArray() {
-  fmt::print("TestArray: N = {}\n", N);
-  std::fflush(stdout);
-  wpi::array<units::nanosecond_t, N> array_a(wpi::empty_array);
-  for (size_t i = 0; i < N; ++i) {
-    array_a[i] = 0_ns;
-  }
-
-  [[ maybe_unused ]] std::array<units::nanosecond_t, N> array_b{array_a};
-
-  wpi::print("{}\n", array_b[0]);
-}
-
 TEST(TimeTest, Time) {
-  fmt::print("Testing 2**10 + 1\n");
-  std::fflush(stdout);
-  TestArray<(1 << 10) + 1>();
-
-  fmt::print("Testing 2**12 + 1\n");
-  std::fflush(stdout);
-  TestArray<(1 << 12) + 1>();
-
-  fmt::print("Testing 2**16 + 1\n");
-  std::fflush(stdout);
-  TestArray<(1 << 16) + 1>();
   {
     frc::DifferentialDriveOdometry odometry{frc::Rotation2d{}, 0_m, 0_m,
                                             frc::Pose2d{}};
