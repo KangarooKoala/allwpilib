@@ -151,6 +151,7 @@ set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
 target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+target_compile_definitions(wpimath PUBLIC MP_UNITS_API_STD_FORMAT=0)
 
 target_compile_features(wpimath PUBLIC cxx_std_20)
 if(MSVC)
@@ -176,7 +177,10 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
+    DIRECTORY
+        src/main/native/thirdparty/gcem/include/
+        src/main/native/thirdparty/mp-units/include
+        src/main/native/thirdparty/sleipnir/include/
     DESTINATION "${include_dest}/wpimath"
 )
 target_include_directories(
@@ -184,6 +188,7 @@ target_include_directories(
     SYSTEM
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mp-units/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
 )

@@ -138,6 +138,12 @@ jobs:
           ./stb.py clone
           ./stb.py copy-src
           ./stb.py format-patch
+      - name: Run units.py
+        run: |
+          cd upstream_utils
+          ./units.py clone
+          ./units.py copy-src
+          ./units.py format-patch
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output
