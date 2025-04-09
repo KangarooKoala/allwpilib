@@ -132,6 +132,12 @@ jobs:
           ./stb.py clone
           ./stb.py copy-src
           ./stb.py format-patch
+      - name: Run units.py
+        run: |
+          cd upstream_utils
+          ./units.py clone
+          ./units.py copy-src
+          ./units.py format-patch
       - name: Run upb.py
         run: |
           cd upstream_utils
