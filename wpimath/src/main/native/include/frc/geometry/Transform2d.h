@@ -46,7 +46,8 @@ class WPILIB_DLLEXPORT Transform2d {
    * @param y The y component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
+  constexpr Transform2d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                        Rotation2d rotation)
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -81,14 +82,14 @@ class WPILIB_DLLEXPORT Transform2d {
    *
    * @return The x component of the transformation's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns an affine transformation matrix representation of this

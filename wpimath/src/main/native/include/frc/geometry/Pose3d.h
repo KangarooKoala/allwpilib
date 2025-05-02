@@ -20,6 +20,7 @@
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/geometry/Twist3d.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -54,8 +55,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
-                   Rotation3d rotation)
+  constexpr Pose3d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                   mp::quantity<mp::m> z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -85,8 +86,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @see Translation3d(Translation2d)
    */
   constexpr explicit Pose3d(const Pose2d& pose)
-      : m_translation{pose.X(), pose.Y(), 0_m},
-        m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
+      : m_translation{pose.X(), pose.Y(), 0.0 * mp::m},
+        m_rotation{0.0 * mp::rad, 0.0 * mp::rad, pose.Rotation().Radians()} {}
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -127,21 +128,21 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the pose's translation.
    *
    * @return The z component of the pose's translation.
    */
-  constexpr units::meter_t Z() const { return m_translation.Z(); }
+  constexpr mp::quantity<mp::m> Z() const { return m_translation.Z(); }
 
   /**
    * Returns the underlying rotation.
@@ -237,8 +238,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param twist The change in pose in the robot's coordinate frame since the
    * previous pose update. For example, if a non-holonomic robot moves forward
    * 0.01 meters and changes angle by 0.5 degrees since the previous pose
-   * update, the twist would be Twist3d{0.01_m, 0_m, 0_m, Rotation3d{0.0, 0.0,
-   * 0.5_deg}}.
+   * update, the twist would be Twist3d{0.01 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+   * Rotation3d{0.0, 0.0, 0.5 * mp::deg}}.
    *
    * @return The new pose of the robot.
    */
@@ -291,8 +292,9 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+                       mp::value((this->Rotation() - a.Rotation()).Angle())) <
+                   gcem::abs(
+                       mp::value((this->Rotation() - b.Rotation()).Angle()));
           }
           return aDistance < bDistance;
         });
@@ -316,8 +318,9 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+                       mp::value((this->Rotation() - a.Rotation()).Angle())) <
+                   gcem::abs(
+                       mp::value((this->Rotation() - b.Rotation()).Angle()));
           }
           return aDistance < bDistance;
         });
@@ -406,8 +409,9 @@ constexpr Pose3d Pose3d::Exp(const Twist3d& twist) const {
 
   auto impl = [this]<typename Matrix3d, typename Vector3d>(
                   const Twist3d& twist) -> Pose3d {
-    Vector3d u{{twist.dx.value(), twist.dy.value(), twist.dz.value()}};
-    Vector3d rvec{{twist.rx.value(), twist.ry.value(), twist.rz.value()}};
+    Vector3d u{{mp::value(twist.dx), mp::value(twist.dy), mp::value(twist.dz)}};
+    Vector3d rvec{
+        {mp::value(twist.rx), mp::value(twist.ry), mp::value(twist.rz)}};
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
     double theta = rvec.norm();
@@ -445,11 +449,10 @@ constexpr Pose3d Pose3d::Exp(const Twist3d& twist) const {
 
     Vector3d translation_component = V * u;
 
-    const Transform3d transform{
-        Translation3d{units::meter_t{translation_component(0)},
-                      units::meter_t{translation_component(1)},
-                      units::meter_t{translation_component(2)}},
-        Rotation3d{R}};
+    const Transform3d transform{Translation3d{translation_component(0) * mp::m,
+                                              translation_component(1) * mp::m,
+                                              translation_component(2) * mp::m},
+                                Rotation3d{R}};
 
     return *this + transform;
   };
@@ -468,8 +471,8 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
                   const Pose3d& end) -> Twist3d {
     const auto transform = end.RelativeTo(*this);
 
-    Vector3d u{
-        {transform.X().value(), transform.Y().value(), transform.Z().value()}};
+    Vector3d u{{mp::value(transform.X()), mp::value(transform.Y()),
+                mp::value(transform.Z())}};
     Vector3d rvec = transform.Rotation().ToVector();
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
@@ -503,12 +506,12 @@ constexpr Twist3d Pose3d::Log(const Pose3d& end) const {
 
     Vector3d translation_component = V_inv * u;
 
-    return Twist3d{units::meter_t{translation_component(0)},
-                   units::meter_t{translation_component(1)},
-                   units::meter_t{translation_component(2)},
-                   units::radian_t{rvec(0)},
-                   units::radian_t{rvec(1)},
-                   units::radian_t{rvec(2)}};
+    return Twist3d{translation_component(0) * mp::m,
+                   translation_component(1) * mp::m,
+                   translation_component(2) * mp::m,
+                   rvec(0) * mp::rad,
+                   rvec(1) * mp::rad,
+                   rvec(2) * mp::rad};
   };
 
   if (std::is_constant_evaluated()) {

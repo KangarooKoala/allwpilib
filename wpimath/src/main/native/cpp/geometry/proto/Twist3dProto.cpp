@@ -14,20 +14,20 @@ std::optional<frc::Twist3d> wpi::Protobuf<frc::Twist3d>::Unpack(
   }
 
   return frc::Twist3d{
-      units::meter_t{msg.dx},  units::meter_t{msg.dy},  units::meter_t{msg.dz},
-      units::radian_t{msg.rx}, units::radian_t{msg.ry}, units::radian_t{msg.rz},
+      msg.dx * mp::m,   msg.dy * mp::m,   msg.dz * mp::m,
+      msg.rx * mp::rad, msg.ry * mp::rad, msg.rz * mp::rad,
   };
 }
 
 bool wpi::Protobuf<frc::Twist3d>::Pack(OutputStream& stream,
                                        const frc::Twist3d& value) {
   wpi_proto_ProtobufTwist3d msg{
-      .dx = value.dx.value(),
-      .dy = value.dy.value(),
-      .dz = value.dz.value(),
-      .rx = value.rx.value(),
-      .ry = value.ry.value(),
-      .rz = value.rz.value(),
+      .dx = mp::value(value.dx),
+      .dy = mp::value(value.dy),
+      .dz = mp::value(value.dz),
+      .rx = mp::value(value.rx),
+      .ry = mp::value(value.ry),
+      .rz = mp::value(value.rz),
   };
   return stream.Encode(msg);
 }

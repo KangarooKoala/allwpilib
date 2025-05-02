@@ -11,7 +11,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalJacobian.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -55,7 +55,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&, const InputVector&)> f,
-      units::second_t dt)
+      mp::quantity<mp::s> dt)
       : m_dt(dt), m_f(f) {
     m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
                                                      InputVector::Zero());
@@ -74,7 +74,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
-      const Matrixd<States, Inputs>& B, units::second_t dt)
+      const Matrixd<States, Inputs>& B, mp::quantity<mp::s> dt)
       : m_B(B), m_dt(dt) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
@@ -164,7 +164,7 @@ class ControlAffinePlantInversionFeedforward {
    * @return The calculated feedforward.
    */
   InputVector Calculate(const StateVector& r, const StateVector& nextR) {
-    StateVector rDot = (nextR - r) / m_dt.value();
+    StateVector rDot = (nextR - r) / mp::value(m_dt);
 
     // ṙ = f(r) + Bu
     // Bu = ṙ − f(r)
@@ -178,7 +178,7 @@ class ControlAffinePlantInversionFeedforward {
  private:
   Matrixd<States, Inputs> m_B;
 
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   /**
    * The model dynamics.

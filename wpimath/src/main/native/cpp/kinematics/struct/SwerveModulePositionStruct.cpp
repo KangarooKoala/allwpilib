@@ -13,13 +13,13 @@ using StructType = wpi::Struct<frc::SwerveModulePosition>;
 
 frc::SwerveModulePosition StructType::Unpack(std::span<const uint8_t> data) {
   return frc::SwerveModulePosition{
-      units::meter_t{wpi::UnpackStruct<double, kDistanceOff>(data)},
+      wpi::UnpackStruct<double, kDistanceOff>(data) * mp::m,
       wpi::UnpackStruct<frc::Rotation2d, kAngleOff>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::SwerveModulePosition& value) {
-  wpi::PackStruct<kDistanceOff>(data, value.distance.value());
+  wpi::PackStruct<kDistanceOff>(data, mp::value(value.distance));
   wpi::PackStruct<kAngleOff>(data, value.angle);
 }

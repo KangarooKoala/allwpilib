@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -13,10 +13,10 @@ namespace frc {
  */
 struct DifferentialDriveWheelVoltages {
   /// Left wheel voltage.
-  units::volt_t left = 0_V;
+  mp::quantity<mp::V> left = 0.0 * mp::V;
 
   /// Right wheel voltage.
-  units::volt_t right = 0_V;
+  mp::quantity<mp::V> right = 0.0 * mp::V;
 };
 
 }  // namespace frc

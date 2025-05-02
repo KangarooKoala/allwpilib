@@ -8,8 +8,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Rotation2d.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -19,7 +18,7 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
   /**
    * Distance the wheel of a module has traveled
    */
-  units::meter_t distance = 0_m;
+  mp::quantity<mp::m> distance = 0.0 * mp::m;
 
   /**
    * Angle of the module.
@@ -33,7 +32,7 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModulePosition& other) const {
-    return units::math::abs(distance - other.distance) < 1E-9_m &&
+    return mp::abs(distance - other.distance) < 1E-9 * mp::m &&
            angle == other.angle;
   }
 

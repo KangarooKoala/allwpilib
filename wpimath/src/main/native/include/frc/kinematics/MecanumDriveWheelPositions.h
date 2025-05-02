@@ -7,7 +7,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -17,22 +17,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   /**
    * Distance driven by the front-left wheel.
    */
-  units::meter_t frontLeft = 0_m;
+  mp::quantity<mp::m> frontLeft = 0.0 * mp::m;
 
   /**
    * Distance driven by the front-right wheel.
    */
-  units::meter_t frontRight = 0_m;
+  mp::quantity<mp::m> frontRight = 0.0 * mp::m;
 
   /**
    * Distance driven by the rear-left wheel.
    */
-  units::meter_t rearLeft = 0_m;
+  mp::quantity<mp::m> rearLeft = 0.0 * mp::m;
 
   /**
    * Distance driven by the rear-right wheel.
    */
-  units::meter_t rearRight = 0_m;
+  mp::quantity<mp::m> rearRight = 0.0 * mp::m;
 
   /**
    * Checks equality between this MecanumDriveWheelPositions and another object.

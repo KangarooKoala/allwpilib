@@ -13,8 +13,7 @@
 #include "frc/controller/LinearQuadraticRegulator.h"
 #include "frc/estimator/KalmanFilter.h"
 #include "frc/system/LinearSystem.h"
-#include "units/time.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -58,11 +57,12 @@ class LinearSystemLoop {
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
-                   units::volt_t maxVoltage, units::second_t dt)
+                   mp::quantity<mp::V> maxVoltage, mp::quantity<mp::s> dt)
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const InputVector& u) {
-              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
+              return frc::DesaturateInputVector<Inputs>(u,
+                                                        mp::value(maxVoltage));
             },
             dt) {}
 
@@ -82,7 +82,7 @@ class LinearSystemLoop {
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    std::function<InputVector(const InputVector&)> clampFunction,
-                   units::second_t dt)
+                   mp::quantity<mp::s> dt)
       : LinearSystemLoop(
             controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
@@ -102,11 +102,13 @@ class LinearSystemLoop {
   LinearSystemLoop(
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
-      KalmanFilter<States, Inputs, Outputs>& observer, units::volt_t maxVoltage)
-      : LinearSystemLoop(
-            controller, feedforward, observer, [=](const InputVector& u) {
-              return frc::DesaturateInputVector<Inputs>(u, maxVoltage.value());
-            }) {}
+      KalmanFilter<States, Inputs, Outputs>& observer,
+      mp::quantity<mp::V> maxVoltage)
+      : LinearSystemLoop(controller, feedforward, observer,
+                         [=](const InputVector& u) {
+                           return frc::DesaturateInputVector<Inputs>(
+                               u, mp::value(maxVoltage));
+                         }) {}
 
   /**
    * Constructs a state-space loop with the given controller, feedforward,
@@ -252,7 +254,7 @@ class LinearSystemLoop {
    *
    * @param dt Timestep for model update.
    */
-  void Predict(units::second_t dt) {
+  void Predict(mp::quantity<mp::s> dt) {
     InputVector u =
         ClampInput(m_controller->Calculate(m_observer->Xhat(), m_nextR) +
                    m_feedforward.Calculate(m_nextR));

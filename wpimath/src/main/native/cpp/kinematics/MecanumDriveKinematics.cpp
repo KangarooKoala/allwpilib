@@ -4,6 +4,8 @@
 
 #include "frc/kinematics/MecanumDriveKinematics.h"
 
+#include "frc/units.h"
+
 using namespace frc;
 
 MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
@@ -21,67 +23,67 @@ MecanumDriveWheelSpeeds MecanumDriveKinematics::ToWheelSpeeds(
     m_previousCoR = centerOfRotation;
   }
 
-  Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
-                                      chassisSpeeds.vy.value(),
-                                      chassisSpeeds.omega.value()};
+  Eigen::Vector3d chassisSpeedsVector{mp::value(chassisSpeeds.vx),
+                                      mp::value(chassisSpeeds.vy),
+                                      mp::value(chassisSpeeds.omega)};
 
   Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisSpeedsVector;
 
   MecanumDriveWheelSpeeds wheelSpeeds;
-  wheelSpeeds.frontLeft = units::meters_per_second_t{wheelsVector(0)};
-  wheelSpeeds.frontRight = units::meters_per_second_t{wheelsVector(1)};
-  wheelSpeeds.rearLeft = units::meters_per_second_t{wheelsVector(2)};
-  wheelSpeeds.rearRight = units::meters_per_second_t{wheelsVector(3)};
+  wheelSpeeds.frontLeft = wheelsVector(0) * mp::m / mp::s;
+  wheelSpeeds.frontRight = wheelsVector(1) * mp::m / mp::s;
+  wheelSpeeds.rearLeft = wheelsVector(2) * mp::m / mp::s;
+  wheelSpeeds.rearRight = wheelsVector(3) * mp::m / mp::s;
   return wheelSpeeds;
 }
 
 ChassisSpeeds MecanumDriveKinematics::ToChassisSpeeds(
     const MecanumDriveWheelSpeeds& wheelSpeeds) const {
   Eigen::Vector4d wheelSpeedsVector{
-      wheelSpeeds.frontLeft.value(), wheelSpeeds.frontRight.value(),
-      wheelSpeeds.rearLeft.value(), wheelSpeeds.rearRight.value()};
+      mp::value(wheelSpeeds.frontLeft), mp::value(wheelSpeeds.frontRight),
+      mp::value(wheelSpeeds.rearLeft), mp::value(wheelSpeeds.rearRight)};
 
   Eigen::Vector3d chassisSpeedsVector =
       m_forwardKinematics.solve(wheelSpeedsVector);
 
-  return {units::meters_per_second_t{chassisSpeedsVector(0)},  // NOLINT
-          units::meters_per_second_t{chassisSpeedsVector(1)},
-          units::radians_per_second_t{chassisSpeedsVector(2)}};
+  return {chassisSpeedsVector(0) * mp::m / mp::s,
+          chassisSpeedsVector(1) * mp::m / mp::s,
+          chassisSpeedsVector(2) * mp::rad / mp::s};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
     const MecanumDriveWheelPositions& start,
     const MecanumDriveWheelPositions& end) const {
   Eigen::Vector4d wheelDeltasVector{
-      end.frontLeft.value() - start.frontLeft.value(),
-      end.frontRight.value() - start.frontRight.value(),
-      end.rearLeft.value() - start.rearLeft.value(),
-      end.rearRight.value() - start.rearRight.value()};
+      mp::value(end.frontLeft) - mp::value(start.frontLeft),
+      mp::value(end.frontRight) - mp::value(start.frontRight),
+      mp::value(end.rearLeft) - mp::value(start.rearLeft),
+      mp::value(end.rearRight) - mp::value(start.rearRight)};
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
-          units::radian_t{twistVector(2)}};
+  return {twistVector(0) * mp::m, twistVector(1) * mp::m,
+          twistVector(2) * mp::rad};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
     const MecanumDriveWheelPositions& wheelDeltas) const {
   Eigen::Vector4d wheelDeltasVector{
-      wheelDeltas.frontLeft.value(), wheelDeltas.frontRight.value(),
-      wheelDeltas.rearLeft.value(), wheelDeltas.rearRight.value()};
+      mp::value(wheelDeltas.frontLeft), mp::value(wheelDeltas.frontRight),
+      mp::value(wheelDeltas.rearLeft), mp::value(wheelDeltas.rearRight)};
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {units::meter_t{twistVector(0)}, units::meter_t{twistVector(1)},
-          units::radian_t{twistVector(2)}};
+  return {twistVector(0) * mp::m, twistVector(1) * mp::m,
+          twistVector(2) * mp::rad};
 }
 
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
                                                   Translation2d fr,
                                                   Translation2d rl,
                                                   Translation2d rr) const {
-  m_inverseKinematics = Matrixd<4, 3>{{1, -1, (-(fl.X() + fl.Y())).value()},
-                                      {1, 1, (fr.X() - fr.Y()).value()},
-                                      {1, 1, (rl.X() - rl.Y()).value()},
-                                      {1, -1, (-(rr.X() + rr.Y())).value()}};
+  m_inverseKinematics = Matrixd<4, 3>{{1, -1, mp::value(-(fl.X() + fl.Y()))},
+                                      {1, 1, mp::value(fr.X() - fr.Y())},
+                                      {1, 1, mp::value(rl.X() - rl.Y())},
+                                      {1, -1, mp::value(-(rr.X() + rr.Y()))}};
 }

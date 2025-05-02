@@ -12,46 +12,46 @@
 
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/units.h"
 
 using namespace frc;
 
-units::volt_t ArmFeedforward::Calculate(
-    units::unit_t<Angle> currentAngle, units::unit_t<Velocity> currentVelocity,
-    units::unit_t<Velocity> nextVelocity) const {
+mp::quantity<mp::V> ArmFeedforward::Calculate(
+    mp::quantity<Angle> currentAngle, mp::quantity<Velocity> currentVelocity,
+    mp::quantity<Velocity> nextVelocity) const {
   using VarMat = slp::VariableMatrix;
 
   // Small kₐ values make the solver ill-conditioned
-  if (kA < units::unit_t<ka_unit>{1e-1}) {
+  if (kA < 1e-1 * ka_unit) {
     auto acceleration = (nextVelocity - currentVelocity) / m_dt;
-    return kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
-           kA * acceleration + kG * units::math::cos(currentAngle);
+    return kS * wpi::sgn(currentVelocity) + kV * currentVelocity +
+           kA * acceleration + kG * mp::cos(currentAngle);
   }
 
   // Arm dynamics
-  Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-  Matrixd<2, 1> B{{0.0}, {1.0 / kA.value()}};
+  Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -mp::value(kV) / mp::value(kA)}};
+  Matrixd<2, 1> B{{0.0}, {1.0 / mp::value(kA)}};
   const auto& f = [&](const VarMat& x, const VarMat& u) -> VarMat {
     VarMat c{{0.0},
-             {-(kS / kA).value() * slp::sign(x[1]) -
-              (kG / kA).value() * slp::cos(x[0])}};
+             {-mp::value(kS / kA) * slp::sign(x[1]) -
+              mp::value(kG / kA) * slp::cos(x[0])}};
     return A * x + B * u + c;
   };
 
-  Vectord<2> r_k{currentAngle.value(), currentVelocity.value()};
+  Vectord<2> r_k{mp::value(currentAngle), mp::value(currentVelocity)};
 
   slp::Variable u_k;
 
   // Initial guess
   auto acceleration = (nextVelocity - currentVelocity) / m_dt;
-  u_k.set_value((kS * wpi::sgn(currentVelocity.value()) + kV * currentVelocity +
-                 kA * acceleration + kG * units::math::cos(currentAngle))
-                    .value());
+  u_k.set_value(mp::value(kS * wpi::sgn(currentVelocity) + kV * currentVelocity +
+                          kA * acceleration + kG * mp::cos(currentAngle)));
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, m_dt);
 
   // Minimize difference between desired and actual next velocity
   auto cost =
-      (nextVelocity.value() - r_k1[1]) * (nextVelocity.value() - r_k1[1]);
+      (mp::value(nextVelocity) - r_k1[1]) * (mp::value(nextVelocity) - r_k1[1]);
 
   // Refine solution via Newton's method
   {
@@ -107,5 +107,5 @@ units::volt_t ArmFeedforward::Calculate(
     }
   }
 
-  return units::volt_t{u_k.value()};
+  return u_k.value() * mp::V;
 }

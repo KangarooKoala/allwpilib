@@ -36,6 +36,7 @@
 
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -43,7 +44,7 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT TrajectoryParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, mp::quantity<mp::rad / mp::m>>;
 
   /**
    * Parameterize the trajectory by time. This is where the velocity profile is
@@ -67,10 +68,10 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
   static Trajectory TimeParameterizeTrajectory(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
-      units::meters_per_second_t startVelocity,
-      units::meters_per_second_t endVelocity,
-      units::meters_per_second_t maxVelocity,
-      units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      mp::quantity<mp::m / mp::s> startVelocity,
+      mp::quantity<mp::m / mp::s> endVelocity,
+      mp::quantity<mp::m / mp::s> maxVelocity,
+      mp::quantity<mp::m / mp::s2> maxAcceleration, bool reversed);
 
  private:
   constexpr static double kEpsilon = 1E-6;
@@ -81,11 +82,11 @@ class WPILIB_DLLEXPORT TrajectoryParameterizer {
    * the trajectory, max velocity, min acceleration and max acceleration.
    */
   struct ConstrainedState {
-    PoseWithCurvature pose = {Pose2d{}, units::curvature_t{0.0}};
-    units::meter_t distance = 0_m;
-    units::meters_per_second_t maxVelocity = 0_mps;
-    units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
-    units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
+    PoseWithCurvature pose = {Pose2d{}, 0.0 * mp::rad / mp::m};
+    mp::quantity<mp::m> distance = 0.0 * mp::m;
+    mp::quantity<mp::m / mp::s> maxVelocity = 0.0 * mp::m / mp::s;
+    mp::quantity<mp::m / mp::s2> minAcceleration = 0.0 * mp::m / mp::s2;
+    mp::quantity<mp::m / mp::s2> maxAcceleration = 0.0 * mp::m / mp::s2;
   };
 
   /**

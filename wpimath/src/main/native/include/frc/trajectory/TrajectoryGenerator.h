@@ -16,6 +16,7 @@
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -23,7 +24,7 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT TrajectoryGenerator {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, mp::quantity<mp::rad / mp::m>>;
 
   /**
    * Generates a trajectory from the given control vectors and config. This

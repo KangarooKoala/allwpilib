@@ -14,16 +14,16 @@ std::optional<frc::DifferentialDriveWheelPositions> wpi::Protobuf<
   }
 
   return frc::DifferentialDriveWheelPositions{
-      units::meter_t{msg.left},
-      units::meter_t{msg.right},
+      msg.left * mp::m,
+      msg.right * mp::m,
   };
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelPositions>::Pack(
     OutputStream& stream, const frc::DifferentialDriveWheelPositions& value) {
   wpi_proto_ProtobufDifferentialDriveWheelPositions msg{
-      .left = value.left.value(),
-      .right = value.right.value(),
+      .left = mp::value(value.left),
+      .right = mp::value(value.right),
   };
   return stream.Encode(msg);
 }

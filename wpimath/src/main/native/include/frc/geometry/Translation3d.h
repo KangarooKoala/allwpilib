@@ -14,8 +14,7 @@
 
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation2d.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -42,7 +41,8 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param y The y component of the translation.
    * @param z The z component of the translation.
    */
-  constexpr Translation3d(units::meter_t x, units::meter_t y, units::meter_t z)
+  constexpr Translation3d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                          mp::quantity<mp::m> z)
       : m_x{x}, m_y{y}, m_z{z} {}
 
   /**
@@ -52,8 +52,10 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  constexpr Translation3d(units::meter_t distance, const Rotation3d& angle) {
-    auto rectangular = Translation3d{distance, 0_m, 0_m}.RotateBy(angle);
+  constexpr Translation3d(mp::quantity<mp::m> distance,
+                          const Rotation3d& angle) {
+    auto rectangular =
+        Translation3d{distance, 0.0 * mp::m, 0.0 * mp::m}.RotateBy(angle);
     m_x = rectangular.X();
     m_y = rectangular.Y();
     m_z = rectangular.Z();
@@ -66,9 +68,9 @@ class WPILIB_DLLEXPORT Translation3d {
    * @param vector The translation vector.
    */
   constexpr explicit Translation3d(const Eigen::Vector3d& vector)
-      : m_x{units::meter_t{vector.x()}},
-        m_y{units::meter_t{vector.y()}},
-        m_z{units::meter_t{vector.z()}} {}
+      : m_x{vector.x() * mp::m},
+        m_y{vector.y() * mp::m},
+        m_z{vector.z() * mp::m} {}
 
   /**
    * Constructs a 3D translation from a 2D translation in the X-Y plane.
@@ -78,7 +80,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @see Transform3d(Transform2d)
    */
   constexpr explicit Translation3d(const Translation2d& translation)
-      : Translation3d{translation.X(), translation.Y(), 0_m} {}
+      : Translation3d{translation.X(), translation.Y(), 0.0 * mp::m} {}
 
   /**
    * Calculates the distance between two translations in 3D space.
@@ -90,10 +92,9 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The distance between the two translations.
    */
-  constexpr units::meter_t Distance(const Translation3d& other) const {
-    return units::math::sqrt(units::math::pow<2>(other.m_x - m_x) +
-                             units::math::pow<2>(other.m_y - m_y) +
-                             units::math::pow<2>(other.m_z - m_z));
+  constexpr mp::quantity<mp::m> Distance(const Translation3d& other) const {
+    return mp::sqrt(mp::pow<2>(other.m_x - m_x) + mp::pow<2>(other.m_y - m_y) +
+                    mp::pow<2>(other.m_z - m_z));
   }
 
   /**
@@ -101,21 +102,21 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The Z component of the translation.
    */
-  constexpr units::meter_t X() const { return m_x; }
+  constexpr mp::quantity<mp::m> X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
    * @return The Y component of the translation.
    */
-  constexpr units::meter_t Y() const { return m_y; }
+  constexpr mp::quantity<mp::m> Y() const { return m_y; }
 
   /**
    * Returns the Z component of the translation.
    *
    * @return The Z component of the translation.
    */
-  constexpr units::meter_t Z() const { return m_z; }
+  constexpr mp::quantity<mp::m> Z() const { return m_z; }
 
   /**
    * Returns a 3D translation vector representation of this translation.
@@ -123,7 +124,7 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return A 3D translation vector representation of this translation.
    */
   constexpr Eigen::Vector3d ToVector() const {
-    return Eigen::Vector3d{{m_x.value(), m_y.value(), m_z.value()}};
+    return Eigen::Vector3d{{mp::value(m_x), mp::value(m_y), mp::value(m_z)}};
   }
 
   /**
@@ -131,8 +132,8 @@ class WPILIB_DLLEXPORT Translation3d {
    *
    * @return The norm of the translation.
    */
-  constexpr units::meter_t Norm() const {
-    return units::math::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+  constexpr mp::quantity<mp::m> Norm() const {
+    return mp::sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
   }
 
   /**
@@ -146,10 +147,10 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return The new rotated translation.
    */
   constexpr Translation3d RotateBy(const Rotation3d& other) const {
-    Quaternion p{0.0, m_x.value(), m_y.value(), m_z.value()};
+    Quaternion p{0.0, mp::value(m_x), mp::value(m_y), mp::value(m_z)};
     auto qprime = other.GetQuaternion() * p * other.GetQuaternion().Inverse();
-    return Translation3d{units::meter_t{qprime.X()}, units::meter_t{qprime.Y()},
-                         units::meter_t{qprime.Z()}};
+    return Translation3d{qprime.X() * mp::m, qprime.Y() * mp::m,
+                         qprime.Z() * mp::m};
   }
 
   /**
@@ -243,9 +244,9 @@ class WPILIB_DLLEXPORT Translation3d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Translation3d& other) const {
-    return units::math::abs(m_x - other.m_x) < 1E-9_m &&
-           units::math::abs(m_y - other.m_y) < 1E-9_m &&
-           units::math::abs(m_z - other.m_z) < 1E-9_m;
+    return mp::abs(m_x - other.m_x) < 1E-9 * mp::m &&
+           mp::abs(m_y - other.m_y) < 1E-9 * mp::m &&
+           mp::abs(m_z - other.m_z) < 1E-9 * mp::m;
   }
 
   /**
@@ -277,9 +278,9 @@ class WPILIB_DLLEXPORT Translation3d {
   }
 
  private:
-  units::meter_t m_x = 0_m;
-  units::meter_t m_y = 0_m;
-  units::meter_t m_z = 0_m;
+  mp::quantity<mp::m> m_x = 0.0 * mp::m;
+  mp::quantity<mp::m> m_y = 0.0 * mp::m;
+  mp::quantity<mp::m> m_z = 0.0 * mp::m;
 };
 
 WPILIB_DLLEXPORT

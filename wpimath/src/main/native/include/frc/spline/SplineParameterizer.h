@@ -36,10 +36,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/spline/Spline.h"
-#include "units/angle.h"
-#include "units/curvature.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -48,7 +45,7 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT SplineParameterizer {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, mp::quantity<mp::rad / mp::m>>;
 
   struct MalformedSplineException : public std::runtime_error {
     explicit MalformedSplineException(const char* what_arg)
@@ -108,9 +105,8 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
       const auto twist = start.value().first.Log(end.value().first);
 
-      if (units::math::abs(twist.dy) > kMaxDy ||
-          units::math::abs(twist.dx) > kMaxDx ||
-          units::math::abs(twist.dtheta) > kMaxDtheta) {
+      if (mp::abs(twist.dy) > kMaxDy || mp::abs(twist.dx) > kMaxDx ||
+          mp::abs(twist.dtheta) > kMaxDtheta) {
         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
       } else {
@@ -127,9 +123,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static inline constexpr units::meter_t kMaxDx = 5_in;
-  static inline constexpr units::meter_t kMaxDy = 0.05_in;
-  static inline constexpr units::radian_t kMaxDtheta = 0.0872_rad;
+  static inline constexpr mp::quantity<mp::m> kMaxDx = 15.0 * mp::cm;
+  static inline constexpr mp::quantity<mp::m> kMaxDy = 0.15 * mp::cm;
+  static inline constexpr mp::quantity<mp::rad> kMaxDtheta = 0.0872 * mp::rad;
 
   struct StackContents {
     double t0;

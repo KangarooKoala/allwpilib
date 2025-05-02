@@ -254,9 +254,9 @@ WPILIB_DLLEXPORT Eigen::VectorXd MakeWhiteNoiseVector(
  */
 [[deprecated("Use Pose2d.ToMatrix() instead.")]]
 WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
-  return Eigen::Vector3d{{pose.Translation().X().value(),
-                          pose.Translation().Y().value(),
-                          pose.Rotation().Radians().value()}};
+  return Eigen::Vector3d{{mp::value(pose.Translation().X()),
+                          mp::value(pose.Translation().Y()),
+                          mp::value(pose.Rotation().Radians())}};
 }
 
 /**
@@ -271,9 +271,9 @@ WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseTo3dVector(const Pose2d& pose) {
  */
 [[deprecated("Use Pose2d.ToMatrix() instead.")]]
 WPILIB_DLLEXPORT constexpr Eigen::Vector4d PoseTo4dVector(const Pose2d& pose) {
-  return Eigen::Vector4d{{pose.Translation().X().value(),
-                          pose.Translation().Y().value(), pose.Rotation().Cos(),
-                          pose.Rotation().Sin()}};
+  return Eigen::Vector4d{{mp::value(pose.Translation().X()),
+                          mp::value(pose.Translation().Y()),
+                          pose.Rotation().Cos(), pose.Rotation().Sin()}};
 }
 
 /**
@@ -369,8 +369,8 @@ IsDetectable<Eigen::Dynamic, Eigen::Dynamic>(const Eigen::MatrixXd& A,
  */
 [[deprecated("Use Pose2d.ToMatrix() instead.")]]
 WPILIB_DLLEXPORT constexpr Eigen::Vector3d PoseToVector(const Pose2d& pose) {
-  return Eigen::Vector3d{
-      {pose.X().value(), pose.Y().value(), pose.Rotation().Radians().value()}};
+  return Eigen::Vector3d{{mp::value(pose.X()), mp::value(pose.Y()),
+                          mp::value(pose.Rotation().Radians())}};
 }
 
 /**

@@ -26,7 +26,7 @@ wpi::Protobuf<frc::SwerveModulePosition>::Unpack(InputStream& stream) {
   }
 
   return frc::SwerveModulePosition{
-      units::meter_t{msg.distance},
+      msg.distance * mp::m,
       iangle[0],
   };
 }
@@ -35,7 +35,7 @@ bool wpi::Protobuf<frc::SwerveModulePosition>::Pack(
     OutputStream& stream, const frc::SwerveModulePosition& value) {
   wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModulePosition msg{
-      .distance = value.distance.value(),
+      .distance = mp::value(value.distance),
       .angle = angle.Callback(),
   };
   return stream.Encode(msg);

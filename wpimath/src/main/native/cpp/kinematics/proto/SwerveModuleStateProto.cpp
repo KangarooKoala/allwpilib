@@ -26,7 +26,7 @@ wpi::Protobuf<frc::SwerveModuleState>::Unpack(InputStream& stream) {
   }
 
   return frc::SwerveModuleState{
-      units::meters_per_second_t{msg.speed},
+      msg.speed * mp::m / mp::s,
       iangle[0],
   };
 }
@@ -35,7 +35,7 @@ bool wpi::Protobuf<frc::SwerveModuleState>::Pack(
     OutputStream& stream, const frc::SwerveModuleState& value) {
   wpi::PackCallback angle{&value.angle};
   wpi_proto_ProtobufSwerveModuleState msg{
-      .speed = value.speed.value(),
+      .speed = mp::value(value.speed),
       .angle = angle.Callback(),
   };
   return stream.Encode(msg);

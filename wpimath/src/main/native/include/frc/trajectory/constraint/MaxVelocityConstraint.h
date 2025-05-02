@@ -7,8 +7,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -25,23 +24,23 @@ class WPILIB_DLLEXPORT MaxVelocityConstraint : public TrajectoryConstraint {
    * @param maxVelocity The max velocity.
    */
   constexpr explicit MaxVelocityConstraint(
-      units::meters_per_second_t maxVelocity)
-      : m_maxVelocity(units::math::abs(maxVelocity)) {}
+      mp::quantity<mp::m / mp::s> maxVelocity)
+      : m_maxVelocity(mp::abs(maxVelocity)) {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  constexpr mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const override {
     return m_maxVelocity;
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> speed) const override {
     return {};
   }
 
  private:
-  units::meters_per_second_t m_maxVelocity;
+  mp::quantity<mp::m / mp::s> m_maxVelocity;
 };
 
 }  // namespace frc

@@ -12,7 +12,7 @@
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -44,7 +44,8 @@ class LinearPlantInversionFeedforward {
    */
   template <int Outputs>
   LinearPlantInversionFeedforward(
-      const LinearSystem<States, Inputs, Outputs>& plant, units::second_t dt)
+      const LinearSystem<States, Inputs, Outputs>& plant,
+      mp::quantity<mp::s> dt)
       : LinearPlantInversionFeedforward(plant.A(), plant.B(), dt) {}
 
   /**
@@ -56,7 +57,7 @@ class LinearPlantInversionFeedforward {
    */
   LinearPlantInversionFeedforward(const Matrixd<States, States>& A,
                                   const Matrixd<States, Inputs>& B,
-                                  units::second_t dt)
+                                  mp::quantity<mp::s> dt)
       : m_dt(dt) {
     DiscretizeAB<States, Inputs>(A, B, dt, &m_A, &m_B);
     Reset();
@@ -150,7 +151,7 @@ class LinearPlantInversionFeedforward {
   Matrixd<States, States> m_A;
   Matrixd<States, Inputs> m_B;
 
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   // Current reference
   StateVector m_r;

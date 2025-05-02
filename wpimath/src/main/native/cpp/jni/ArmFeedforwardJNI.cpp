@@ -8,6 +8,7 @@
 
 #include "edu_wpi_first_math_jni_ArmFeedforwardJNI.h"
 #include "frc/controller/ArmFeedforward.h"
+#include "frc/units.h"
 
 using namespace wpi::java;
 
@@ -24,14 +25,12 @@ Java_edu_wpi_first_math_jni_ArmFeedforwardJNI_calculate
    jdouble currentAngle, jdouble currentVelocity, jdouble nextVelocity,
    jdouble dt)
 {
-  return frc::ArmFeedforward{units::volt_t{ks}, units::volt_t{kg},
-                             units::unit_t<frc::ArmFeedforward::kv_unit>{kv},
-                             units::unit_t<frc::ArmFeedforward::ka_unit>{ka},
-                             units::second_t{dt}}
-      .Calculate(units::radian_t{currentAngle},
-                 units::radians_per_second_t{currentVelocity},
-                 units::radians_per_second_t{nextVelocity})
-      .value();
+  return mp::value(
+      frc::ArmFeedforward{ks * mp::V, kg * mp::V,
+                          kv * frc::ArmFeedforward::kv_unit,
+                          ka * frc::ArmFeedforward::ka_unit, dt * mp::s}
+          .Calculate(currentAngle * mp::rad, currentVelocity * mp::rad / mp::s,
+                     nextVelocity * mp::rad / mp::s));
 }
 
 }  // extern "C"

@@ -10,7 +10,7 @@ using namespace frc;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
+    mp::quantity<mp::m> leftDistance, mp::quantity<mp::m> rightDistance,
     const Pose2d& initialPose)
     : DifferentialDrivePoseEstimator{
           kinematics,  gyroAngle,          leftDistance,   rightDistance,
@@ -18,7 +18,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
+    mp::quantity<mp::m> leftDistance, mp::quantity<mp::m> rightDistance,
     const Pose2d& initialPose, const wpi::array<double, 3>& stateStdDevs,
     const wpi::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,

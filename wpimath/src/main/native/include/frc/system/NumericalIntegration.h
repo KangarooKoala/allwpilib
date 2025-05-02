@@ -8,7 +8,7 @@
 #include <array>
 #include <cmath>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -20,8 +20,8 @@ namespace frc {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>
-T RK4(F&& f, T x, units::second_t dt) {
-  const auto h = dt.value();
+T RK4(F&& f, T x, mp::quantity<mp::s> dt) {
+  const auto h = mp::value(dt);
 
   T k1 = f(x);
   T k2 = f(x + h * 0.5 * k1);
@@ -40,8 +40,8 @@ T RK4(F&& f, T x, units::second_t dt) {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T, typename U>
-T RK4(F&& f, T x, U u, units::second_t dt) {
-  const auto h = dt.value();
+T RK4(F&& f, T x, U u, mp::quantity<mp::s> dt) {
+  const auto h = mp::value(dt);
 
   T k1 = f(x, u);
   T k2 = f(x + h * 0.5 * k1, u);
@@ -60,8 +60,8 @@ T RK4(F&& f, T x, U u, units::second_t dt) {
  * @param dt The time over which to integrate.
  */
 template <typename F, typename T>
-T RK4(F&& f, units::second_t t, T y, units::second_t dt) {
-  const auto h = dt.to<double>();
+T RK4(F&& f, mp::quantity<mp::s> t, T y, mp::quantity<mp::s> dt) {
+  const auto h = mp::value(dt);
 
   T k1 = f(t, y);
   T k2 = f(t + dt * 0.5, y + h * k1 * 0.5);
@@ -83,7 +83,7 @@ T RK4(F&& f, units::second_t t, T y, units::second_t dt) {
  *                 number like 1e-6.
  */
 template <typename F, typename T, typename U>
-T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
+T RKDP(F&& f, T x, U u, mp::quantity<mp::s> dt, double maxError = 1e-6) {
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
 
@@ -111,13 +111,13 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
   double truncationError;
 
   double dtElapsed = 0.0;
-  double h = dt.value();
+  double h = mp::value(dt);
 
   // Loop until we've gotten to our desired dt
-  while (dtElapsed < dt.value()) {
+  while (dtElapsed < mp::value(dt)) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = (std::min)(h, dt.value() - dtElapsed);
+      h = (std::min)(h, mp::value(dt) - dtElapsed);
 
       // clang-format off
       T k1 = f(x, u);
@@ -141,7 +141,7 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
                             .norm();
 
       if (truncationError == 0.0) {
-        h = dt.value() - dtElapsed;
+        h = mp::value(dt) - dtElapsed;
       } else {
         h *= 0.9 * std::pow(maxError / truncationError, 1.0 / 5.0);
       }
@@ -166,7 +166,7 @@ T RKDP(F&& f, T x, U u, units::second_t dt, double maxError = 1e-6) {
  *                 number like 1e-6.
  */
 template <typename F, typename T>
-T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
+T RKDP(F&& f, mp::quantity<mp::s> t, T y, mp::quantity<mp::s> dt,
        double maxError = 1e-6) {
   // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
   // Butcher tableau the following arrays came from.
@@ -198,28 +198,28 @@ T RKDP(F&& f, units::second_t t, T y, units::second_t dt,
   double truncationError;
 
   double dtElapsed = 0.0;
-  double h = dt.to<double>();
+  double h = mp::value(dt);
 
   // Loop until we've gotten to our desired dt
-  while (dtElapsed < dt.to<double>()) {
+  while (dtElapsed < mp::value(dt)) {
     do {
       // Only allow us to advance up to the dt remaining
-      h = std::min(h, dt.to<double>() - dtElapsed);
+      h = std::min(h, mp::value(dt) - dtElapsed);
 
       // clang-format off
       T k1 = f(t, y);
-      T k2 = f(t + units::second_t{h} * c[0], y + h * (A[0][0] * k1));
-      T k3 = f(t + units::second_t{h} * c[1], y + h * (A[1][0] * k1 + A[1][1] * k2));
-      T k4 = f(t + units::second_t{h} * c[2], y + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3));
-      T k5 = f(t + units::second_t{h} * c[3], y + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4));
-      T k6 = f(t + units::second_t{h} * c[4], y + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5));
+      T k2 = f(t + h * mp::s * c[0], y + h * (A[0][0] * k1));
+      T k3 = f(t + h * mp::s * c[1], y + h * (A[1][0] * k1 + A[1][1] * k2));
+      T k4 = f(t + h * mp::s * c[2], y + h * (A[2][0] * k1 + A[2][1] * k2 + A[2][2] * k3));
+      T k5 = f(t + h * mp::s * c[3], y + h * (A[3][0] * k1 + A[3][1] * k2 + A[3][2] * k3 + A[3][3] * k4));
+      T k6 = f(t + h * mp::s * c[4], y + h * (A[4][0] * k1 + A[4][1] * k2 + A[4][2] * k3 + A[4][3] * k4 + A[4][4] * k5));
       // clang-format on
 
       // Since the final row of A and the array b1 have the same coefficients
       // and k7 has no effect on newY, we can reuse the calculation.
       newY = y + h * (A[5][0] * k1 + A[5][1] * k2 + A[5][2] * k3 +
                       A[5][3] * k4 + A[5][4] * k5 + A[5][5] * k6);
-      T k7 = f(t + units::second_t{h} * c[5], newY);
+      T k7 = f(t + h * mp::s * c[5], newY);
 
       truncationError = (h * ((b1[0] - b2[0]) * k1 + (b1[1] - b2[1]) * k2 +
                               (b1[2] - b2[2]) * k3 + (b1[3] - b2[3]) * k4 +

@@ -6,14 +6,14 @@
 
 #include "frc/DARE.h"
 #include "frc/system/Discretization.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 using namespace frc;
 
 ChassisSpeeds LTVUnicycleController::Calculate(
     const Pose2d& currentPose, const Pose2d& poseRef,
-    units::meters_per_second_t linearVelocityRef,
-    units::radians_per_second_t angularVelocityRef) {
+    mp::quantity<mp::m / mp::s> linearVelocityRef,
+    mp::quantity<mp::rad / mp::s> angularVelocityRef) {
   // The change in global pose for a unicycle is defined by the following three
   // equations.
   //
@@ -48,19 +48,21 @@ ChassisSpeeds LTVUnicycleController::Calculate(
   //     [0  0  0]              [0  1]
 
   if (!m_enabled) {
-    return ChassisSpeeds{linearVelocityRef, 0_mps, angularVelocityRef};
+    return ChassisSpeeds{linearVelocityRef, 0.0 * mp::m / mp::s,
+                         angularVelocityRef};
   }
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
   // let the system stop.
-  if (units::math::abs(linearVelocityRef) < 1e-4_mps) {
-    linearVelocityRef = 1e-4_mps;
+  if (mp::abs(linearVelocityRef) < 1e-4 * mp::m / mp::s) {
+    linearVelocityRef = 1e-4 * mp::m / mp::s;
   }
 
   m_poseError = poseRef.RelativeTo(currentPose);
 
-  Eigen::Matrix<double, 3, 3> A{
-      {0.0, 0.0, 0.0}, {0.0, 0.0, linearVelocityRef.value()}, {0.0, 0.0, 0.0}};
+  Eigen::Matrix<double, 3, 3> A{{0.0, 0.0, 0.0},
+                                {0.0, 0.0, mp::value(linearVelocityRef)},
+                                {0.0, 0.0, 0.0}};
   constexpr Eigen::Matrix<double, 3, 2> B{{1.0, 0.0}, {0.0, 0.0}, {0.0, 1.0}};
 
   Eigen::Matrix<double, 3, 3> discA;
@@ -74,11 +76,11 @@ ChassisSpeeds LTVUnicycleController::Calculate(
                                       .llt()
                                       .solve(discB.transpose() * S * discA);
 
-  Eigen::Vector3d e{m_poseError.X().value(), m_poseError.Y().value(),
-                    m_poseError.Rotation().Radians().value()};
+  Eigen::Vector3d e{mp::value(m_poseError.X()), mp::value(m_poseError.Y()),
+                    mp::value(m_poseError.Rotation().Radians())};
   Eigen::Vector2d u = K * e;
 
-  return ChassisSpeeds{linearVelocityRef + units::meters_per_second_t{u(0)},
-                       0_mps,
-                       angularVelocityRef + units::radians_per_second_t{u(1)}};
+  return ChassisSpeeds{linearVelocityRef + u(0) * mp::m / mp::s,
+                       0.0 * mp::m / mp::s,
+                       angularVelocityRef + u(1) * mp::rad / mp::s};
 }

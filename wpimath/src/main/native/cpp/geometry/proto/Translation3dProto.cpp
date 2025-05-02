@@ -14,18 +14,18 @@ std::optional<frc::Translation3d> wpi::Protobuf<frc::Translation3d>::Unpack(
   }
 
   return frc::Translation3d{
-      units::meter_t{msg.x},
-      units::meter_t{msg.y},
-      units::meter_t{msg.z},
+      msg.x * mp::m,
+      msg.y * mp::m,
+      msg.z * mp::m,
   };
 }
 
 bool wpi::Protobuf<frc::Translation3d>::Pack(OutputStream& stream,
                                              const frc::Translation3d& value) {
   wpi_proto_ProtobufTranslation3d msg{
-      .x = value.X().value(),
-      .y = value.Y().value(),
-      .z = value.Z().value(),
+      .x = mp::value(value.X()),
+      .y = mp::value(value.Y()),
+      .z = mp::value(value.Z()),
   };
   return stream.Encode(msg);
 }

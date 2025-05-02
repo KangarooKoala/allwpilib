@@ -14,16 +14,16 @@ wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Unpack(InputStream& stream) {
   }
 
   return frc::DifferentialDriveWheelSpeeds{
-      units::meters_per_second_t{msg.left},
-      units::meters_per_second_t{msg.right},
+      msg.left * mp::m / mp::s,
+      msg.right * mp::m / mp::s,
   };
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelSpeeds>::Pack(
     OutputStream& stream, const frc::DifferentialDriveWheelSpeeds& value) {
   wpi_proto_ProtobufDifferentialDriveWheelSpeeds msg{
-      .left = value.left.value(),
-      .right = value.right.value(),
+      .left = mp::value(value.left),
+      .right = mp::value(value.right),
   };
   return stream.Encode(msg);
 }

@@ -26,7 +26,8 @@ namespace frc {
  *   pose. This can either be a constant for a rigidly mounted camera, or
  *   variable if the camera is mounted to a turret. If the camera was mounted 3
  *   inches in front of the "origin" (usually physical center) of the robot,
- *   this would be frc::Transform3d{3_in, 0_in, 0_in, frc::Rotation3d{}}.
+ *   this would be frc::Transform3d{3.0 * mp::in, 0.0 * mp::in, 0.0 * mp::in,
+ *   frc::Rotation3d{}}.
  * @return The robot's field-relative pose.
  */
 WPILIB_DLLEXPORT

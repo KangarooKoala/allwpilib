@@ -14,11 +14,7 @@
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Transform2d.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -33,19 +29,19 @@ class WPILIB_DLLEXPORT Trajectory {
    */
   struct WPILIB_DLLEXPORT State {
     /// The time elapsed since the beginning of the trajectory.
-    units::second_t t = 0_s;
+    mp::quantity<mp::s> t = 0.0 * mp::s;
 
     /// The speed at that point of the trajectory.
-    units::meters_per_second_t velocity = 0_mps;
+    mp::quantity<mp::m / mp::s> velocity = 0.0 * mp::m / mp::s;
 
     /// The acceleration at that point of the trajectory.
-    units::meters_per_second_squared_t acceleration = 0_mps_sq;
+    mp::quantity<mp::m / mp::s2> acceleration = 0.0 * mp::m / mp::s2;
 
     /// The pose at that point of the trajectory.
     Pose2d pose;
 
     /// The curvature at that point of the trajectory.
-    units::curvature_t curvature{0.0};
+    mp::quantity<mp::rad / mp::m> curvature = 0.0 * mp::rad / mp::m;
 
     /**
      * Checks equality between this State and another object.
@@ -69,23 +65,23 @@ class WPILIB_DLLEXPORT Trajectory {
       const auto deltaT = newT - t;
 
       // If delta time is negative, flip the order of interpolation.
-      if (deltaT < 0_s) {
+      if (deltaT < 0.0 * mp::s) {
         return endValue.Interpolate(*this, 1.0 - i);
       }
 
       // Check whether the robot is reversing at this stage.
-      const auto reversing =
-          velocity < 0_mps ||
-          (units::math::abs(velocity) < 1E-9_mps && acceleration < 0_mps_sq);
+      const auto reversing = velocity < 0.0 * mp::m / mp::s ||
+                             (mp::abs(velocity) < 1E-9 * mp::m / mp::s &&
+                              acceleration < 0.0 * mp::m / mp::s2);
 
       // Calculate the new velocity.
       // v = v_0 + at
-      const units::meters_per_second_t newV =
+      const mp::quantity<mp::m / mp::s> newV =
           velocity + (acceleration * deltaT);
 
       // Calculate the change in position.
       // delta_s = v_0 t + 0.5at²
-      const units::meter_t newS =
+      const mp::quantity<mp::m> newS =
           (velocity * deltaT + 0.5 * acceleration * deltaT * deltaT) *
           (reversing ? -1.0 : 1.0);
 
@@ -93,8 +89,8 @@ class WPILIB_DLLEXPORT Trajectory {
       // need to interpolate between the two endpoint poses. The fraction for
       // interpolation is the change in position (delta s) divided by the total
       // distance between the two endpoints.
-      const double interpolationFrac =
-          newS / endValue.pose.Translation().Distance(pose.Translation());
+      const double interpolationFrac{
+          newS / endValue.pose.Translation().Distance(pose.Translation())};
 
       return {newT, newV, acceleration,
               wpi::Lerp(pose, endValue.pose, interpolationFrac),
@@ -122,7 +118,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * Returns the overall duration of the trajectory.
    * @return The duration of the trajectory.
    */
-  units::second_t TotalTime() const { return m_totalTime; }
+  mp::quantity<mp::s> TotalTime() const { return m_totalTime; }
 
   /**
    * Return the states of the trajectory.
@@ -138,7 +134,7 @@ class WPILIB_DLLEXPORT Trajectory {
    * @return The state at that point in time.
    * @throws std::runtime_error if the trajectory has no states.
    */
-  State Sample(units::second_t t) const {
+  State Sample(mp::quantity<mp::s> t) const {
     if (m_states.empty()) {
       throw std::runtime_error(
           "Trajectory cannot be sampled if it has no states.");
@@ -166,12 +162,12 @@ class WPILIB_DLLEXPORT Trajectory {
     // want.
 
     // If the difference in states is negligible, then we are spot on!
-    if (units::math::abs(sample->t - prevSample->t) < 1E-9_s) {
+    if (mp::abs(sample->t - prevSample->t) < 1E-9 * mp::s) {
       return *sample;
     }
     // Interpolate between the two states for the state that we want.
     return prevSample->Interpolate(
-        *sample, (t - prevSample->t) / (sample->t - prevSample->t));
+        *sample, double{(t - prevSample->t) / (sample->t - prevSample->t)});
   }
 
   /**
@@ -252,7 +248,7 @@ class WPILIB_DLLEXPORT Trajectory {
    *
    * @return The initial pose of the trajectory.
    */
-  Pose2d InitialPose() const { return Sample(0_s).pose; }
+  Pose2d InitialPose() const { return Sample(0.0 * mp::s).pose; }
 
   /**
    * Checks equality between this Trajectory and another object.
@@ -261,7 +257,7 @@ class WPILIB_DLLEXPORT Trajectory {
 
  private:
   std::vector<State> m_states;
-  units::second_t m_totalTime = 0_s;
+  mp::quantity<mp::s> m_totalTime = 0.0 * mp::s;
 };
 
 WPILIB_DLLEXPORT

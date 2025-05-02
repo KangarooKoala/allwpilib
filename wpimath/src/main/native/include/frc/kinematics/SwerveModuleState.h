@@ -7,9 +7,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Rotation2d.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -19,7 +17,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
   /**
    * Speed of the wheel of the module.
    */
-  units::meters_per_second_t speed = 0_mps;
+  mp::quantity<mp::m / mp::s> speed = 0.0 * mp::m / mp::s;
 
   /**
    * Angle of the module.
@@ -33,7 +31,7 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModuleState& other) const {
-    return units::math::abs(speed - other.speed) < 1E-9_mps &&
+    return mp::abs(speed - other.speed) < 1E-9 * mp::m / mp::s &&
            angle == other.angle;
   }
 
@@ -47,9 +45,9 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
    */
   constexpr void Optimize(const Rotation2d& currentAngle) {
     auto delta = angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
+    if (mp::abs(delta.Degrees()) > 90.0 * mp::deg) {
       speed *= -1;
-      angle = angle + Rotation2d{180_deg};
+      angle = angle + Rotation2d{180.0 * mp::deg};
     }
   }
 
@@ -66,8 +64,9 @@ struct WPILIB_DLLEXPORT SwerveModuleState {
   constexpr static SwerveModuleState Optimize(
       const SwerveModuleState& desiredState, const Rotation2d& currentAngle) {
     auto delta = desiredState.angle - currentAngle;
-    if (units::math::abs(delta.Degrees()) > 90_deg) {
-      return {-desiredState.speed, desiredState.angle + Rotation2d{180_deg}};
+    if (mp::abs(delta.Degrees()) > 90.0 * mp::deg) {
+      return {-desiredState.speed,
+              desiredState.angle + Rotation2d{180.0 * mp::deg}};
     } else {
       return {desiredState.speed, desiredState.angle};
     }

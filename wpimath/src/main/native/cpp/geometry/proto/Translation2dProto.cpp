@@ -14,16 +14,16 @@ std::optional<frc::Translation2d> wpi::Protobuf<frc::Translation2d>::Unpack(
   }
 
   return frc::Translation2d{
-      units::meter_t{msg.x},
-      units::meter_t{msg.y},
+      msg.x * mp::m,
+      msg.y * mp::m,
   };
 }
 
 bool wpi::Protobuf<frc::Translation2d>::Pack(OutputStream& stream,
                                              const frc::Translation2d& value) {
   wpi_proto_ProtobufTranslation2d msg{
-      .x = value.X().value(),
-      .y = value.Y().value(),
+      .x = mp::value(value.X()),
+      .y = mp::value(value.Y()),
   };
   return stream.Encode(msg);
 }

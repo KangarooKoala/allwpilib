@@ -12,6 +12,7 @@
 
 #include "frc/spline/CubicHermiteSpline.h"
 #include "frc/spline/QuinticHermiteSpline.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -35,15 +36,16 @@ class WPILIB_DLLEXPORT SplineHelper {
       const Pose2d& end) {
     double scalar;
     if (interiorWaypoints.empty()) {
-      scalar = 1.2 * start.Translation().Distance(end.Translation()).value();
+      scalar = 1.2 * mp::value(start.Translation().Distance(end.Translation()));
     } else {
       scalar =
-          1.2 * start.Translation().Distance(interiorWaypoints.front()).value();
+          1.2 *
+          mp::value(start.Translation().Distance(interiorWaypoints.front()));
     }
     const auto initialCV = CubicControlVector(scalar, start);
     if (!interiorWaypoints.empty()) {
       scalar =
-          1.2 * end.Translation().Distance(interiorWaypoints.back()).value();
+          1.2 * mp::value(end.Translation().Distance(interiorWaypoints.back()));
     }
     const auto finalCV = CubicControlVector(scalar, end);
     return {initialCV, finalCV};
@@ -65,7 +67,7 @@ class WPILIB_DLLEXPORT SplineHelper {
 
       // This just makes the splines look better.
       const auto scalar =
-          1.2 * p0.Translation().Distance(p1.Translation()).value();
+          1.2 * mp::value(p0.Translation().Distance(p1.Translation()));
 
       auto controlVectorA = QuinticControlVector(scalar, p0);
       auto controlVectorB = QuinticControlVector(scalar, p1);
@@ -104,11 +106,10 @@ class WPILIB_DLLEXPORT SplineHelper {
     wpi::array<double, 2> yFinal = end.y;
 
     if (waypoints.size() > 1) {
-      waypoints.emplace(waypoints.begin(),
-                        Translation2d{units::meter_t{xInitial[0]},
-                                      units::meter_t{yInitial[0]}});
+      waypoints.emplace(waypoints.begin(), Translation2d{xInitial[0] * mp::m,
+                                                         yInitial[0] * mp::m});
       waypoints.emplace_back(
-          Translation2d{units::meter_t{xFinal[0]}, units::meter_t{yFinal[0]}});
+          Translation2d{xFinal[0] * mp::m, yFinal[0] * mp::m});
 
       // Populate tridiagonal system for clamped cubic
       /* See:
@@ -138,10 +139,10 @@ class WPILIB_DLLEXPORT SplineHelper {
 
       // populate rhs vectors
       dx.emplace_back(
-          3 * (waypoints[2].X().value() - waypoints[0].X().value()) -
+          3 * (mp::value(waypoints[2].X()) - mp::value(waypoints[0].X())) -
           xInitial[1]);
       dy.emplace_back(
-          3 * (waypoints[2].Y().value() - waypoints[0].Y().value()) -
+          3 * (mp::value(waypoints[2].Y()) - mp::value(waypoints[0].Y())) -
           yInitial[1]);
       if (waypoints.size() > 4) {
         for (size_t i = 1; i <= waypoints.size() - 4; ++i) {
@@ -149,17 +150,17 @@ class WPILIB_DLLEXPORT SplineHelper {
           // derivative of the second internal waypoint should involve the third
           // and first internal waypoint, which have indices of 1 and 3 in the
           // waypoints list (which contains ALL waypoints).
-          dx.emplace_back(
-              3 * (waypoints[i + 2].X().value() - waypoints[i].X().value()));
-          dy.emplace_back(
-              3 * (waypoints[i + 2].Y().value() - waypoints[i].Y().value()));
+          dx.emplace_back(3 * (mp::value(waypoints[i + 2].X()) -
+                               mp::value(waypoints[i].X())));
+          dy.emplace_back(3 * (mp::value(waypoints[i + 2].Y()) -
+                               mp::value(waypoints[i].Y())));
         }
       }
-      dx.emplace_back(3 * (waypoints[waypoints.size() - 1].X().value() -
-                           waypoints[waypoints.size() - 3].X().value()) -
+      dx.emplace_back(3 * (mp::value(waypoints[waypoints.size() - 1].X()) -
+                           mp::value(waypoints[waypoints.size() - 3].X())) -
                       xFinal[1]);
-      dy.emplace_back(3 * (waypoints[waypoints.size() - 1].Y().value() -
-                           waypoints[waypoints.size() - 3].Y().value()) -
+      dy.emplace_back(3 * (mp::value(waypoints[waypoints.size() - 1].Y()) -
+                           mp::value(waypoints[waypoints.size() - 3].Y())) -
                       yFinal[1]);
 
       // Compute solution to tridiagonal system
@@ -174,10 +175,10 @@ class WPILIB_DLLEXPORT SplineHelper {
       for (size_t i = 0; i < fx.size() - 1; ++i) {
         // Create the spline.
         const CubicHermiteSpline spline{
-            {waypoints[i].X().value(), fx[i]},
-            {waypoints[i + 1].X().value(), fx[i + 1]},
-            {waypoints[i].Y().value(), fy[i]},
-            {waypoints[i + 1].Y().value(), fy[i + 1]}};
+            {mp::value(waypoints[i].X()), fx[i]},
+            {mp::value(waypoints[i + 1].X()), fx[i + 1]},
+            {mp::value(waypoints[i].Y()), fy[i]},
+            {mp::value(waypoints[i + 1].Y()), fy[i + 1]}};
 
         splines.push_back(spline);
       }
@@ -187,8 +188,10 @@ class WPILIB_DLLEXPORT SplineHelper {
       const double yDeriv =
           (3 * (yFinal[0] - yInitial[0]) - yFinal[1] - yInitial[1]) / 4.0;
 
-      wpi::array<double, 2> midXControlVector{waypoints[0].X().value(), xDeriv};
-      wpi::array<double, 2> midYControlVector{waypoints[0].Y().value(), yDeriv};
+      wpi::array<double, 2> midXControlVector{mp::value(waypoints[0].X()),
+                                              xDeriv};
+      wpi::array<double, 2> midYControlVector{mp::value(waypoints[0].Y()),
+                                              yDeriv};
 
       splines.emplace_back(xInitial, midXControlVector, yInitial,
                            midYControlVector);
@@ -312,14 +315,14 @@ class WPILIB_DLLEXPORT SplineHelper {
  private:
   static Spline<3>::ControlVector CubicControlVector(double scalar,
                                                      const Pose2d& point) {
-    return {{point.X().value(), scalar * point.Rotation().Cos()},
-            {point.Y().value(), scalar * point.Rotation().Sin()}};
+    return {{mp::value(point.X()), scalar * point.Rotation().Cos()},
+            {mp::value(point.Y()), scalar * point.Rotation().Sin()}};
   }
 
   static Spline<5>::ControlVector QuinticControlVector(double scalar,
                                                        const Pose2d& point) {
-    return {{point.X().value(), scalar * point.Rotation().Cos(), 0.0},
-            {point.Y().value(), scalar * point.Rotation().Sin(), 0.0}};
+    return {{mp::value(point.X()), scalar * point.Rotation().Cos(), 0.0},
+            {mp::value(point.Y()), scalar * point.Rotation().Sin(), 0.0}};
   }
 
   /**

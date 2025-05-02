@@ -7,7 +7,7 @@
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "frc/EigenCore.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -20,10 +20,10 @@ namespace frc {
  * @param discA Storage for discrete system matrix.
  */
 template <int States>
-void DiscretizeA(const Matrixd<States, States>& contA, units::second_t dt,
+void DiscretizeA(const Matrixd<States, States>& contA, mp::quantity<mp::s> dt,
                  Matrixd<States, States>* discA) {
   // A_d = eᴬᵀ
-  *discA = (contA * dt.value()).exp();
+  *discA = (contA * mp::value(dt)).exp();
 }
 
 /**
@@ -39,7 +39,7 @@ void DiscretizeA(const Matrixd<States, States>& contA, units::second_t dt,
  */
 template <int States, int Inputs>
 void DiscretizeAB(const Matrixd<States, States>& contA,
-                  const Matrixd<States, Inputs>& contB, units::second_t dt,
+                  const Matrixd<States, Inputs>& contB, mp::quantity<mp::s> dt,
                   Matrixd<States, States>* discA,
                   Matrixd<States, Inputs>* discB) {
   // M = [A  B]
@@ -51,7 +51,7 @@ void DiscretizeAB(const Matrixd<States, States>& contA,
 
   // ϕ = eᴹᵀ = [A_d  B_d]
   //           [ 0    I ]
-  Matrixd<States + Inputs, States + Inputs> phi = (M * dt.value()).exp();
+  Matrixd<States + Inputs, States + Inputs> phi = (M * mp::value(dt)).exp();
 
   *discA = phi.template block<States, States>(0, 0);
   *discB = phi.template block<States, Inputs>(0, States);
@@ -69,7 +69,7 @@ void DiscretizeAB(const Matrixd<States, States>& contA,
  */
 template <int States>
 void DiscretizeAQ(const Matrixd<States, States>& contA,
-                  const Matrixd<States, States>& contQ, units::second_t dt,
+                  const Matrixd<States, States>& contQ, mp::quantity<mp::s> dt,
                   Matrixd<States, States>* discA,
                   Matrixd<States, States>* discQ) {
   // Make continuous Q symmetric if it isn't already
@@ -85,7 +85,7 @@ void DiscretizeAQ(const Matrixd<States, States>& contA,
 
   // ϕ = eᴹᵀ = [−A_d  A_d⁻¹Q_d]
   //           [ 0      A_dᵀ  ]
-  Matrixd<2 * States, 2 * States> phi = (M * dt.value()).exp();
+  Matrixd<2 * States, 2 * States> phi = (M * mp::value(dt)).exp();
 
   // ϕ₁₂ = A_d⁻¹Q_d
   Matrixd<States, States> phi12 = phi.block(0, States, States, States);
@@ -111,9 +111,9 @@ void DiscretizeAQ(const Matrixd<States, States>& contA,
  */
 template <int Outputs>
 Matrixd<Outputs, Outputs> DiscretizeR(const Matrixd<Outputs, Outputs>& R,
-                                      units::second_t dt) {
+                                      mp::quantity<mp::s> dt) {
   // R_d = 1/T R
-  return R / dt.value();
+  return R / mp::value(dt);
 }
 
 }  // namespace frc

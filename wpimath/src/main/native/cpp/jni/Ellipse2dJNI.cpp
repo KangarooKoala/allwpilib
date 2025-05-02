@@ -9,6 +9,7 @@
 
 #include "edu_wpi_first_math_jni_Ellipse2dJNI.h"
 #include "frc/geometry/Ellipse2d.h"
+#include "frc/units.h"
 
 using namespace wpi::java;
 
@@ -25,14 +26,12 @@ Java_edu_wpi_first_math_jni_Ellipse2dJNI_nearest
    jdouble xSemiAxis, jdouble ySemiAxis, jdouble pointX, jdouble pointY,
    jdoubleArray nearestPoint)
 {
-  auto point =
-      frc::Ellipse2d{
-          frc::Pose2d{units::meter_t{centerX}, units::meter_t{centerY},
-                      units::radian_t{centerHeading}},
-          units::meter_t{xSemiAxis}, units::meter_t{ySemiAxis}}
-          .Nearest({units::meter_t{pointX}, units::meter_t{pointY}});
+  auto point = frc::Ellipse2d{frc::Pose2d{centerX * mp::m, centerY * mp::m,
+                                          centerHeading * mp::rad},
+                              xSemiAxis * mp::m, ySemiAxis * mp::m}
+                   .Nearest({pointX * mp::m, pointY * mp::m});
 
-  wpi::array buf{point.X().value(), point.Y().value()};
+  wpi::array buf{mp::value(point.X()), mp::value(point.Y())};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());
 }
 

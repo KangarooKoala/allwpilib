@@ -14,14 +14,14 @@ wpi::Protobuf<frc::DifferentialDriveKinematics>::Unpack(InputStream& stream) {
   }
 
   return frc::DifferentialDriveKinematics{
-      units::meter_t{msg.trackwidth},
+      msg.trackwidth * mp::m,
   };
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveKinematics>::Pack(
     OutputStream& stream, const frc::DifferentialDriveKinematics& value) {
   wpi_proto_ProtobufDifferentialDriveKinematics msg{
-      .trackwidth = value.trackwidth.value(),
+      .trackwidth = mp::value(value.trackwidth),
   };
   return stream.Encode(msg);
 }

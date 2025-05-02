@@ -12,8 +12,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
-#include "units/curvature.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -26,7 +25,7 @@ namespace frc {
 template <int Degree>
 class Spline {
  public:
-  using PoseWithCurvature = std::pair<Pose2d, units::curvature_t>;
+  using PoseWithCurvature = std::pair<Pose2d, mp::quantity<mp::rad / mp::m>>;
 
   constexpr Spline() = default;
 
@@ -100,7 +99,7 @@ class Spline {
 
     return PoseWithCurvature{
         {FromVector(combined.template block<2, 1>(0, 0)), Rotation2d{dx, dy}},
-        units::curvature_t{curvature}};
+        curvature * mp::rad / mp::m};
   }
 
   /**
@@ -132,8 +131,8 @@ class Spline {
    * @return The vector.
    */
   static constexpr Eigen::Vector2d ToVector(const Translation2d& translation) {
-    return Eigen::Vector2d{{translation.X().value()},
-                           {translation.Y().value()}};
+    return Eigen::Vector2d{{mp::value(translation.X())},
+                           {mp::value(translation.Y())}};
   }
 
   /**
@@ -143,7 +142,7 @@ class Spline {
    * @return The Translation2d.
    */
   static constexpr Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d{units::meter_t{vector(0)}, units::meter_t{vector(1)}};
+    return Translation2d{vector(0) * mp::m, vector(1) * mp::m};
   }
 };
 

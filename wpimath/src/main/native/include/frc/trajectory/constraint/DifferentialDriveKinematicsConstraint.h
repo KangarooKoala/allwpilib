@@ -10,7 +10,7 @@
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -24,27 +24,27 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
  public:
   constexpr DifferentialDriveKinematicsConstraint(
       DifferentialDriveKinematics kinematics,
-      units::meters_per_second_t maxSpeed)
+      mp::quantity<mp::m / mp::s> maxSpeed)
       : m_kinematics(std::move(kinematics)), m_maxSpeed(maxSpeed) {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    auto wheelSpeeds =
-        m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
+  constexpr mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const override {
+    auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
+        {velocity, 0.0 * mp::m / mp::s, velocity * curvature});
     wheelSpeeds.Desaturate(m_maxSpeed);
 
     return m_kinematics.ToChassisSpeeds(wheelSpeeds).vx;
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> speed) const override {
     return {};
   }
 
  private:
   DifferentialDriveKinematics m_kinematics;
-  units::meters_per_second_t m_maxSpeed;
+  mp::quantity<mp::m / mp::s> m_maxSpeed;
 };
 }  // namespace frc

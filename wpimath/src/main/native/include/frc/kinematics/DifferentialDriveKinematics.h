@@ -13,8 +13,7 @@
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Kinematics.h"
-#include "units/angle.h"
-#include "units/length.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -38,7 +37,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(units::meter_t trackwidth)
+  constexpr explicit DifferentialDriveKinematics(mp::quantity<mp::m> trackwidth)
       : trackwidth(trackwidth) {
     if (!std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
@@ -55,8 +54,9 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    */
   constexpr ChassisSpeeds ToChassisSpeeds(
       const DifferentialDriveWheelSpeeds& wheelSpeeds) const override {
-    return {(wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0_mps,
-            (wheelSpeeds.right - wheelSpeeds.left) / trackwidth * 1_rad};
+    return {
+        (wheelSpeeds.left + wheelSpeeds.right) / 2.0, 0.0 * mp::m / mp::s,
+        (wheelSpeeds.right - wheelSpeeds.left) / trackwidth * 1.0 * mp::rad};
   }
 
   /**
@@ -69,8 +69,10 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    */
   constexpr DifferentialDriveWheelSpeeds ToWheelSpeeds(
       const ChassisSpeeds& chassisSpeeds) const override {
-    return {chassisSpeeds.vx - trackwidth / 2 * chassisSpeeds.omega / 1_rad,
-            chassisSpeeds.vx + trackwidth / 2 * chassisSpeeds.omega / 1_rad};
+    return {chassisSpeeds.vx -
+                trackwidth / 2 * chassisSpeeds.omega / (1.0 * mp::rad),
+            chassisSpeeds.vx +
+                trackwidth / 2 * chassisSpeeds.omega / (1.0 * mp::rad)};
   }
 
   /**
@@ -81,10 +83,10 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * @param rightDistance The distance measured by the right encoder.
    * @return The resulting Twist2d.
    */
-  constexpr Twist2d ToTwist2d(const units::meter_t leftDistance,
-                              const units::meter_t rightDistance) const {
-    return {(leftDistance + rightDistance) / 2, 0_m,
-            (rightDistance - leftDistance) / trackwidth * 1_rad};
+  constexpr Twist2d ToTwist2d(const mp::quantity<mp::m> leftDistance,
+                              const mp::quantity<mp::m> rightDistance) const {
+    return {(leftDistance + rightDistance) / 2, 0.0 * mp::m,
+            (rightDistance - leftDistance) / trackwidth * 1.0 * mp::rad};
   }
 
   constexpr Twist2d ToTwist2d(
@@ -100,7 +102,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   }
 
   /// Differential drive trackwidth.
-  units::meter_t trackwidth;
+  mp::quantity<mp::m> trackwidth;
 };
 }  // namespace frc
 

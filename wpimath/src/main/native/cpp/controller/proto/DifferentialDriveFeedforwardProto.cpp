@@ -14,20 +14,20 @@ wpi::Protobuf<frc::DifferentialDriveFeedforward>::Unpack(InputStream& stream) {
   }
 
   return frc::DifferentialDriveFeedforward{
-      decltype(1_V / 1_mps){msg.kv_linear},
-      decltype(1_V / 1_mps_sq){msg.ka_linear},
-      decltype(1_V / 1_mps){msg.kv_angular},
-      decltype(1_V / 1_mps_sq){msg.ka_angular},
+      msg.kv_linear * mp::V / (mp::m / mp::s),
+      msg.ka_linear * mp::V / (mp::m / mp::s2),
+      msg.kv_angular * mp::V / (mp::m / mp::s),
+      msg.ka_angular * mp::V / (mp::m / mp::s2),
   };
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveFeedforward>::Pack(
     OutputStream& stream, const frc::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
-      .kv_linear = value.m_kVLinear.value(),
-      .ka_linear = value.m_kALinear.value(),
-      .kv_angular = value.m_kVAngular.value(),
-      .ka_angular = value.m_kAAngular.value(),
+      .kv_linear = mp::value(value.m_kVLinear),
+      .ka_linear = mp::value(value.m_kALinear),
+      .kv_angular = mp::value(value.m_kVAngular),
+      .ka_angular = mp::value(value.m_kAAngular),
   };
   return stream.Encode(msg);
 }

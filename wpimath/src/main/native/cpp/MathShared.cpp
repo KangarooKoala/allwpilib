@@ -10,7 +10,7 @@
 #include <wpi/mutex.h>
 #include <wpi/timestamp.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 using namespace wpi::math;
 
@@ -21,9 +21,7 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(fmt::string_view format, fmt::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  units::second_t GetTimestamp() override {
-    return units::second_t{wpi::Now() * 1.0e-6};
-  }
+  mp::quantity<mp::s> GetTimestamp() override { return wpi::Now() * mp::µs; }
 };
 }  // namespace
 
