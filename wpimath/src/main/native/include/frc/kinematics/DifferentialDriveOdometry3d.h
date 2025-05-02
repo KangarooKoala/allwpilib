@@ -11,7 +11,7 @@
 #include "frc/kinematics/DifferentialDriveWheelPositions.h"
 #include "frc/kinematics/DifferentialDriveWheelSpeeds.h"
 #include "frc/kinematics/Odometry3d.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -42,8 +42,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry3d(const Rotation3d& gyroAngle,
-                                       units::meter_t leftDistance,
-                                       units::meter_t rightDistance,
+                                       mp::quantity<mp::m> leftDistance,
+                                       mp::quantity<mp::m> rightDistance,
                                        const Pose3d& initialPose = Pose3d{});
 
   /**
@@ -60,8 +60,9 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param leftDistance The distance traveled by the left encoder.
    * @param rightDistance The distance traveled by the right encoder.
    */
-  void ResetPosition(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                     units::meter_t rightDistance, const Pose3d& pose) {
+  void ResetPosition(const Rotation3d& gyroAngle,
+                     mp::quantity<mp::m> leftDistance,
+                     mp::quantity<mp::m> rightDistance, const Pose3d& pose) {
     Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -76,12 +77,13 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    * @return The new pose of the robot.
    */
-  const Pose3d& Update(const Rotation3d& gyroAngle, units::meter_t leftDistance,
-                       units::meter_t rightDistance) {
+  const Pose3d& Update(const Rotation3d& gyroAngle,
+                       mp::quantity<mp::m> leftDistance,
+                       mp::quantity<mp::m> rightDistance) {
     return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 
  private:
-  DifferentialDriveKinematics m_kinematicsImpl{units::meter_t{1}};
+  DifferentialDriveKinematics m_kinematicsImpl{1.0 * mp::m};
 };
 }  // namespace frc

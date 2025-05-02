@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <stdexcept>
 
 #include <gcem.hpp>
@@ -14,8 +15,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation2d.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -33,10 +33,10 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @param xSemiAxis The x semi-axis.
    * @param ySemiAxis The y semi-axis.
    */
-  constexpr Ellipse2d(const Pose2d& center, units::meter_t xSemiAxis,
-                      units::meter_t ySemiAxis)
+  constexpr Ellipse2d(const Pose2d& center, mp::quantity<mp::m> xSemiAxis,
+                      mp::quantity<mp::m> ySemiAxis)
       : m_center{center}, m_xSemiAxis{xSemiAxis}, m_ySemiAxis{ySemiAxis} {
-    if (xSemiAxis <= 0_m || ySemiAxis <= 0_m) {
+    if (xSemiAxis <= 0.0 * mp::m || ySemiAxis <= 0.0 * mp::m) {
       throw std::invalid_argument("Ellipse2d semi-axes must be positive");
     }
   }
@@ -47,7 +47,7 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @param center The center of the circle.
    * @param radius The radius of the circle.
    */
-  constexpr Ellipse2d(const Translation2d& center, double radius)
+  constexpr Ellipse2d(const Translation2d& center, mp::quantity<mp::m> radius)
       : m_center{center, Rotation2d{}},
         m_xSemiAxis{radius},
         m_ySemiAxis{radius} {}
@@ -71,14 +71,14 @@ class WPILIB_DLLEXPORT Ellipse2d {
    *
    * @return The x semi-axis.
    */
-  constexpr units::meter_t XSemiAxis() const { return m_xSemiAxis; }
+  constexpr mp::quantity<mp::m> XSemiAxis() const { return m_xSemiAxis; }
 
   /**
    * Returns the y semi-axis.
    *
    * @return The y semi-axis.
    */
-  constexpr units::meter_t YSemiAxis() const { return m_ySemiAxis; }
+  constexpr mp::quantity<mp::m> YSemiAxis() const { return m_ySemiAxis; }
 
   /**
    * Returns the focal points of the ellipse. In a perfect circle, this will
@@ -88,21 +88,21 @@ class WPILIB_DLLEXPORT Ellipse2d {
    */
   constexpr wpi::array<Translation2d, 2> FocalPoints() const {
     // Major semi-axis
-    auto a = units::math::max(m_xSemiAxis, m_ySemiAxis);
+    auto a = std::max(m_xSemiAxis, m_ySemiAxis);
 
     // Minor semi-axis
-    auto b = units::math::min(m_xSemiAxis, m_ySemiAxis);  // NOLINT
+    auto b = std::min(m_xSemiAxis, m_ySemiAxis);
 
-    auto c = units::math::sqrt(a * a - b * b);
+    auto c = mp::sqrt(a * a - b * b);
 
     if (m_xSemiAxis > m_ySemiAxis) {
       return wpi::array{
-          (m_center + Transform2d{-c, 0_m, Rotation2d{}}).Translation(),
-          (m_center + Transform2d{c, 0_m, Rotation2d{}}).Translation()};
+          (m_center + Transform2d{-c, 0.0 * mp::m, Rotation2d{}}).Translation(),
+          (m_center + Transform2d{c, 0.0 * mp::m, Rotation2d{}}).Translation()};
     } else {
       return wpi::array{
-          (m_center + Transform2d{0_m, -c, Rotation2d{}}).Translation(),
-          (m_center + Transform2d{0_m, c, Rotation2d{}}).Translation()};
+          (m_center + Transform2d{0.0 * mp::m, -c, Rotation2d{}}).Translation(),
+          (m_center + Transform2d{0.0 * mp::m, c, Rotation2d{}}).Translation()};
     }
   }
 
@@ -153,7 +153,7 @@ class WPILIB_DLLEXPORT Ellipse2d {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the ellipse)
    */
-  units::meter_t Distance(const Translation2d& point) const {
+  mp::quantity<mp::m> Distance(const Translation2d& point) const {
     return Nearest(point).Distance(point);
   }
 
@@ -174,14 +174,14 @@ class WPILIB_DLLEXPORT Ellipse2d {
    */
   constexpr bool operator==(const Ellipse2d& other) const {
     return m_center == other.m_center &&
-           units::math::abs(m_xSemiAxis - other.m_xSemiAxis) < 1E-9_m &&
-           units::math::abs(m_ySemiAxis - other.m_ySemiAxis) < 1E-9_m;
+           mp::abs(m_xSemiAxis - other.m_xSemiAxis) < 1E-9 * mp::m &&
+           mp::abs(m_ySemiAxis - other.m_ySemiAxis) < 1E-9 * mp::m;
   }
 
  private:
   Pose2d m_center;
-  units::meter_t m_xSemiAxis;
-  units::meter_t m_ySemiAxis;
+  mp::quantity<mp::m> m_xSemiAxis;
+  mp::quantity<mp::m> m_ySemiAxis;
 
   /**
    * Solves the equation of an ellipse from the given point. This is a helper
@@ -203,8 +203,8 @@ class WPILIB_DLLEXPORT Ellipse2d {
     auto x = rotPoint.X() - m_center.X();
     auto y = rotPoint.Y() - m_center.Y();
 
-    return (x * x) / (m_xSemiAxis * m_xSemiAxis) +
-           (y * y) / (m_ySemiAxis * m_ySemiAxis);
+    return double{(x * x) / (m_xSemiAxis * m_xSemiAxis) +
+                  (y * y) / (m_ySemiAxis * m_ySemiAxis)};
   }
 };
 

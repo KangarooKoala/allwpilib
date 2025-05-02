@@ -17,8 +17,7 @@
 #include "frc/fmt/Eigen.h"
 #include "frc/geometry/Quaternion.h"
 #include "frc/geometry/Rotation2d.h"
-#include "units/angle.h"
-#include "units/math.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -54,17 +53,17 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
    */
-  constexpr Rotation3d(units::radian_t roll, units::radian_t pitch,
-                       units::radian_t yaw) {
+  constexpr Rotation3d(mp::quantity<mp::rad> roll, mp::quantity<mp::rad> pitch,
+                       mp::quantity<mp::rad> yaw) {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
-    double cr = units::math::cos(roll * 0.5);
-    double sr = units::math::sin(roll * 0.5);
+    double cr = mp::cos(roll * 0.5);
+    double sr = mp::sin(roll * 0.5);
 
-    double cp = units::math::cos(pitch * 0.5);
-    double sp = units::math::sin(pitch * 0.5);
+    double cp = mp::cos(pitch * 0.5);
+    double sp = mp::sin(pitch * 0.5);
 
-    double cy = units::math::cos(yaw * 0.5);
-    double sy = units::math::sin(yaw * 0.5);
+    double cy = mp::cos(yaw * 0.5);
+    double sy = mp::sin(yaw * 0.5);
 
     m_q = Quaternion{cr * cp * cy + sr * sp * sy, sr * cp * cy - cr * sp * sy,
                      cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy};
@@ -77,17 +76,18 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param axis The rotation axis.
    * @param angle The rotation around the axis.
    */
-  constexpr Rotation3d(const Eigen::Vector3d& axis, units::radian_t angle) {
+  constexpr Rotation3d(const Eigen::Vector3d& axis,
+                       mp::quantity<mp::rad> angle) {
     double norm = ct_matrix{axis}.norm();
     if (norm == 0.0) {
       return;
     }
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-    Eigen::Vector3d v{{axis(0) / norm * units::math::sin(angle / 2.0),
-                       axis(1) / norm * units::math::sin(angle / 2.0),
-                       axis(2) / norm * units::math::sin(angle / 2.0)}};
-    m_q = Quaternion{units::math::cos(angle / 2.0), v(0), v(1), v(2)};
+    Eigen::Vector3d v{{axis(0) / norm * mp::sin(angle / 2.0),
+                       axis(1) / norm * mp::sin(angle / 2.0),
+                       axis(2) / norm * mp::sin(angle / 2.0)}};
+    m_q = Quaternion{mp::cos(angle / 2.0), v(0), v(1), v(2)};
   }
 
   /**
@@ -98,7 +98,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @param rvec The rotation vector.
    */
   constexpr explicit Rotation3d(const Eigen::Vector3d& rvec)
-      : Rotation3d{rvec, units::radian_t{ct_matrix{rvec}.norm()}} {}
+      : Rotation3d{rvec, ct_matrix{rvec}.norm() * mp::rad} {}
 
   /**
    * Constructs a Rotation3d from a rotation matrix.
@@ -239,7 +239,7 @@ class WPILIB_DLLEXPORT Rotation3d {
    * @see Transform3d(Transform2d)
    */
   constexpr explicit Rotation3d(const Rotation2d& rotation)
-      : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
+      : Rotation3d{0.0 * mp::rad, 0.0 * mp::rad, rotation.Radians()} {}
 
   /**
    * Adds two rotations together.
@@ -282,10 +282,10 @@ class WPILIB_DLLEXPORT Rotation3d {
     // https://en.wikipedia.org/wiki/Slerp#Quaternion_Slerp
     if (m_q.W() >= 0.0) {
       return Rotation3d{Eigen::Vector3d{{m_q.X(), m_q.Y(), m_q.Z()}},
-                        2.0 * units::radian_t{scalar * gcem::acos(m_q.W())}};
+                        2.0 * scalar * gcem::acos(m_q.W()) * mp::rad};
     } else {
       return Rotation3d{Eigen::Vector3d{{-m_q.X(), -m_q.Y(), -m_q.Z()}},
-                        2.0 * units::radian_t{scalar * gcem::acos(-m_q.W())}};
+                        2.0 * scalar * gcem::acos(-m_q.W()) * mp::rad};
     }
   }
 
@@ -311,9 +311,11 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Adds the new rotation to the current rotation. The other rotation is
    * applied extrinsically, which means that it rotates around the global axes.
-   * For example, Rotation3d{90_deg, 0, 0}.RotateBy(Rotation3d{0, 45_deg, 0})
+   * For example, Rotation3d{90.0 * mp::deg, 0.0 * mp::deg, 0.0 *
+   * mp::deg}.RotateBy(Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg})
    * rotates by 90 degrees around the +X axis and then by 45 degrees around the
-   * global +Y axis. (This is equivalent to Rotation3d{90_deg, 45_deg, 0})
+   * global +Y axis. (This is equivalent to Rotation3d{90.0 * mp::deg, 45.0 *
+   * mp::deg, 0.0 * mp::deg})
    *
    * @param other The extrinsic rotation to rotate by.
    *
@@ -331,7 +333,7 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Returns the counterclockwise rotation angle around the X axis (roll).
    */
-  constexpr units::radian_t X() const {
+  constexpr mp::quantity<mp::rad> X() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -342,16 +344,16 @@ class WPILIB_DLLEXPORT Rotation3d {
     double sxcy = 2.0 * (w * x + y * z);
     double cy_sq = cxcy * cxcy + sxcy * sxcy;
     if (cy_sq > 1e-20) {
-      return units::radian_t{gcem::atan2(sxcy, cxcy)};
+      return gcem::atan2(sxcy, cxcy) * mp::rad;
     } else {
-      return 0_rad;
+      return 0.0 * mp::rad;
     }
   }
 
   /**
    * Returns the counterclockwise rotation angle around the Y axis (pitch).
    */
-  constexpr units::radian_t Y() const {
+  constexpr mp::quantity<mp::rad> Y() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -360,16 +362,16 @@ class WPILIB_DLLEXPORT Rotation3d {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     double ratio = 2.0 * (w * y - z * x);
     if (gcem::abs(ratio) >= 1.0) {
-      return units::radian_t{gcem::copysign(std::numbers::pi / 2.0, ratio)};
+      return gcem::copysign(std::numbers::pi / 2.0, ratio) * mp::rad;
     } else {
-      return units::radian_t{gcem::asin(ratio)};
+      return gcem::asin(ratio) * mp::rad;
     }
   }
 
   /**
    * Returns the counterclockwise rotation angle around the Z axis (yaw).
    */
-  constexpr units::radian_t Z() const {
+  constexpr mp::quantity<mp::rad> Z() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -380,9 +382,9 @@ class WPILIB_DLLEXPORT Rotation3d {
     double cysz = 2.0 * (w * z + x * y);
     double cy_sq = cycz * cycz + cysz * cysz;
     if (cy_sq > 1e-20) {
-      return units::radian_t{gcem::atan2(cysz, cycz)};
+      return gcem::atan2(cysz, cycz) * mp::rad;
     } else {
-      return units::radian_t{gcem::atan2(2.0 * w * z, w * w - z * z)};
+      return gcem::atan2(2.0 * w * z, w * w - z * z) * mp::rad;
     }
   }
 
@@ -401,9 +403,9 @@ class WPILIB_DLLEXPORT Rotation3d {
   /**
    * Returns the angle in the axis-angle representation of this rotation.
    */
-  constexpr units::radian_t Angle() const {
+  constexpr mp::quantity<mp::rad> Angle() const {
     double norm = gcem::hypot(m_q.X(), m_q.Y(), m_q.Z());
-    return units::radian_t{2.0 * gcem::atan2(norm, m_q.W())};
+    return 2.0 * gcem::atan2(norm, m_q.W()) * mp::rad;
   }
 
   /**

@@ -11,8 +11,7 @@
 #include <vector>
 
 #include "frc/EigenCore.h"
-#include "units/math.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -62,7 +61,8 @@ class KalmanFilterLatencyCompensator {
    * @param timestamp The timestamp of the state.
    */
   void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
-                        Vectord<Outputs> localY, units::second_t timestamp) {
+                        Vectord<Outputs> localY,
+                        mp::quantity<mp::s> timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -86,10 +86,11 @@ class KalmanFilterLatencyCompensator {
    */
   template <int Rows>
   void ApplyPastGlobalMeasurement(
-      KalmanFilterType* observer, units::second_t nominalDt, Vectord<Rows> y,
+      KalmanFilterType* observer, mp::quantity<mp::s> nominalDt,
+      Vectord<Rows> y,
       std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
           globalMeasurementCorrect,
-      units::second_t timestamp) {
+      mp::quantity<mp::s> timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {
       // State map was empty, which means that we got a measurement right at
       // startup. The only thing we can do is ignore the measurement.
@@ -130,14 +131,14 @@ class KalmanFilterLatencyCompensator {
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
-      units::second_t prevTimeDiff =
-          units::math::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
-      units::second_t nextTimeDiff =
-          units::math::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
+      mp::quantity<mp::s> prevTimeDiff =
+          mp::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
+      mp::quantity<mp::s> nextTimeDiff =
+          mp::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
       indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
     }
 
-    units::second_t lastTimestamp =
+    mp::quantity<mp::s> lastTimestamp =
         m_pastObserverSnapshots[indexOfClosestEntry].first - nominalDt;
 
     // We will now go back in time to the state of the system at the time when
@@ -174,7 +175,7 @@ class KalmanFilterLatencyCompensator {
 
  private:
   static constexpr size_t kMaxPastObserverStates = 300;
-  std::vector<std::pair<units::second_t, ObserverSnapshot>>
+  std::vector<std::pair<mp::quantity<mp::s>, ObserverSnapshot>>
       m_pastObserverSnapshots;
 };
 }  // namespace frc

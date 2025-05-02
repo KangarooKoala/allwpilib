@@ -28,8 +28,8 @@ std::optional<frc::Ellipse2d> wpi::Protobuf<frc::Ellipse2d>::Unpack(
 
   return frc::Ellipse2d{
       ipose[0],
-      units::meter_t{msg.xSemiAxis},
-      units::meter_t{msg.ySemiAxis},
+      msg.xSemiAxis * mp::m,
+      msg.ySemiAxis * mp::m,
   };
 }
 
@@ -38,8 +38,8 @@ bool wpi::Protobuf<frc::Ellipse2d>::Pack(OutputStream& stream,
   wpi::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufEllipse2d msg{
       .center = pose.Callback(),
-      .xSemiAxis = value.XSemiAxis().value(),
-      .ySemiAxis = value.YSemiAxis().value(),
+      .xSemiAxis = mp::value(value.XSemiAxis()),
+      .ySemiAxis = mp::value(value.YSemiAxis()),
   };
   return stream.Encode(msg);
 }

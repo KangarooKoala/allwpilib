@@ -14,7 +14,7 @@
 #include <wpi/json_fwd.h>
 
 #include "frc/ct_matrix.h"
-#include "units/angle.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -35,9 +35,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @param value The value of the angle.
    */
-  constexpr Rotation2d(units::angle_unit auto value)  // NOLINT
-      : m_cos{gcem::cos(value.template convert<units::radian>().value())},
-        m_sin{gcem::sin(value.template convert<units::radian>().value())} {}
+  constexpr Rotation2d(mp::QuantityOf<mp::angle> auto value)  // NOLINT
+      : m_cos{gcem::cos(mp::value(value.in(mp::rad)))},
+        m_sin{gcem::sin(mp::value(value.in(mp::rad)))} {}
 
   /**
    * Constructs a Rotation2d with the given x and y (cosine and sine)
@@ -105,8 +105,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Adds two rotations together, with the result being bounded between -π and
    * π.
    *
-   * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{std::numbers::pi/2.0}}</code>
+   * For example, <code>Rotation2d{30.0 * mp::deg} + Rotation2d{60.0 *
+   * mp::deg}</code> equals <code>Rotation2d{std::numbers::pi/2.0 *
+   * mp::rad}</code>
    *
    * @param other The rotation to add.
    *
@@ -120,8 +121,9 @@ class WPILIB_DLLEXPORT Rotation2d {
    * Subtracts the new rotation from the current rotation and returns the new
    * rotation.
    *
-   * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
-   * <code>Rotation2d{units::radian_t{-std::numbers::pi/2.0}}</code>
+   * For example, <code>Rotation2d{10.0 * mp::deg} - Rotation2d{100.0 *
+   * mp::deg}</code> equals <code>Rotation2d{-std::numbers::pi/2.0 *
+   * mp::rad}</code>
    *
    * @param other The rotation to subtract.
    *
@@ -203,8 +205,8 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The radian value of the rotation constrained within [-π, π].
    */
-  constexpr units::radian_t Radians() const {
-    return units::radian_t{gcem::atan2(m_sin, m_cos)};
+  constexpr mp::quantity<mp::rad> Radians() const {
+    return gcem::atan2(m_sin, m_cos) * mp::rad;
   }
 
   /**
@@ -212,7 +214,7 @@ class WPILIB_DLLEXPORT Rotation2d {
    *
    * @return The degree value of the rotation constrained within [-180, 180].
    */
-  constexpr units::degree_t Degrees() const { return Radians(); }
+  constexpr mp::quantity<mp::deg> Degrees() const { return Radians(); }
 
   /**
    * Returns the cosine of the rotation.

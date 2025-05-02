@@ -6,9 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -25,32 +23,32 @@ struct WPILIB_DLLEXPORT Twist3d {
   /**
    * Linear "dx" component
    */
-  units::meter_t dx = 0_m;
+  mp::quantity<mp::m> dx = 0.0 * mp::m;
 
   /**
    * Linear "dy" component
    */
-  units::meter_t dy = 0_m;
+  mp::quantity<mp::m> dy = 0.0 * mp::m;
 
   /**
    * Linear "dz" component
    */
-  units::meter_t dz = 0_m;
+  mp::quantity<mp::m> dz = 0.0 * mp::m;
 
   /**
    * Rotation vector x component.
    */
-  units::radian_t rx = 0_rad;
+  mp::quantity<mp::rad> rx = 0.0 * mp::rad;
 
   /**
    * Rotation vector y component.
    */
-  units::radian_t ry = 0_rad;
+  mp::quantity<mp::rad> ry = 0.0 * mp::rad;
 
   /**
    * Rotation vector z component.
    */
-  units::radian_t rz = 0_rad;
+  mp::quantity<mp::rad> rz = 0.0 * mp::rad;
 
   /**
    * Obtain a new Transform3d from a (constant curvature) velocity.
@@ -77,12 +75,12 @@ struct WPILIB_DLLEXPORT Twist3d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist3d& other) const {
-    return units::math::abs(dx - other.dx) < 1E-9_m &&
-           units::math::abs(dy - other.dy) < 1E-9_m &&
-           units::math::abs(dz - other.dz) < 1E-9_m &&
-           units::math::abs(rx - other.rx) < 1E-9_rad &&
-           units::math::abs(ry - other.ry) < 1E-9_rad &&
-           units::math::abs(rz - other.rz) < 1E-9_rad;
+    return mp::abs(dx - other.dx) < 1E-9 * mp::m &&
+           mp::abs(dy - other.dy) < 1E-9 * mp::m &&
+           mp::abs(dz - other.dz) < 1E-9 * mp::m &&
+           mp::abs(rx - other.rx) < 1E-9 * mp::rad &&
+           mp::abs(ry - other.ry) < 1E-9 * mp::rad &&
+           mp::abs(rz - other.rz) < 1E-9 * mp::rad;
   }
 
   /**
@@ -108,8 +106,8 @@ constexpr Transform3d Twist3d::Exp() const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
 
   auto impl = [this]<typename Matrix3d, typename Vector3d>() -> Transform3d {
-    Vector3d u{{dx.value(), dy.value(), dz.value()}};
-    Vector3d rvec{{rx.value(), ry.value(), rz.value()}};
+    Vector3d u{{mp::value(dx), mp::value(dy), mp::value(dz)}};
+    Vector3d rvec{{mp::value(rx), mp::value(ry), mp::value(rz)}};
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
     double theta = rvec.norm();
@@ -147,11 +145,10 @@ constexpr Transform3d Twist3d::Exp() const {
 
     Vector3d translation_component = V * u;
 
-    const Transform3d transform{
-        Translation3d{units::meter_t{translation_component(0)},
-                      units::meter_t{translation_component(1)},
-                      units::meter_t{translation_component(2)}},
-        Rotation3d{R}};
+    const Transform3d transform{Translation3d{translation_component(0) * mp::m,
+                                              translation_component(1) * mp::m,
+                                              translation_component(2) * mp::m},
+                                Rotation3d{R}};
 
     return transform;
   };

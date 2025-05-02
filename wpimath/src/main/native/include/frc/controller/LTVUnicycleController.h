@@ -12,10 +12,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
 #include "frc/trajectory/Trajectory.h"
-#include "units/angular_velocity.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -37,7 +34,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *
    * @param dt Discretization timestep.
    */
-  explicit LTVUnicycleController(units::second_t dt)
+  explicit LTVUnicycleController(mp::quantity<mp::s> dt)
       : LTVUnicycleController{{0.0625, 0.125, 2.0}, {1.0, 2.0}, dt} {}
 
   /**
@@ -54,7 +51,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param dt     Discretization timestep.
    */
   LTVUnicycleController(const wpi::array<double, 3>& Qelems,
-                        const wpi::array<double, 2>& Relems, units::second_t dt)
+                        const wpi::array<double, 2>& Relems,
+                        mp::quantity<mp::s> dt)
       : m_Q{frc::MakeCostMatrix(Qelems)},
         m_R{frc::MakeCostMatrix(Relems)},
         m_dt{dt} {}
@@ -77,9 +75,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
     const auto& eRotate = m_poseError.Rotation();
     const auto& tolTranslate = m_poseTolerance.Translation();
     const auto& tolRotate = m_poseTolerance.Rotation();
-    return units::math::abs(eTranslate.X()) < tolTranslate.X() &&
-           units::math::abs(eTranslate.Y()) < tolTranslate.Y() &&
-           units::math::abs(eRotate.Radians()) < tolRotate.Radians();
+    return mp::abs(eTranslate.X()) < tolTranslate.X() &&
+           mp::abs(eTranslate.Y()) < tolTranslate.Y() &&
+           mp::abs(eRotate.Radians()) < tolRotate.Radians();
   }
 
   /**
@@ -104,8 +102,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param angularVelocityRef The desired angular velocity.
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& poseRef,
-                          units::meters_per_second_t linearVelocityRef,
-                          units::radians_per_second_t angularVelocityRef);
+                          mp::quantity<mp::m / mp::s> linearVelocityRef,
+                          mp::quantity<mp::rad / mp::s> angularVelocityRef);
 
   /**
    * Returns the linear and angular velocity outputs of the LTV controller.
@@ -135,7 +133,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   Eigen::Matrix<double, 3, 3> m_Q;
   Eigen::Matrix<double, 2, 2> m_R;
 
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;

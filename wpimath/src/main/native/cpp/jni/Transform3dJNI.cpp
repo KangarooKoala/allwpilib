@@ -11,8 +11,7 @@
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Twist3d.h"
-#include "units/angle.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 using namespace wpi::java;
 
@@ -29,14 +28,14 @@ Java_edu_wpi_first_math_jni_Transform3dJNI_log
    jdouble relQx, jdouble relQy, jdouble relQz)
 {
   frc::Transform3d transform3d{
-      units::meter_t{relX}, units::meter_t{relY}, units::meter_t{relZ},
+      relX * mp::m, relY * mp::m, relZ * mp::m,
       frc::Rotation3d{frc::Quaternion{relQw, relQx, relQy, relQz}}};
 
   frc::Twist3d result = transform3d.Log();
 
-  return MakeJDoubleArray(
-      env, {{result.dx.value(), result.dy.value(), result.dz.value(),
-             result.rx.value(), result.ry.value(), result.rz.value()}});
+  return MakeJDoubleArray(env, {{mp::value(result.dx), mp::value(result.dy),
+                                 mp::value(result.dz), mp::value(result.rx),
+                                 mp::value(result.ry), mp::value(result.rz)}});
 }
 
 }  // extern "C"

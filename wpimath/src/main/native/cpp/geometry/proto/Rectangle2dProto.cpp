@@ -28,8 +28,8 @@ std::optional<frc::Rectangle2d> wpi::Protobuf<frc::Rectangle2d>::Unpack(
 
   return frc::Rectangle2d{
       ipose[0],
-      units::meter_t{msg.xWidth},
-      units::meter_t{msg.yWidth},
+      msg.xWidth * mp::m,
+      msg.yWidth * mp::m,
   };
 }
 
@@ -38,8 +38,8 @@ bool wpi::Protobuf<frc::Rectangle2d>::Pack(OutputStream& stream,
   wpi::PackCallback pose{&value.Center()};
   wpi_proto_ProtobufRectangle2d msg{
       .center = pose.Callback(),
-      .xWidth = value.XWidth().value(),
-      .yWidth = value.YWidth().value(),
+      .xWidth = mp::value(value.XWidth()),
+      .yWidth = mp::value(value.YWidth()),
   };
   return stream.Encode(msg);
 }

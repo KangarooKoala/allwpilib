@@ -8,8 +8,7 @@
 
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -23,12 +22,12 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
  public:
   SwerveDriveKinematicsConstraint(
       const frc::SwerveDriveKinematics<NumModules>& kinematics,
-      units::meters_per_second_t maxSpeed)
+      mp::quantity<mp::m / mp::s> maxSpeed)
       : m_kinematics(kinematics), m_maxSpeed(maxSpeed) {}
 
-  units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const override {
     auto xVelocity = velocity * pose.Rotation().Cos();
     auto yVelocity = velocity * pose.Rotation().Sin();
     auto wheelSpeeds = m_kinematics.ToSwerveModuleStates(
@@ -37,17 +36,18 @@ class SwerveDriveKinematicsConstraint : public TrajectoryConstraint {
 
     auto normSpeeds = m_kinematics.ToChassisSpeeds(wheelSpeeds);
 
-    return units::math::hypot(normSpeeds.vx, normSpeeds.vy);
+    return mp::hypot(normSpeeds.vx, normSpeeds.vy);
   }
 
-  MinMax MinMaxAcceleration(const Pose2d& pose, units::curvature_t curvature,
-                            units::meters_per_second_t speed) const override {
+  MinMax MinMaxAcceleration(const Pose2d& pose,
+                            mp::quantity<mp::rad / mp::m> curvature,
+                            mp::quantity<mp::m / mp::s> speed) const override {
     return {};
   }
 
  private:
   frc::SwerveDriveKinematics<NumModules> m_kinematics;
-  units::meters_per_second_t m_maxSpeed;
+  mp::quantity<mp::m / mp::s> m_maxSpeed;
 };
 
 }  // namespace frc

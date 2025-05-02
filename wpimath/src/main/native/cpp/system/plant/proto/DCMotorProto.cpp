@@ -16,22 +16,20 @@ std::optional<frc::DCMotor> wpi::Protobuf<frc::DCMotor>::Unpack(
   }
 
   return frc::DCMotor{
-      units::volt_t{msg.nominal_voltage},
-      units::newton_meter_t{msg.stall_torque},
-      units::ampere_t{msg.stall_current},
-      units::ampere_t{msg.free_current},
-      units::radians_per_second_t{msg.free_speed},
+      msg.nominal_voltage * mp::V,      msg.stall_torque * mp::N * mp::m,
+      msg.stall_current * mp::A,        msg.free_current * mp::A,
+      msg.free_speed * mp::rad / mp::s,
   };
 }
 
 bool wpi::Protobuf<frc::DCMotor>::Pack(OutputStream& stream,
                                        const frc::DCMotor& value) {
   wpi_proto_ProtobufDCMotor msg{
-      .nominal_voltage = value.nominalVoltage.value(),
-      .stall_torque = value.stallTorque.value(),
-      .stall_current = value.stallCurrent.value(),
-      .free_current = value.freeCurrent.value(),
-      .free_speed = value.freeSpeed.value(),
+      .nominal_voltage = mp::value(value.nominalVoltage),
+      .stall_torque = mp::value(value.stallTorque),
+      .stall_current = mp::value(value.stallCurrent),
+      .free_current = mp::value(value.freeCurrent),
+      .free_speed = mp::value(value.freeSpeed),
   };
   return stream.Encode(msg);
 }

@@ -9,6 +9,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/MathUtil.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -25,8 +26,7 @@ template <int States>
 Vectord<States> AngleResidual(const Vectord<States>& a,
                               const Vectord<States>& b, int angleStateIdx) {
   Vectord<States> ret = a - b;
-  ret[angleStateIdx] =
-      AngleModulus(units::radian_t{ret[angleStateIdx]}).value();
+  ret[angleStateIdx] = mp::value(AngleModulus(ret[angleStateIdx] * mp::rad));
   return ret;
 }
 

@@ -9,10 +9,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
-#include "units/angle.h"
-#include "units/angular_velocity.h"
-#include "units/math.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -22,15 +19,11 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT ArmFeedforward {
  public:
-  using Angle = units::radians;
-  using Velocity = units::radians_per_second;
-  using Acceleration = units::compound_unit<units::radians_per_second,
-                                            units::inverse<units::second>>;
-  using kv_unit =
-      units::compound_unit<units::volts,
-                           units::inverse<units::radians_per_second>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+  inline static constexpr auto Angle = mp::rad;
+  inline static constexpr auto Velocity = Angle / mp::s;
+  inline static constexpr auto Acceleration = Velocity / mp::s;
+  inline static constexpr auto kv_unit = mp::V / Velocity;
+  inline static constexpr auto ka_unit = mp::V / Acceleration;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -44,27 +37,27 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  constexpr ArmFeedforward(
-      units::volt_t kS, units::volt_t kG, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
-      units::second_t dt = 20_ms)
+  constexpr ArmFeedforward(mp::quantity<mp::V> kS, mp::quantity<mp::V> kG,
+                           mp::quantity<kv_unit> kV,
+                           mp::quantity<ka_unit> kA = 0.0 * ka_unit,
+                           mp::quantity<mp::s> dt = 20.0 * mp::ms)
       : kS(kS), kG(kG), kV(kV), kA(kA), m_dt(dt) {
-    if (kV.value() < 0) {
+    if (mp::value(kV) < 0) {
       wpi::math::MathSharedStore::ReportError(
-          "kV must be a non-negative number, got {}!", kV.value());
-      this->kV = units::unit_t<kv_unit>{0};
+          "kV must be a non-negative number, got {}!", mp::value(kV));
+      this->kV = 0.0 * kv_unit;
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
-    if (kA.value() < 0) {
+    if (mp::value(kA) < 0) {
       wpi::math::MathSharedStore::ReportError(
-          "kA must be a non-negative number, got {}!", kA.value());
-      this->kA = units::unit_t<ka_unit>{0};
+          "kA must be a non-negative number, got {}!", mp::value(kA));
+      this->kA = 0.0 * ka_unit;
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0;");
     }
-    if (dt <= 0_ms) {
+    if (dt <= 0.0 * mp::ms) {
       wpi::math::MathSharedStore::ReportError(
-          "period must be a positive number, got {}!", dt.value());
-      this->m_dt = 20_ms;
+          "period must be a positive number, got {}!", mp::value(dt));
+      this->m_dt = 20.0 * mp::ms;
       wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
     }
   }
@@ -83,11 +76,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @return The computed feedforward, in volts.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  constexpr units::volt_t Calculate(
-      units::unit_t<Angle> angle, units::unit_t<Velocity> velocity,
-      units::unit_t<Acceleration> acceleration) const {
-    return kS * wpi::sgn(velocity) + kG * units::math::cos(angle) +
-           kV * velocity + kA * acceleration;
+  constexpr mp::quantity<mp::V> Calculate(
+      mp::quantity<Angle> angle, mp::quantity<Velocity> velocity,
+      mp::quantity<Acceleration> acceleration) const {
+    return kS * wpi::sgn(velocity) + kG * mp::cos(angle) + kV * velocity +
+           kA * acceleration;
   }
 
   /**
@@ -104,10 +97,10 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @return The computed feedforward in volts.
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
-  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity,
-                          units::second_t dt) const {
+  mp::quantity<mp::V> Calculate(mp::quantity<Angle> currentAngle,
+                                mp::quantity<Velocity> currentVelocity,
+                                mp::quantity<Velocity> nextVelocity,
+                                mp::quantity<mp::s> dt) const {
     return Calculate(currentAngle, currentVelocity, nextVelocity);
   }
 
@@ -122,11 +115,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param currentVelocity The current velocity.
    * @return The computed feedforward in volts.
    */
-  constexpr units::volt_t Calculate(
-      units::unit_t<Angle> currentAngle,
-      units::unit_t<Velocity> currentVelocity) const {
-    return kS * wpi::sgn(currentVelocity) +
-           kG * units::math::cos(currentAngle) + kV * currentVelocity;
+  constexpr mp::quantity<mp::V> Calculate(
+      mp::quantity<Angle> currentAngle,
+      mp::quantity<Velocity> currentVelocity) const {
+    return kS * wpi::sgn(currentVelocity) + kG * mp::cos(currentAngle) +
+           kV * currentVelocity;
   }
 
   /**
@@ -141,9 +134,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param nextVelocity    The next velocity.
    * @return The computed feedforward in volts.
    */
-  units::volt_t Calculate(units::unit_t<Angle> currentAngle,
-                          units::unit_t<Velocity> currentVelocity,
-                          units::unit_t<Velocity> nextVelocity) const;
+  mp::quantity<mp::V> Calculate(mp::quantity<Angle> currentAngle,
+                                mp::quantity<Velocity> currentVelocity,
+                                mp::quantity<Velocity> nextVelocity) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
@@ -164,13 +157,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param acceleration The acceleration of the arm.
    * @return The maximum possible velocity at the given acceleration and angle.
    */
-  constexpr units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Angle> angle,
-      units::unit_t<Acceleration> acceleration) {
+  constexpr mp::quantity<Velocity> MaxAchievableVelocity(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Angle> angle,
+      mp::quantity<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kG * units::math::cos(angle) -
-            kA * acceleration) /
-           kV;
+    return (maxVoltage - kS - kG * mp::cos(angle) - kA * acceleration) / kV;
   }
 
   /**
@@ -189,13 +180,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param acceleration The acceleration of the arm.
    * @return The minimum possible velocity at the given acceleration and angle.
    */
-  constexpr units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage, units::unit_t<Angle> angle,
-      units::unit_t<Acceleration> acceleration) {
+  constexpr mp::quantity<Velocity> MinAchievableVelocity(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Angle> angle,
+      mp::quantity<Acceleration> acceleration) {
     // Assume min velocity is negative, ks flips sign
-    return (-maxVoltage + kS - kG * units::math::cos(angle) -
-            kA * acceleration) /
-           kV;
+    return (-maxVoltage + kS - kG * mp::cos(angle) - kA * acceleration) / kV;
   }
 
   /**
@@ -214,11 +203,11 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param velocity   The velocity of the arm.
    * @return The maximum possible acceleration at the given velocity and angle.
    */
-  constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Angle> angle,
-      units::unit_t<Velocity> velocity) {
-    return (maxVoltage - kS * wpi::sgn(velocity) -
-            kG * units::math::cos(angle) - kV * velocity) /
+  constexpr mp::quantity<Acceleration> MaxAchievableAcceleration(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Angle> angle,
+      mp::quantity<Velocity> velocity) {
+    return (maxVoltage - kS * wpi::sgn(velocity) - kG * mp::cos(angle) -
+            kV * velocity) /
            kA;
   }
 
@@ -238,9 +227,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @param velocity   The velocity of the arm.
    * @return The minimum possible acceleration at the given velocity and angle.
    */
-  constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Angle> angle,
-      units::unit_t<Velocity> velocity) {
+  constexpr mp::quantity<Acceleration> MinAchievableAcceleration(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Angle> angle,
+      mp::quantity<Velocity> velocity) {
     return MaxAchievableAcceleration(-maxVoltage, angle, velocity);
   }
 
@@ -249,72 +238,72 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    *
    * @param kS The static gain.
    */
-  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+  constexpr void SetKs(mp::quantity<mp::V> kS) { this->kS = kS; }
 
   /**
    * Sets the gravity gain.
    *
    * @param kG The gravity gain.
    */
-  constexpr void SetKg(units::volt_t kG) { this->kG = kG; }
+  constexpr void SetKg(mp::quantity<mp::V> kG) { this->kG = kG; }
 
   /**
    * Sets the velocity gain.
    *
    * @param kV The velocity gain.
    */
-  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
+  constexpr void SetKv(mp::quantity<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
    *
    * @param kA The acceleration gain.
    */
-  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
+  constexpr void SetKa(mp::quantity<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the static gain.
    *
    * @return The static gain.
    */
-  constexpr units::volt_t GetKs() const { return kS; }
+  constexpr mp::quantity<mp::V> GetKs() const { return kS; }
 
   /**
    * Returns the gravity gain.
    *
    * @return The gravity gain.
    */
-  constexpr units::volt_t GetKg() const { return kG; }
+  constexpr mp::quantity<mp::V> GetKg() const { return kG; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  constexpr units::unit_t<kv_unit> GetKv() const { return kV; }
+  constexpr mp::quantity<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
+  constexpr mp::quantity<ka_unit> GetKa() const { return kA; }
 
  private:
   /// The static gain, in volts.
-  units::volt_t kS;
+  mp::quantity<mp::V> kS;
 
   /// The gravity gain, in volts.
-  units::volt_t kG;
+  mp::quantity<mp::V> kG;
 
   /// The velocity gain, in V/(rad/s)volt seconds per radian.
-  units::unit_t<kv_unit> kV;
+  mp::quantity<kv_unit> kV;
 
   /// The acceleration gain, in V/(rad/s²).
-  units::unit_t<ka_unit> kA;
+  mp::quantity<ka_unit> kA;
 
   /** The period. */
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 };
 }  // namespace frc
 

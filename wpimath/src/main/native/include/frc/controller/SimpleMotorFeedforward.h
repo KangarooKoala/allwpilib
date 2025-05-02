@@ -7,10 +7,7 @@
 #include <gcem.hpp>
 #include <wpi/MathExtras.h>
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -19,17 +16,15 @@ namespace frc {
  * A helper class that computes feedforward voltages for a simple
  * permanent-magnet DC motor.
  */
-template <class Distance>
-  requires units::length_unit<Distance> || units::angle_unit<Distance>
+template <mp::Unit auto Distance>
+  requires mp::UnitOf<decltype(Distance), mp::length> ||
+           mp::UnitOf<decltype(Distance), mp::angle>
 class SimpleMotorFeedforward {
  public:
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using kv_unit = units::compound_unit<units::volts, units::inverse<Velocity>>;
-  using ka_unit =
-      units::compound_unit<units::volts, units::inverse<Acceleration>>;
+  inline static constexpr auto Velocity = Distance / mp::s;
+  inline static constexpr auto Acceleration = Velocity / mp::s;
+  inline static constexpr auto kv_unit = mp::V / Velocity;
+  inline static constexpr auto ka_unit = mp::V / Acceleration;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -42,27 +37,27 @@ class SimpleMotorFeedforward {
    * @throws IllegalArgumentException for ka &lt; zero.
    * @throws IllegalArgumentException for period &le; zero.
    */
-  constexpr SimpleMotorFeedforward(
-      units::volt_t kS, units::unit_t<kv_unit> kV,
-      units::unit_t<ka_unit> kA = units::unit_t<ka_unit>(0),
-      units::second_t dt = 20_ms)
+  constexpr SimpleMotorFeedforward(mp::quantity<mp::V> kS,
+                                   mp::quantity<kv_unit> kV,
+                                   mp::quantity<ka_unit> kA = 0.0 * ka_unit,
+                                   mp::quantity<mp::s> dt = 20.0 * mp::ms)
       : kS(kS), kV(kV), kA(kA), m_dt(dt) {
-    if (kV.value() < 0) {
+    if (mp::value(kV) < 0) {
       wpi::math::MathSharedStore::ReportError(
-          "kV must be a non-negative number, got {}!", kV.value());
-      this->kV = units::unit_t<kv_unit>{0};
+          "kV must be a non-negative number, got {}!", mp::value(kV));
+      this->kV = 0.0 * kv_unit;
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
-    if (kA.value() < 0) {
+    if (mp::value(kA) < 0) {
       wpi::math::MathSharedStore::ReportError(
-          "kA must be a non-negative number, got {}!", kA.value());
-      this->kA = units::unit_t<ka_unit>{0};
+          "kA must be a non-negative number, got {}!", mp::value(kA));
+      this->kA = 0.0 * ka_unit;
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0.");
     }
-    if (dt <= 0_ms) {
+    if (dt <= 0.0 * mp::ms) {
       wpi::math::MathSharedStore::ReportError(
-          "period must be a positive number, got {}!", dt.value());
-      this->m_dt = 20_ms;
+          "period must be a positive number, got {}!", mp::value(dt));
+      this->m_dt = 20.0 * mp::ms;
       wpi::math::MathSharedStore::ReportWarning("period defaulted to 20 ms.");
     }
   }
@@ -75,7 +70,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(units::unit_t<Velocity> velocity) const {
+  constexpr mp::quantity<mp::V> Calculate(
+      mp::quantity<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -89,21 +85,21 @@ class SimpleMotorFeedforward {
    * @param nextVelocity    The next velocity setpoint.
    * @return The computed feedforward, in volts.
    */
-  constexpr units::volt_t Calculate(
-      units::unit_t<Velocity> currentVelocity,
-      units::unit_t<Velocity> nextVelocity) const {
+  constexpr mp::quantity<mp::V> Calculate(
+      mp::quantity<Velocity> currentVelocity,
+      mp::quantity<Velocity> nextVelocity) const {
     // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
-    if (kA < decltype(kA)(1e-9)) {
+    if (kA < 1e-9 * ka_unit) {
       return kS * wpi::sgn(nextVelocity) + kV * nextVelocity;
     } else {
-      double A = -kV.value() / kA.value();
-      double B = 1.0 / kA.value();
-      double A_d = gcem::exp(A * m_dt.value());
-      double B_d = A > -1e-9 ? B * m_dt.value() : 1.0 / A * (A_d - 1.0) * B;
+      double A = -mp::value(kV) / mp::value(kA);
+      double B = 1.0 / mp::value(kA);
+      double A_d = gcem::exp(A * mp::value(m_dt));
+      double B_d = A > -1e-9 ? B * mp::value(m_dt) : 1.0 / A * (A_d - 1.0) * B;
       return kS * wpi::sgn(currentVelocity) +
-             units::volt_t{
-                 1.0 / B_d *
-                 (nextVelocity.value() - A_d * currentVelocity.value())};
+             1.0 / B_d *
+                 (mp::value(nextVelocity) - A_d * mp::value(currentVelocity)) *
+                 mp::V;
     }
   }
 
@@ -121,9 +117,9 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
-  constexpr units::unit_t<Velocity> MaxAchievableVelocity(
-      units::volt_t maxVoltage,
-      units::unit_t<Acceleration> acceleration) const {
+  constexpr mp::quantity<Velocity> MaxAchievableVelocity(
+      mp::quantity<mp::V> maxVoltage,
+      mp::quantity<Acceleration> acceleration) const {
     // Assume max velocity is positive
     return (maxVoltage - kS - kA * acceleration) / kV;
   }
@@ -139,9 +135,9 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
-  constexpr units::unit_t<Velocity> MinAchievableVelocity(
-      units::volt_t maxVoltage,
-      units::unit_t<Acceleration> acceleration) const {
+  constexpr mp::quantity<Velocity> MinAchievableVelocity(
+      mp::quantity<mp::V> maxVoltage,
+      mp::quantity<Acceleration> acceleration) const {
     // Assume min velocity is positive, ks flips sign
     return (-maxVoltage + kS - kA * acceleration) / kV;
   }
@@ -157,8 +153,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
-  constexpr units::unit_t<Acceleration> MaxAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
+  constexpr mp::quantity<Acceleration> MaxAchievableAcceleration(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Velocity> velocity) const {
     return (maxVoltage - kS * wpi::sgn(velocity) - kV * velocity) / kA;
   }
 
@@ -173,8 +169,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
-  constexpr units::unit_t<Acceleration> MinAchievableAcceleration(
-      units::volt_t maxVoltage, units::unit_t<Velocity> velocity) const {
+  constexpr mp::quantity<Acceleration> MinAchievableAcceleration(
+      mp::quantity<mp::V> maxVoltage, mp::quantity<Velocity> velocity) const {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
@@ -183,62 +179,62 @@ class SimpleMotorFeedforward {
    *
    * @param kS The static gain.
    */
-  constexpr void SetKs(units::volt_t kS) { this->kS = kS; }
+  constexpr void SetKs(mp::quantity<mp::V> kS) { this->kS = kS; }
 
   /**
    * Sets the velocity gain.
    *
    * @param kV The velocity gain.
    */
-  constexpr void SetKv(units::unit_t<kv_unit> kV) { this->kV = kV; }
+  constexpr void SetKv(mp::quantity<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
    *
    * @param kA The acceleration gain.
    */
-  constexpr void SetKa(units::unit_t<ka_unit> kA) { this->kA = kA; }
+  constexpr void SetKa(mp::quantity<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the static gain.
    *
    * @return The static gain.
    */
-  constexpr units::volt_t GetKs() const { return kS; }
+  constexpr mp::quantity<mp::V> GetKs() const { return kS; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  constexpr units::unit_t<kv_unit> GetKv() const { return kV; }
+  constexpr mp::quantity<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  constexpr units::unit_t<ka_unit> GetKa() const { return kA; }
+  constexpr mp::quantity<ka_unit> GetKa() const { return kA; }
 
   /**
    * Returns the period.
    *
    * @return The period.
    */
-  constexpr units::second_t GetDt() const { return m_dt; }
+  constexpr mp::quantity<mp::s> GetDt() const { return m_dt; }
 
  private:
   /** The static gain. */
-  units::volt_t kS;
+  mp::quantity<mp::V> kS;
 
   /** The velocity gain. */
-  units::unit_t<kv_unit> kV;
+  mp::quantity<kv_unit> kV;
 
   /** The acceleration gain. */
-  units::unit_t<ka_unit> kA;
+  mp::quantity<ka_unit> kA;
 
   /** The period. */
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 };
 
 }  // namespace frc

@@ -17,7 +17,7 @@
 #include <wpi/circular_buffer.h>
 
 #include "frc/EigenCore.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -128,8 +128,8 @@ class LinearFilter {
    *                     user.
    */
   static constexpr LinearFilter<T> SinglePoleIIR(double timeConstant,
-                                                 units::second_t period) {
-    double gain = gcem::exp(-period.value() / timeConstant);
+                                                 mp::quantity<mp::s> period) {
+    double gain = gcem::exp(-mp::value(period) / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
 
@@ -148,8 +148,8 @@ class LinearFilter {
    *                     user.
    */
   static constexpr LinearFilter<T> HighPass(double timeConstant,
-                                            units::second_t period) {
-    double gain = gcem::exp(-period.value() / timeConstant);
+                                            mp::quantity<mp::s> period) {
+    double gain = gcem::exp(-mp::value(period) / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
 
@@ -191,7 +191,7 @@ class LinearFilter {
    */
   template <int Derivative, int Samples>
   static LinearFilter<T> FiniteDifference(
-      const wpi::array<int, Samples>& stencil, units::second_t period) {
+      const wpi::array<int, Samples>& stencil, mp::quantity<mp::s> period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
@@ -228,7 +228,7 @@ class LinearFilter {
     }
 
     Vectord<Samples> a =
-        S.householderQr().solve(d) / gcem::pow(period.value(), Derivative);
+        S.householderQr().solve(d) / gcem::pow(mp::value(period), Derivative);
 
     // Reverse gains list
     std::vector<double> ffGains;
@@ -247,7 +247,7 @@ class LinearFilter {
    * period of 20 ms would be
    *
    * <pre><code>
-   * LinearFilter<double>::BackwardFiniteDifference<1, 2>(20_ms);
+   * LinearFilter<double>::BackwardFiniteDifference<1, 2>(20.0 * mp::ms);
    * </code></pre>
    *
    * @tparam Derivative The order of the derivative to compute.
@@ -257,7 +257,7 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static LinearFilter<T> BackwardFiniteDifference(units::second_t period) {
+  static LinearFilter<T> BackwardFiniteDifference(mp::quantity<mp::s> period) {
     // Generate stencil points from -(samples - 1) to 0
     wpi::array<int, Samples> stencil{wpi::empty_array};
     for (int i = 0; i < Samples; ++i) {

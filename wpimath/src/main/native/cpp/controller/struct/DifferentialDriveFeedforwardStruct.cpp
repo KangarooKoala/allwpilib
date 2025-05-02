@@ -14,16 +14,17 @@ constexpr size_t kKaAngularOff = kKvAngularOff + 8;
 frc::DifferentialDriveFeedforward wpi::Struct<
     frc::DifferentialDriveFeedforward>::Unpack(std::span<const uint8_t> data) {
   return {
-      decltype(1_V / 1_mps){wpi::UnpackStruct<double, kKvLinearOff>(data)},
-      decltype(1_V / 1_mps_sq){wpi::UnpackStruct<double, kKaLinearOff>(data)},
-      decltype(1_V / 1_mps){wpi::UnpackStruct<double, kKvAngularOff>(data)},
-      decltype(1_V / 1_mps_sq){wpi::UnpackStruct<double, kKaAngularOff>(data)}};
+      wpi::UnpackStruct<double, kKvLinearOff>(data) * mp::V / (mp::m / mp::s),
+      wpi::UnpackStruct<double, kKaLinearOff>(data) * mp::V / (mp::m / mp::s2),
+      wpi::UnpackStruct<double, kKvAngularOff>(data) * mp::V / (mp::m / mp::s),
+      wpi::UnpackStruct<double, kKaAngularOff>(data) * mp::V /
+          (mp::m / mp::s2)};
 }
 
 void wpi::Struct<frc::DifferentialDriveFeedforward>::Pack(
     std::span<uint8_t> data, const frc::DifferentialDriveFeedforward& value) {
-  wpi::PackStruct<kKvLinearOff>(data, value.m_kVLinear.value());
-  wpi::PackStruct<kKaLinearOff>(data, value.m_kALinear.value());
-  wpi::PackStruct<kKvAngularOff>(data, value.m_kVAngular.value());
-  wpi::PackStruct<kKaAngularOff>(data, value.m_kAAngular.value());
+  wpi::PackStruct<kKvLinearOff>(data, mp::value(value.m_kVLinear));
+  wpi::PackStruct<kKaLinearOff>(data, mp::value(value.m_kALinear));
+  wpi::PackStruct<kKvAngularOff>(data, mp::value(value.m_kVAngular));
+  wpi::PackStruct<kKaAngularOff>(data, mp::value(value.m_kAAngular));
 }

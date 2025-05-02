@@ -6,16 +6,18 @@
 
 #include <Eigen/QR>
 
+#include "frc/units.h"
+
 using namespace frc;
 
 DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
-    units::meters_per_second_t leftVelocity,
-    units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
-    units::volt_t rightVoltage) {
-  Vectord<2> u{leftVoltage.value(), rightVoltage.value()};
+    mp::quantity<mp::m / mp::s> leftVelocity,
+    mp::quantity<mp::m / mp::s> rightVelocity, mp::quantity<mp::V> leftVoltage,
+    mp::quantity<mp::V> rightVoltage) {
+  Vectord<2> u{mp::value(leftVoltage), mp::value(rightVoltage)};
 
   // Find unconstrained wheel accelerations
-  Vectord<2> x{leftVelocity.value(), rightVelocity.value()};
+  Vectord<2> x{mp::value(leftVelocity), mp::value(rightVelocity)};
   Vectord<2> dxdt = m_system.A() * x + m_system.B() * u;
 
   // Convert from wheel accelerations to linear and angular accelerations
@@ -30,20 +32,21 @@ DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
   // [α]   [-1/trackwidth  1/trackwidth][dxdt(1)]
   //
   // accels = M dxdt where M = [0.5, 0.5; -1/trackwidth, 1/trackwidth]
-  Matrixd<2, 2> M{{0.5, 0.5},
-                  {-1.0 / m_trackwidth.value(), 1.0 / m_trackwidth.value()}};
+  Matrixd<2, 2> M{
+      {0.5, 0.5},
+      {-1.0 / mp::value(m_trackwidth), 1.0 / mp::value(m_trackwidth)}};
   Vectord<2> accels = M * dxdt;
 
   // Constrain the linear and angular accelerations
-  if (accels(0) > m_maxLinearAccel.value()) {
-    accels(0) = m_maxLinearAccel.value();
-  } else if (accels(0) < m_minLinearAccel.value()) {
-    accels(0) = m_minLinearAccel.value();
+  if (accels(0) > mp::value(m_maxLinearAccel)) {
+    accels(0) = mp::value(m_maxLinearAccel);
+  } else if (accels(0) < mp::value(m_minLinearAccel)) {
+    accels(0) = mp::value(m_minLinearAccel);
   }
-  if (accels(1) > m_maxAngularAccel.value()) {
-    accels(1) = m_maxAngularAccel.value();
-  } else if (accels(1) < -m_maxAngularAccel.value()) {
-    accels(1) = -m_maxAngularAccel.value();
+  if (accels(1) > mp::value(m_maxAngularAccel)) {
+    accels(1) = mp::value(m_maxAngularAccel);
+  } else if (accels(1) < -mp::value(m_maxAngularAccel)) {
+    accels(1) = -mp::value(m_maxAngularAccel);
   }
 
   // Convert the constrained linear and angular accelerations back to wheel
@@ -56,5 +59,5 @@ DifferentialDriveWheelVoltages DifferentialDriveAccelerationLimiter::Calculate(
   // u = B⁻¹(dx/dt - Ax)
   u = m_system.B().householderQr().solve(dxdt - m_system.A() * x);
 
-  return {units::volt_t{u(0)}, units::volt_t{u(1)}};
+  return {u(0) * mp::V, u(1) * mp::V};
 }

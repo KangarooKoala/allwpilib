@@ -6,9 +6,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -25,17 +23,17 @@ struct WPILIB_DLLEXPORT Twist2d {
   /**
    * Linear "dx" component
    */
-  units::meter_t dx = 0_m;
+  mp::quantity<mp::m> dx = 0.0 * mp::m;
 
   /**
    * Linear "dy" component
    */
-  units::meter_t dy = 0_m;
+  mp::quantity<mp::m> dy = 0.0 * mp::m;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  units::radian_t dtheta = 0_rad;
+  mp::quantity<mp::rad> dtheta = 0.0 * mp::rad;
 
   /**
    * Obtain a new Transform2d from a (constant curvature) velocity.
@@ -62,9 +60,9 @@ struct WPILIB_DLLEXPORT Twist2d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist2d& other) const {
-    return units::math::abs(dx - other.dx) < 1E-9_m &&
-           units::math::abs(dy - other.dy) < 1E-9_m &&
-           units::math::abs(dtheta - other.dtheta) < 1E-9_rad;
+    return mp::abs(dx - other.dx) < 1E-9 * mp::m &&
+           mp::abs(dy - other.dy) < 1E-9 * mp::m &&
+           mp::abs(dtheta - other.dtheta) < 1E-9 * mp::rad;
   }
 
   /**
@@ -85,7 +83,7 @@ struct WPILIB_DLLEXPORT Twist2d {
 namespace frc {
 
 constexpr Transform2d Twist2d::Exp() const {
-  const auto theta = dtheta.value();
+  const auto theta = mp::value(dtheta);
   const auto sinTheta = gcem::sin(theta);
   const auto cosTheta = gcem::cos(theta);
 

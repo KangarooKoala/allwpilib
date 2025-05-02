@@ -15,7 +15,7 @@
 
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -49,7 +49,8 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
+  constexpr Pose2d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                   Rotation2d rotation)
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -110,14 +111,14 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.
@@ -225,9 +226,9 @@ class WPILIB_DLLEXPORT Pose2d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Radians().value()) <
+                       mp::value((this->Rotation() - a.Rotation()).Radians())) <
                    gcem::abs(
-                       (this->Rotation() - b.Rotation()).Radians().value());
+                       mp::value((this->Rotation() - b.Rotation()).Radians()));
           }
           return aDistance < bDistance;
         });
@@ -251,9 +252,9 @@ class WPILIB_DLLEXPORT Pose2d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Radians().value()) <
+                       mp::value((this->Rotation() - a.Rotation()).Radians())) <
                    gcem::abs(
-                       (this->Rotation() - b.Rotation()).Radians().value());
+                       mp::value((this->Rotation() - b.Rotation()).Radians()));
           }
           return aDistance < bDistance;
         });

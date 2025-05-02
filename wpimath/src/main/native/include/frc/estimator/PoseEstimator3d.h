@@ -20,7 +20,7 @@
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/Odometry3d.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -178,7 +178,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    * @return The pose at the given timestamp (or std::nullopt if the buffer is
    * empty).
    */
-  std::optional<Pose3d> SampleAt(units::second_t timestamp) const {
+  std::optional<Pose3d> SampleAt(mp::quantity<mp::s> timestamp) const {
     // Step 0: If there are no odometry updates to sample, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty()) {
       return std::nullopt;
@@ -187,9 +187,9 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // Step 1: Make sure timestamp matches the sample from the odometry pose
     // buffer. (When sampling, the buffer will always use a timestamp
     // between the first and last timestamps)
-    units::second_t oldestOdometryTimestamp =
+    mp::quantity<mp::s> oldestOdometryTimestamp =
         m_odometryPoseBuffer.GetInternalBuffer().front().first;
-    units::second_t newestOdometryTimestamp =
+    mp::quantity<mp::s> newestOdometryTimestamp =
         m_odometryPoseBuffer.GetInternalBuffer().back().first;
     timestamp =
         std::clamp(timestamp, oldestOdometryTimestamp, newestOdometryTimestamp);
@@ -241,7 +241,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *     frc::Timer::GetFPGATimestamp() as your time source in this case.
    */
   void AddVisionMeasurement(const Pose3d& visionRobotPose,
-                            units::second_t timestamp) {
+                            mp::quantity<mp::s> timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
@@ -278,15 +278,14 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // twist by a Kalman gain matrix representing how much we trust vision
     // measurements compared to our current pose.
     frc::Vectord<6> k_times_twist =
-        m_visionK * frc::Vectord<6>{twist.dx.value(), twist.dy.value(),
-                                    twist.dz.value(), twist.rx.value(),
-                                    twist.ry.value(), twist.rz.value()};
+        m_visionK * frc::Vectord<6>{mp::value(twist.dx), mp::value(twist.dy),
+                                    mp::value(twist.dz), mp::value(twist.rx),
+                                    mp::value(twist.ry), mp::value(twist.rz)};
 
     // Step 6: Convert back to Twist3d.
-    Twist3d scaledTwist{
-        units::meter_t{k_times_twist(0)},  units::meter_t{k_times_twist(1)},
-        units::meter_t{k_times_twist(2)},  units::radian_t{k_times_twist(3)},
-        units::radian_t{k_times_twist(4)}, units::radian_t{k_times_twist(5)}};
+    Twist3d scaledTwist{k_times_twist(0) * mp::m,   k_times_twist(1) * mp::m,
+                        k_times_twist(2) * mp::m,   k_times_twist(3) * mp::rad,
+                        k_times_twist(4) * mp::rad, k_times_twist(5) * mp::rad};
 
     // Step 7: Calculate and record the vision update.
     VisionUpdate visionUpdate{visionSample.value() + scaledTwist.Exp(),
@@ -331,7 +330,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *     less.
    */
   void AddVisionMeasurement(
-      const Pose3d& visionRobotPose, units::second_t timestamp,
+      const Pose3d& visionRobotPose, mp::quantity<mp::s> timestamp,
       const wpi::array<double, 4>& visionMeasurementStdDevs) {
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
     AddVisionMeasurement(visionRobotPose, timestamp);
@@ -362,7 +361,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
    *
    * @return The estimated pose of the robot in meters.
    */
-  Pose3d UpdateWithTime(units::second_t currentTime,
+  Pose3d UpdateWithTime(mp::quantity<mp::s> currentTime,
                         const Rotation3d& gyroAngle,
                         const WheelPositions& wheelPositions) {
     auto odometryEstimate = m_odometry.Update(gyroAngle, wheelPositions);
@@ -390,7 +389,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
 
     // Step 1: Find the oldest timestamp that needs a vision update.
-    units::second_t oldestOdometryTimestamp =
+    mp::quantity<mp::s> oldestOdometryTimestamp =
         m_odometryPoseBuffer.GetInternalBuffer().front().first;
 
     // Step 2: If there are no vision updates before that timestamp, skip.
@@ -433,7 +432,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
   };
 
-  static constexpr units::second_t kBufferDuration = 1.5_s;
+  static constexpr mp::quantity<mp::s> kBufferDuration = 1.5 * mp::s;
 
   Odometry3d<WheelSpeeds, WheelPositions>& m_odometry;
   wpi::array<double, 4> m_q{wpi::empty_array};
@@ -444,7 +443,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset
-  std::map<units::second_t, VisionUpdate> m_visionUpdates;
+  std::map<mp::quantity<mp::s>, VisionUpdate> m_visionUpdates;
 
   Pose3d m_poseEstimate;
 };

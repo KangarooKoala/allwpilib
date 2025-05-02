@@ -14,18 +14,18 @@ std::optional<frc::ChassisSpeeds> wpi::Protobuf<frc::ChassisSpeeds>::Unpack(
   }
 
   return frc::ChassisSpeeds{
-      units::meters_per_second_t{msg.vx},
-      units::meters_per_second_t{msg.vy},
-      units::radians_per_second_t{msg.omega},
+      msg.vx * mp::m / mp::s,
+      msg.vy * mp::m / mp::s,
+      msg.omega * mp::rad / mp::s,
   };
 }
 
 bool wpi::Protobuf<frc::ChassisSpeeds>::Pack(OutputStream& stream,
                                              const frc::ChassisSpeeds& value) {
   wpi_proto_ProtobufChassisSpeeds msg{
-      .vx = value.vx.value(),
-      .vy = value.vy.value(),
-      .omega = value.omega.value(),
+      .vx = mp::value(value.vx),
+      .vy = mp::value(value.vy),
+      .omega = mp::value(value.omega),
   };
   return stream.Encode(msg);
 }

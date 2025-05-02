@@ -10,6 +10,7 @@
 
 #include "frc/geometry/Transform2d.h"
 #include "frc/geometry/Translation3d.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -48,8 +49,8 @@ class WPILIB_DLLEXPORT Transform3d {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform3d(units::meter_t x, units::meter_t y, units::meter_t z,
-                        Rotation3d rotation)
+  constexpr Transform3d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                        mp::quantity<mp::m> z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -99,21 +100,21 @@ class WPILIB_DLLEXPORT Transform3d {
    *
    * @return The x component of the transformation's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the transformation's translation.
    *
    * @return The z component of the transformation's translation.
    */
-  constexpr units::meter_t Z() const { return m_translation.Z(); }
+  constexpr mp::quantity<mp::m> Z() const { return m_translation.Z(); }
 
   /**
    * Returns an affine transformation matrix representation of this
@@ -220,8 +221,8 @@ constexpr Twist3d Transform3d::Log() const {
   // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
 
   auto impl = [this]<typename Matrix3d, typename Vector3d>() -> Twist3d {
-    Vector3d u{{m_translation.X().value(), m_translation.Y().value(),
-                m_translation.Z().value()}};
+    Vector3d u{{mp::value(m_translation.X()), mp::value(m_translation.Y()),
+                mp::value(m_translation.Z())}};
     Vector3d rvec = m_rotation.ToVector();
     Matrix3d omega = detail::RotationVectorToMatrix(rvec);
     Matrix3d omegaSq = omega * omega;
@@ -255,12 +256,12 @@ constexpr Twist3d Transform3d::Log() const {
 
     Vector3d translation_component = V_inv * u;
 
-    return Twist3d{units::meter_t{translation_component(0)},
-                   units::meter_t{translation_component(1)},
-                   units::meter_t{translation_component(2)},
-                   units::radian_t{rvec(0)},
-                   units::radian_t{rvec(1)},
-                   units::radian_t{rvec(2)}};
+    return Twist3d{translation_component(0) * mp::m,
+                   translation_component(1) * mp::m,
+                   translation_component(2) * mp::m,
+                   rvec(0) * mp::rad,
+                   rvec(1) * mp::rad,
+                   rvec(2) * mp::rad};
   };
 
   if (std::is_constant_evaluated()) {

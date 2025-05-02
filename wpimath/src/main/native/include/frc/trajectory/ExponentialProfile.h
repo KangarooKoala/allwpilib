@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "units/math.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -20,7 +19,7 @@ namespace frc {
  * Initialization:
  * @code{.cpp}
  * ExponentialProfile::Constraints constraints{kMaxV, kV, kA};
- * State previousProfiledReference = {initialReference, 0_mps};
+ * State previousProfiledReference = {initialReference, 0.0 * mp::m / mp::s};
  * @endcode
  *
  * Run on update:
@@ -37,23 +36,20 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
-template <class Distance, class Input>
+template <mp::Unit auto Distance, mp::Unit auto Input>
 class ExponentialProfile {
  public:
-  using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Velocity_t = units::unit_t<Velocity>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using Input_t = units::unit_t<Input>;
-  using A_t = units::unit_t<units::inverse<units::seconds>>;
-  using B_t =
-      units::unit_t<units::compound_unit<Acceleration, units::inverse<Input>>>;
-  using KV = units::compound_unit<Input, units::inverse<Velocity>>;
-  using kV_t = units::unit_t<KV>;
-  using KA = units::compound_unit<Input, units::inverse<Acceleration>>;
-  using kA_t = units::unit_t<KA>;
+  using Distance_t = mp::quantity<Distance>;
+  inline static constexpr auto Velocity = Distance / mp::s;
+  using Velocity_t = mp::quantity<Velocity>;
+  inline static constexpr auto Acceleration = Velocity / mp::s;
+  using Input_t = mp::quantity<Input>;
+  using A_t = mp::quantity<mp::one / mp::s>;
+  using B_t = mp::quantity<Acceleration / Input>;
+  inline static constexpr auto KV = Input / Velocity;
+  using kV_t = mp::quantity<KV>;
+  inline static constexpr auto KA = Input / Acceleration;
+  using kA_t = mp::quantity<KA>;
 
   /**
    * Profile timing.
@@ -61,10 +57,10 @@ class ExponentialProfile {
   class ProfileTiming {
    public:
     /// Profile inflection time.
-    units::second_t inflectionTime;
+    mp::quantity<mp::s> inflectionTime;
 
     /// Total profile time.
-    units::second_t totalTime;
+    mp::quantity<mp::s> totalTime;
 
     /**
      * Decides if the profile is finished by time t.
@@ -72,7 +68,7 @@ class ExponentialProfile {
      * @param t The time since the beginning of the profile.
      * @return if the profile is finished at time t.
      */
-    constexpr bool IsFinished(const units::second_t& t) const {
+    constexpr bool IsFinished(const mp::quantity<mp::s>& t) const {
       return t >= totalTime;
     }
   };
@@ -110,23 +106,23 @@ class ExponentialProfile {
     constexpr Velocity_t MaxVelocity() const { return -maxInput * B / A; }
 
     /// Maximum unsigned input voltage.
-    Input_t maxInput{0};
+    Input_t maxInput = 0.0 * Input;
 
     /// The State-Space 1x1 system matrix.
-    A_t A{0};
+    A_t A = 0.0 / mp::s;
 
     /// The State-Space 1x1 input matrix.
-    B_t B{0};
+    B_t B = 0.0 * Acceleration / Input;
   };
 
   /** Profile state. */
   class State {
    public:
     /// The position at this state.
-    Distance_t position{0};
+    Distance_t position = 0.0 * Distance;
 
     /// The velocity at this state.
-    Velocity_t velocity{0};
+    Velocity_t velocity = 0.0 * Velocity;
 
     constexpr bool operator==(const State&) const = default;
   };
@@ -154,7 +150,7 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(const units::second_t& t, const State& current,
+  constexpr State Calculate(const mp::quantity<mp::s>& t, const State& current,
                             const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
@@ -162,7 +158,7 @@ class ExponentialProfile {
     auto inflectionPoint = CalculateInflectionPoint(current, goal, u);
     auto timing = CalculateProfileTiming(current, inflectionPoint, goal, u);
 
-    if (t < 0_s) {
+    if (t < 0.0 * mp::s) {
       return current;
     } else if (t < timing.inflectionTime) {
       return {ComputeDistanceFromTime(t, u, current),
@@ -198,8 +194,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The total duration of this profile.
    */
-  constexpr units::second_t TimeLeftUntil(const State& current,
-                                          const State& goal) const {
+  constexpr mp::quantity<mp::s> TimeLeftUntil(const State& current,
+                                              const State& goal) const {
     auto timing = CalculateProfileTiming(current, goal);
 
     return timing.totalTime;
@@ -265,9 +261,9 @@ class ExponentialProfile {
                                                  const State& goal,
                                                  const Input_t& input) const {
     auto u = input;
-    auto u_dir = units::math::abs(u) / u;
+    auto u_dir = mp::abs(u) / u;
 
-    units::second_t inflectionT_forward;
+    mp::quantity<mp::s> inflectionT_forward;
 
     // We need to handle 5 cases here:
     //
@@ -280,18 +276,17 @@ class ExponentialProfile {
     // For cases 1 and 3, we want to subtract epsilon from the inflection point
     // velocity For cases 2 and 4, we want to add epsilon to the inflection
     // point velocity. For case 5, we have reached inflection point velocity.
-    auto epsilon = Velocity_t(1e-9);
-    if (units::math::abs(u_dir * m_constraints.MaxVelocity() -
-                         inflectionPoint.velocity) < epsilon) {
+    auto epsilon = 1e-9 * Velocity;
+    if (mp::abs(u_dir * m_constraints.MaxVelocity() -
+                inflectionPoint.velocity) < epsilon) {
       auto solvableV = inflectionPoint.velocity;
-      units::second_t t_to_solvable_v;
+      mp::quantity<mp::s> t_to_solvable_v;
       Distance_t x_at_solvable_v;
-      if (units::math::abs(current.velocity - inflectionPoint.velocity) <
-          epsilon) {
-        t_to_solvable_v = 0_s;
+      if (mp::abs(current.velocity - inflectionPoint.velocity) < epsilon) {
+        t_to_solvable_v = 0.0 * mp::s;
         x_at_solvable_v = current.position;
       } else {
-        if (units::math::abs(current.velocity) > m_constraints.MaxVelocity()) {
+        if (mp::abs(current.velocity) > m_constraints.MaxVelocity()) {
           solvableV += u_dir * epsilon;
         } else {
           solvableV -= u_dir * epsilon;
@@ -327,17 +322,16 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Distance_t ComputeDistanceFromTime(const units::second_t& time,
+  constexpr Distance_t ComputeDistanceFromTime(const mp::quantity<mp::s>& time,
                                                const Input_t& input,
                                                const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
-    return initial.position +
-           (-B * u * time +
-            (initial.velocity + B * u / A) * (units::math::exp(A * time) - 1)) /
-               A;
+    return initial.position + (-B * u * time + (initial.velocity + B * u / A) *
+                                                   (mp::exp(A * time) - 1)) /
+                                  A;
   }
 
   /**
@@ -350,15 +344,14 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Velocity_t ComputeVelocityFromTime(const units::second_t& time,
+  constexpr Velocity_t ComputeVelocityFromTime(const mp::quantity<mp::s>& time,
                                                const Input_t& input,
                                                const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
-    return (initial.velocity + B * u / A) * units::math::exp(A * time) -
-           B * u / A;
+    return (initial.velocity + B * u / A) * mp::exp(A * time) - B * u / A;
   }
 
   /**
@@ -371,14 +364,14 @@ class ExponentialProfile {
    * @param initial The initial velocity.
    * @return The time required to reach the goal velocity.
    */
-  constexpr units::second_t ComputeTimeFromVelocity(
+  constexpr mp::quantity<mp::s> ComputeTimeFromVelocity(
       const Velocity_t& velocity, const Input_t& input,
       const Velocity_t& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
-    return units::math::log((A * velocity + B * u) / (A * initial + B * u)) / A;
+    return mp::log((A * velocity + B * u) / (A * initial + B * u)) / A;
   }
 
   /**
@@ -400,8 +393,7 @@ class ExponentialProfile {
 
     return initial.position + (velocity - initial.velocity) / A -
            B * u / (A * A) *
-               units::math::log((A * velocity + B * u) /
-                                (A * initial.velocity + B * u));
+               mp::log((A * velocity + B * u) / (A * initial.velocity + B * u));
   }
 
   /**
@@ -421,7 +413,7 @@ class ExponentialProfile {
     auto B = m_constraints.B;
     auto u = input;
 
-    auto u_dir = u / units::math::abs(u);
+    auto u_dir = u / mp::abs(u);
 
     auto position_delta = goal.position - current.position;
     auto velocity_delta = goal.velocity - current.velocity;
@@ -430,15 +422,15 @@ class ExponentialProfile {
     auto power = -A / B / u * (A * position_delta - velocity_delta);
 
     auto a = -A * A;
-    auto c = B * B * u * u + scalar * units::math::exp(power);
+    auto c = B * B * u * u + scalar * mp::exp(power);
 
-    if (-1e-9 < c.value() && c.value() < 0) {
+    if (-1e-9 < mp::value(c) && mp::value(c) < 0) {
       // numeric instability - the heuristic gets it right but c is around
       // -1e-13
-      return Velocity_t(0);
+      return 0.0 * Velocity;
     }
 
-    return u_dir * units::math::sqrt(-c / a);
+    return u_dir * mp::sqrt(-c / a);
   }
 
   /**
@@ -469,8 +461,8 @@ class ExponentialProfile {
       return xf < x_forward;
     }
 
-    auto a = v0 >= Velocity_t(0);
-    auto b = vf >= Velocity_t(0);
+    auto a = v0 >= 0.0 * Velocity;
+    auto b = vf >= 0.0 * Velocity;
     auto c = xf >= x_forward;
     auto d = xf >= x_reverse;
 

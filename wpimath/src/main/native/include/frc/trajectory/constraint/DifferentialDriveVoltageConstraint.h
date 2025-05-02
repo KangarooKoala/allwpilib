@@ -14,9 +14,7 @@
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -39,23 +37,23 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
    * voltage (12V) to account for "voltage sag" due to current draw.
    */
   constexpr DifferentialDriveVoltageConstraint(
-      const SimpleMotorFeedforward<units::meter>& feedforward,
-      DifferentialDriveKinematics kinematics, units::volt_t maxVoltage)
+      const SimpleMotorFeedforward<mp::m>& feedforward,
+      DifferentialDriveKinematics kinematics, mp::quantity<mp::V> maxVoltage)
       : m_feedforward(feedforward),
         m_kinematics(std::move(kinematics)),
         m_maxVoltage(maxVoltage) {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
-    return units::meters_per_second_t{std::numeric_limits<double>::max()};
+  constexpr mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const override {
+    return std::numeric_limits<double>::max() * mp::m / mp::s;
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
-    auto wheelSpeeds =
-        m_kinematics.ToWheelSpeeds({speed, 0_mps, speed * curvature});
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> speed) const override {
+    auto wheelSpeeds = m_kinematics.ToWheelSpeeds(
+        {speed, 0.0 * mp::m / mp::s, speed * curvature});
 
     auto maxWheelSpeed = (std::max)(wheelSpeeds.left, wheelSpeeds.right);
     auto minWheelSpeed = (std::min)(wheelSpeeds.left, wheelSpeeds.right);
@@ -84,25 +82,25 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // case, as it breaks the signum function.  Both max and min acceleration
     // are *reduced in magnitude* in this case.
 
-    units::meters_per_second_squared_t maxChassisAcceleration;
-    units::meters_per_second_squared_t minChassisAcceleration;
+    mp::quantity<mp::m / mp::s2> maxChassisAcceleration;
+    mp::quantity<mp::m / mp::s2> minChassisAcceleration;
 
-    if (speed == 0_mps) {
+    if (speed == 0.0 * mp::m / mp::s) {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * mp::abs(curvature) / (2.0 * mp::rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) / (2_rad));
+          (1 + m_kinematics.trackwidth * mp::abs(curvature) / (2.0 * mp::rad));
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * units::math::abs(curvature) *
-                   wpi::sgn(speed) / (2_rad));
+          (1 + m_kinematics.trackwidth * mp::abs(curvature) * wpi::sgn(speed) /
+                   (2.0 * mp::rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 - m_kinematics.trackwidth * units::math::abs(curvature) *
-                   wpi::sgn(speed) / (2_rad));
+          (1 - m_kinematics.trackwidth * mp::abs(curvature) * wpi::sgn(speed) /
+                   (2.0 * mp::rad));
     }
 
     // When turning about a point inside of the wheelbase (i.e. radius less than
@@ -111,10 +109,10 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // wheel when this happens. We can accurately account for this by simply
     // negating the inner wheel.
 
-    if ((m_kinematics.trackwidth / 2) > 1_rad / units::math::abs(curvature)) {
-      if (speed > 0_mps) {
+    if ((m_kinematics.trackwidth / 2) > 1.0 * mp::rad / mp::abs(curvature)) {
+      if (speed > 0.0 * mp::m / mp::s) {
         minChassisAcceleration = -minChassisAcceleration;
-      } else if (speed < 0_mps) {
+      } else if (speed < 0.0 * mp::m / mp::s) {
         maxChassisAcceleration = -maxChassisAcceleration;
       }
     }
@@ -123,8 +121,8 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
   }
 
  private:
-  SimpleMotorFeedforward<units::meter> m_feedforward;
+  SimpleMotorFeedforward<mp::m> m_feedforward;
   DifferentialDriveKinematics m_kinematics;
-  units::volt_t m_maxVoltage;
+  mp::quantity<mp::V> m_maxVoltage;
 };
 }  // namespace frc

@@ -16,16 +16,16 @@ std::optional<frc::DifferentialDriveWheelVoltages> wpi::Protobuf<
   }
 
   return frc::DifferentialDriveWheelVoltages{
-      units::volt_t{msg.left},
-      units::volt_t{msg.right},
+      msg.left * mp::V,
+      msg.right * mp::V,
   };
 }
 
 bool wpi::Protobuf<frc::DifferentialDriveWheelVoltages>::Pack(
     OutputStream& stream, const frc::DifferentialDriveWheelVoltages& value) {
   wpi_proto_ProtobufDifferentialDriveWheelVoltages msg{
-      .left = value.left.value(),
-      .right = value.right.value(),
+      .left = mp::value(value.left),
+      .right = mp::value(value.right),
   };
   return stream.Encode(msg);
 }

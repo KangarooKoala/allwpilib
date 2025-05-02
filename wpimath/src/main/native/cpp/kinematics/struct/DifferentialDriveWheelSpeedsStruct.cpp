@@ -14,13 +14,13 @@ using StructType = wpi::Struct<frc::DifferentialDriveWheelSpeeds>;
 frc::DifferentialDriveWheelSpeeds StructType::Unpack(
     std::span<const uint8_t> data) {
   return frc::DifferentialDriveWheelSpeeds{
-      units::meters_per_second_t{wpi::UnpackStruct<double, kLeftOff>(data)},
-      units::meters_per_second_t{wpi::UnpackStruct<double, kRightOff>(data)},
+      wpi::UnpackStruct<double, kLeftOff>(data) * mp::m / mp::s,
+      wpi::UnpackStruct<double, kRightOff>(data) * mp::m / mp::s,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::DifferentialDriveWheelSpeeds& value) {
-  wpi::PackStruct<kLeftOff>(data, value.left.value());
-  wpi::PackStruct<kRightOff>(data, value.right.value());
+  wpi::PackStruct<kLeftOff>(data, mp::value(value.left));
+  wpi::PackStruct<kRightOff>(data, mp::value(value.right));
 }

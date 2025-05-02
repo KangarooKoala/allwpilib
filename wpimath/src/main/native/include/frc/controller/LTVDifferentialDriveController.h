@@ -15,9 +15,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/trajectory/Trajectory.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -55,10 +53,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param dt         Discretization timestep.
    */
   LTVDifferentialDriveController(const frc::LinearSystem<2, 2, 2>& plant,
-                                 units::meter_t trackwidth,
+                                 mp::quantity<mp::m> trackwidth,
                                  const wpi::array<double, 5>& Qelems,
                                  const wpi::array<double, 2>& Relems,
-                                 units::second_t dt)
+                                 mp::quantity<mp::s> dt)
       : m_trackwidth{trackwidth},
         m_A{plant.A()},
         m_B{plant.B()},
@@ -97,12 +95,12 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityTolerance Right velocity error which is tolerable.
    */
   void SetTolerance(const Pose2d& poseTolerance,
-                    units::meters_per_second_t leftVelocityTolerance,
-                    units::meters_per_second_t rightVelocityTolerance) {
+                    mp::quantity<mp::m / mp::s> leftVelocityTolerance,
+                    mp::quantity<mp::m / mp::s> rightVelocityTolerance) {
     m_tolerance = Eigen::Vector<double, 5>{
-        poseTolerance.X().value(), poseTolerance.Y().value(),
-        poseTolerance.Rotation().Radians().value(),
-        leftVelocityTolerance.value(), rightVelocityTolerance.value()};
+        mp::value(poseTolerance.X()), mp::value(poseTolerance.Y()),
+        mp::value(poseTolerance.Rotation().Radians()),
+        mp::value(leftVelocityTolerance), mp::value(rightVelocityTolerance)};
   }
 
   /**
@@ -119,10 +117,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityRef The desired right velocity.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
-      units::meters_per_second_t leftVelocityRef,
-      units::meters_per_second_t rightVelocityRef);
+      const Pose2d& currentPose, mp::quantity<mp::m / mp::s> leftVelocity,
+      mp::quantity<mp::m / mp::s> rightVelocity, const Pose2d& poseRef,
+      mp::quantity<mp::m / mp::s> leftVelocityRef,
+      mp::quantity<mp::m / mp::s> rightVelocityRef);
 
   /**
    * Returns the left and right output voltages of the LTV controller.
@@ -137,8 +135,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    *                     from a trajectory.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity,
+      const Pose2d& currentPose, mp::quantity<mp::m / mp::s> leftVelocity,
+      mp::quantity<mp::m / mp::s> rightVelocity,
       const Trajectory::State& desiredState) {
     // v = (v_r + v_l) / 2     (1)
     // w = (v_r - v_l) / (2r)  (2)
@@ -153,14 +151,14 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
     // v_r = v(1 + kr)
     return Calculate(
         currentPose, leftVelocity, rightVelocity, desiredState.pose,
-        desiredState.velocity *
-            (1 - (desiredState.curvature / 1_rad * m_trackwidth / 2.0)),
-        desiredState.velocity *
-            (1 + (desiredState.curvature / 1_rad * m_trackwidth / 2.0)));
+        desiredState.velocity * (1 - (desiredState.curvature / (1.0 * mp::rad) *
+                                      m_trackwidth / 2.0)),
+        desiredState.velocity * (1 + (desiredState.curvature / (1.0 * mp::rad) *
+                                      m_trackwidth / 2.0)));
   }
 
  private:
-  units::meter_t m_trackwidth;
+  mp::quantity<mp::m> m_trackwidth;
 
   // Continuous velocity dynamics
   Eigen::Matrix<double, 2, 2> m_A;
@@ -170,7 +168,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   Eigen::Matrix<double, 5, 5> m_Q;
   Eigen::Matrix<double, 2, 2> m_R;
 
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   Eigen::Vector<double, 5> m_error;
   Eigen::Vector<double, 5> m_tolerance;

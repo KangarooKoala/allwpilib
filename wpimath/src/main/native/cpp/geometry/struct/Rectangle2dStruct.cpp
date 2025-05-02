@@ -15,13 +15,13 @@ using StructType = wpi::Struct<frc::Rectangle2d>;
 frc::Rectangle2d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Rectangle2d{
       wpi::UnpackStruct<frc::Pose2d, kCenterOff>(data),
-      units::meter_t{wpi::UnpackStruct<double, kXWidthOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kYWidthOff>(data)},
+      wpi::UnpackStruct<double, kXWidthOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kYWidthOff>(data) * mp::m,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data, const frc::Rectangle2d& value) {
   wpi::PackStruct<kCenterOff>(data, value.Center());
-  wpi::PackStruct<kXWidthOff>(data, value.XWidth().value());
-  wpi::PackStruct<kYWidthOff>(data, value.YWidth().value());
+  wpi::PackStruct<kXWidthOff>(data, mp::value(value.XWidth()));
+  wpi::PackStruct<kYWidthOff>(data, mp::value(value.YWidth()));
 }

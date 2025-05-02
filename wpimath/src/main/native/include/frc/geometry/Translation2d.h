@@ -13,9 +13,7 @@
 #include <wpi/json_fwd.h>
 
 #include "frc/geometry/Rotation2d.h"
-#include "units/area.h"
-#include "units/length.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -41,7 +39,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param x The x component of the translation.
    * @param y The y component of the translation.
    */
-  constexpr Translation2d(units::meter_t x, units::meter_t y)
+  constexpr Translation2d(mp::quantity<mp::m> x, mp::quantity<mp::m> y)
       : m_x{x}, m_y{y} {}
 
   /**
@@ -51,7 +49,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  constexpr Translation2d(units::meter_t distance, const Rotation2d& angle)
+  constexpr Translation2d(mp::quantity<mp::m> distance, const Rotation2d& angle)
       : m_x{distance * angle.Cos()}, m_y{distance * angle.Sin()} {}
 
   /**
@@ -61,7 +59,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param vector The translation vector.
    */
   constexpr explicit Translation2d(const Eigen::Vector2d& vector)
-      : m_x{units::meter_t{vector.x()}}, m_y{units::meter_t{vector.y()}} {}
+      : m_x{vector.x() * mp::m}, m_y{vector.y() * mp::m} {}
 
   /**
    * Calculates the distance between two translations in 2D space.
@@ -72,8 +70,8 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The distance between the two translations.
    */
-  constexpr units::meter_t Distance(const Translation2d& other) const {
-    return units::math::hypot(other.m_x - m_x, other.m_y - m_y);
+  constexpr mp::quantity<mp::m> Distance(const Translation2d& other) const {
+    return mp::hypot(other.m_x - m_x, other.m_y - m_y);
   }
 
   /**
@@ -87,10 +85,9 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param other The translation to compute the squared distance to.
    * @return The square of the distance between the two translations.
    */
-  constexpr units::square_meter_t SquaredDistance(
+  constexpr mp::quantity<mp::m2> SquaredDistance(
       const Translation2d& other) const {
-    return units::math::pow<2>(other.m_x - m_x) +
-           units::math::pow<2>(other.m_y - m_y);
+    return mp::pow<2>(other.m_x - m_x) + mp::pow<2>(other.m_y - m_y);
   }
 
   /**
@@ -98,14 +95,14 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The X component of the translation.
    */
-  constexpr units::meter_t X() const { return m_x; }
+  constexpr mp::quantity<mp::m> X() const { return m_x; }
 
   /**
    * Returns the Y component of the translation.
    *
    * @return The Y component of the translation.
    */
-  constexpr units::meter_t Y() const { return m_y; }
+  constexpr mp::quantity<mp::m> Y() const { return m_y; }
 
   /**
    * Returns a 2D translation vector representation of this translation.
@@ -113,7 +110,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return A 2D translation vector representation of this translation.
    */
   constexpr Eigen::Vector2d ToVector() const {
-    return Eigen::Vector2d{{m_x.value(), m_y.value()}};
+    return Eigen::Vector2d{{mp::value(m_x), mp::value(m_y)}};
   }
 
   /**
@@ -121,7 +118,7 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The norm of the translation.
    */
-  constexpr units::meter_t Norm() const { return units::math::hypot(m_x, m_y); }
+  constexpr mp::quantity<mp::m> Norm() const { return mp::hypot(m_x, m_y); }
 
   /**
    * Returns the squared norm, or squared distance from the origin to the
@@ -130,8 +127,8 @@ class WPILIB_DLLEXPORT Translation2d {
    *
    * @return The squared norm of the translation.
    */
-  constexpr units::square_meter_t SquaredNorm() const {
-    return units::math::pow<2>(m_x) + units::math::pow<2>(m_y);
+  constexpr mp::quantity<mp::m2> SquaredNorm() const {
+    return mp::pow<2>(m_x) + mp::pow<2>(m_y);
   }
 
   /**
@@ -140,7 +137,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return The angle of the translation
    */
   constexpr Rotation2d Angle() const {
-    return Rotation2d{m_x.value(), m_y.value()};
+    return Rotation2d{mp::value(m_x), mp::value(m_y)};
   }
 
   /**
@@ -195,7 +192,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param other The translation to compute the dot product with.
    * @return The dot product between the two translations.
    */
-  constexpr units::square_meter_t Dot(const Translation2d& other) const {
+  constexpr mp::quantity<mp::m2> Dot(const Translation2d& other) const {
     return m_x * other.X() + m_y * other.Y();
   }
 
@@ -208,7 +205,7 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param other The translation to compute the cross product with.
    * @return The cross product between the two translations.
    */
-  constexpr units::square_meter_t Cross(const Translation2d& other) const {
+  constexpr mp::quantity<mp::m2> Cross(const Translation2d& other) const {
     return m_x * other.Y() - m_y * other.X();
   }
 
@@ -282,8 +279,8 @@ class WPILIB_DLLEXPORT Translation2d {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Translation2d& other) const {
-    return units::math::abs(m_x - other.m_x) < 1E-9_m &&
-           units::math::abs(m_y - other.m_y) < 1E-9_m;
+    return mp::abs(m_x - other.m_x) < 1E-9 * mp::m &&
+           mp::abs(m_y - other.m_y) < 1E-9 * mp::m;
   }
 
   /**
@@ -315,8 +312,8 @@ class WPILIB_DLLEXPORT Translation2d {
   }
 
  private:
-  units::meter_t m_x = 0_m;
-  units::meter_t m_y = 0_m;
+  mp::quantity<mp::m> m_x = 0.0 * mp::m;
+  mp::quantity<mp::m> m_y = 0.0 * mp::m;
 };
 
 WPILIB_DLLEXPORT

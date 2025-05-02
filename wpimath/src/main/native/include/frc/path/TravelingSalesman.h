@@ -15,6 +15,7 @@
 #include "frc/EigenCore.h"
 #include "frc/geometry/Pose2d.h"
 #include "frc/optimization/SimulatedAnnealing.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -138,7 +139,7 @@ class TravelingSalesman {
   // Default cost is distance between poses
   std::function<double(const Pose2d&, const Pose2d&)> m_cost =
       [](const Pose2d& a, const Pose2d& b) -> double {
-    return units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
+    return mp::value(mp::hypot(a.X() - b.X(), a.Y() - b.Y()));
   };
 
   /**

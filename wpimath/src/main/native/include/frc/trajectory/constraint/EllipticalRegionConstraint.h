@@ -11,7 +11,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -34,8 +34,8 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    */
   [[deprecated("Use constructor taking Ellipse2d instead.")]]
   constexpr EllipticalRegionConstraint(const Translation2d& center,
-                                       units::meter_t xWidth,
-                                       units::meter_t yWidth,
+                                       mp::quantity<mp::m> xWidth,
+                                       mp::quantity<mp::m> yWidth,
                                        const Rotation2d& rotation,
                                        const Constraint& constraint)
       : m_ellipse{Pose2d{center, rotation}, xWidth / 2.0, yWidth / 2.0},
@@ -52,20 +52,19 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
                                        const Constraint& constraint)
       : m_ellipse{ellipse}, m_constraint{constraint} {}
 
-  constexpr units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const override {
+  constexpr mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return units::meters_per_second_t{
-          std::numeric_limits<double>::infinity()};
+      return std::numeric_limits<double>::infinity() * mp::m / mp::s;
     }
   }
 
   constexpr MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const override {
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> speed) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {

@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include <wpi/SymbolExports.h>
 
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -17,12 +18,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
   /**
    * Speed of the left side of the robot.
    */
-  units::meters_per_second_t left = 0_mps;
+  mp::quantity<mp::m / mp::s> left = 0.0 * mp::m / mp::s;
 
   /**
    * Speed of the right side of the robot.
    */
-  units::meters_per_second_t right = 0_mps;
+  mp::quantity<mp::m / mp::s> right = 0.0 * mp::m / mp::s;
 
   /**
    * Renormalizes the wheel speeds if either side is above the specified
@@ -36,9 +37,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    *
    * @param attainableMaxSpeed The absolute max speed that a wheel can reach.
    */
-  constexpr void Desaturate(units::meters_per_second_t attainableMaxSpeed) {
-    auto realMaxSpeed =
-        units::math::max(units::math::abs(left), units::math::abs(right));
+  constexpr void Desaturate(mp::quantity<mp::m / mp::s> attainableMaxSpeed) {
+    auto realMaxSpeed = std::max(mp::abs(left), mp::abs(right));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       left = left / realMaxSpeed * attainableMaxSpeed;

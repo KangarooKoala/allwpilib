@@ -10,8 +10,7 @@
 
 #include <wpi/SymbolExports.h>
 
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -21,22 +20,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   /**
    * Speed of the front-left wheel.
    */
-  units::meters_per_second_t frontLeft = 0_mps;
+  mp::quantity<mp::m / mp::s> frontLeft = 0.0 * mp::m / mp::s;
 
   /**
    * Speed of the front-right wheel.
    */
-  units::meters_per_second_t frontRight = 0_mps;
+  mp::quantity<mp::m / mp::s> frontRight = 0.0 * mp::m / mp::s;
 
   /**
    * Speed of the rear-left wheel.
    */
-  units::meters_per_second_t rearLeft = 0_mps;
+  mp::quantity<mp::m / mp::s> rearLeft = 0.0 * mp::m / mp::s;
 
   /**
    * Speed of the rear-right wheel.
    */
-  units::meters_per_second_t rearRight = 0_mps;
+  mp::quantity<mp::m / mp::s> rearRight = 0.0 * mp::m / mp::s;
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the
@@ -52,14 +51,12 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    * @return Desaturated MecanumDriveWheelSpeeds.
    */
   constexpr MecanumDriveWheelSpeeds Desaturate(
-      units::meters_per_second_t attainableMaxSpeed) const {
-    std::array<units::meters_per_second_t, 4> wheelSpeeds{frontLeft, frontRight,
-                                                          rearLeft, rearRight};
-    units::meters_per_second_t realMaxSpeed = units::math::abs(
-        *std::max_element(wheelSpeeds.begin(), wheelSpeeds.end(),
-                          [](const auto& a, const auto& b) {
-                            return units::math::abs(a) < units::math::abs(b);
-                          }));
+      mp::quantity<mp::m / mp::s> attainableMaxSpeed) const {
+    std::array<mp::quantity<mp::m / mp::s>, 4> wheelSpeeds{
+        frontLeft, frontRight, rearLeft, rearRight};
+    mp::quantity<mp::m / mp::s> realMaxSpeed = mp::abs(*std::max_element(
+        wheelSpeeds.begin(), wheelSpeeds.end(),
+        [](const auto& a, const auto& b) { return mp::abs(a) < mp::abs(b); }));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (int i = 0; i < 4; ++i) {

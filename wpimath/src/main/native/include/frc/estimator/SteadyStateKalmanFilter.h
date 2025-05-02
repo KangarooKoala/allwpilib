@@ -18,7 +18,7 @@
 #include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -73,7 +73,7 @@ class SteadyStateKalmanFilter {
   SteadyStateKalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                           const StateArray& stateStdDevs,
                           const OutputArray& measurementStdDevs,
-                          units::second_t dt) {
+                          mp::quantity<mp::s> dt) {
     m_plant = &plant;
 
     auto contQ = MakeCovMatrix(stateStdDevs);
@@ -205,7 +205,7 @@ class SteadyStateKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  void Predict(const InputVector& u, mp::quantity<mp::s> dt) {
     m_xHat = m_plant->CalculateX(m_xHat, u, dt);
   }
 

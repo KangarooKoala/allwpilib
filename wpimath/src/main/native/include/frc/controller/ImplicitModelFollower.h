@@ -9,7 +9,6 @@
 #include <Eigen/QR>
 
 #include "frc/EigenCore.h"
-#include "units/time.h"
 
 namespace frc {
 

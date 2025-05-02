@@ -14,14 +14,14 @@ std::optional<frc::Rotation2d> wpi::Protobuf<frc::Rotation2d>::Unpack(
   }
 
   return frc::Rotation2d{
-      units::radian_t{msg.value},
+      msg.value * mp::rad,
   };
 }
 
 bool wpi::Protobuf<frc::Rotation2d>::Pack(OutputStream& stream,
                                           const frc::Rotation2d& value) {
   wpi_proto_ProtobufRotation2d msg{
-      .value = value.Radians().value(),
+      .value = mp::value(value.Radians()),
   };
   return stream.Encode(msg);
 }

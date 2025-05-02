@@ -7,7 +7,7 @@
 #include <wpi/SymbolExports.h>
 #include <wpi/timestamp.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @param type         Which type of state change the debouncing will be
    *                     performed on.
    */
-  explicit Debouncer(units::second_t debounceTime,
+  explicit Debouncer(mp::quantity<mp::s> debounceTime,
                      DebounceType type = DebounceType::kRising);
 
   /**
@@ -54,7 +54,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @param time The number of seconds the value must change from baseline
    *             for the filtered value to change.
    */
-  constexpr void SetDebounceTime(units::second_t time) {
+  constexpr void SetDebounceTime(mp::quantity<mp::s> time) {
     m_debounceTime = time;
   }
 
@@ -64,7 +64,9 @@ class WPILIB_DLLEXPORT Debouncer {
    * @return The number of seconds the value must change from baseline
    *             for the filtered value to change.
    */
-  constexpr units::second_t GetDebounceTime() const { return m_debounceTime; }
+  constexpr mp::quantity<mp::s> GetDebounceTime() const {
+    return m_debounceTime;
+  }
 
   /**
    * Set the debounce type.
@@ -85,11 +87,11 @@ class WPILIB_DLLEXPORT Debouncer {
   constexpr DebounceType GetDebounceType() const { return m_debounceType; }
 
  private:
-  units::second_t m_debounceTime;
+  mp::quantity<mp::s> m_debounceTime;
   bool m_baseline;
   DebounceType m_debounceType;
 
-  units::second_t m_prevTime;
+  mp::quantity<mp::s> m_prevTime;
 
   void ResetTimer();
 

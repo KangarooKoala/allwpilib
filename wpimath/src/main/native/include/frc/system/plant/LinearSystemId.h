@@ -12,13 +12,7 @@
 
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
-#include "units/acceleration.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
-#include "units/length.h"
-#include "units/moment_of_inertia.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -26,14 +20,11 @@ namespace frc {
  */
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
-  template <typename Distance>
-  using Velocity_t = units::unit_t<
-      units::compound_unit<Distance, units::inverse<units::seconds>>>;
+  template <mp::Unit auto Distance>
+  using Velocity_t = mp::quantity<Distance / mp::s>;
 
-  template <typename Distance>
-  using Acceleration_t = units::unit_t<units::compound_unit<
-      units::compound_unit<Distance, units::inverse<units::seconds>>,
-      units::inverse<units::seconds>>>;
+  template <mp::Unit auto Distance>
+  using Acceleration_t = mp::quantity<Distance / mp::s2>;
 
   /**
    * Create a state-space model of the elevator system. The states of the system
@@ -46,14 +37,13 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @param gearing Gear ratio from motor to carriage.
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
-  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(DCMotor motor,
-                                                        units::kilogram_t mass,
-                                                        units::meter_t radius,
-                                                        double gearing) {
-    if (mass <= 0_kg) {
+  static constexpr LinearSystem<2, 1, 2> ElevatorSystem(
+      DCMotor motor, mp::quantity<mp::kg> mass, mp::quantity<mp::m> radius,
+      double gearing) {
+    if (mass <= 0.0 * mp::kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
-    if (radius <= 0_m) {
+    if (radius <= 0.0 * mp::m) {
       throw std::domain_error("radius must be greater than zero.");
     }
     if (gearing <= 0.0) {
@@ -62,11 +52,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
 
     Matrixd<2, 2> A{
         {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt /
-               (motor.R * units::math::pow<2>(radius) * mass * motor.Kv))
-                  .value()}};
-    Matrixd<2, 1> B{{0.0},
-                    {(gearing * motor.Kt / (motor.R * radius * mass)).value()}};
+        {0.0, mp::value(-gcem::pow(gearing, 2) * motor.Kt /
+                        (motor.R * mp::pow<2>(radius) * mass * motor.Kv))}};
+    Matrixd<2, 1> B{
+        {0.0}, {mp::value(gearing * motor.Kt / (motor.R * radius * mass))}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -84,19 +73,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> SingleJointedArmSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
+      DCMotor motor, mp::quantity<mp::kg * mp::m2> J, double gearing) {
+    if (J <= 0.0 * mp::kg * mp::m2) {
       throw std::domain_error("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-                  .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, mp::value(-gcem::pow(gearing, 2) * motor.Kt /
+                                    (motor.Kv * motor.R * J))}};
+    Matrixd<2, 1> B{{0.0}, {mp::value(gearing * motor.Kt / (motor.R * J))}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -124,21 +112,20 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+  template <mp::Unit auto Distance>
+    requires(Distance == mp::m) || (Distance == mp::rad)
   static constexpr LinearSystem<1, 1, 1> IdentifyVelocitySystem(
-      decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
+      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
+    if (kV < 0.0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0.0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Matrixd<1, 1> A{{-kV.value() / kA.value()}};
-    Matrixd<1, 1> B{{1.0 / kA.value()}};
+    Matrixd<1, 1> A{{-mp::value(kV) / mp::value(kA)}};
+    Matrixd<1, 1> B{{1.0 / mp::value(kA)}};
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
@@ -167,21 +154,20 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @see <a
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+  template <mp::Unit auto Distance>
+    requires(Distance == mp::m) || (Distance == mp::rad)
   static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
-      decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
+      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
+    if (kV < 0.0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0.0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Matrixd<2, 1> B{{0.0}, {1.0 / kA.value()}};
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -mp::value(kV) / mp::value(kA)}};
+    Matrixd<2, 1> B{{0.0}, {1.0 / mp::value(kA)}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -211,27 +197,29 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular) {
-    if (kVLinear <= decltype(kVLinear){0}) {
+      mp::quantity<mp::V / (mp::m / mp::s)> kVLinear,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+      mp::quantity<mp::V / (mp::m / mp::s)> kVAngular,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kAAngular) {
+    if (kVLinear <= 0.0 * decltype(kVLinear)::unit) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= decltype(kALinear){0}) {
+    if (kALinear <= 0.0 * decltype(kALinear)::unit) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= decltype(kVAngular){0}) {
+    if (kVAngular <= 0.0 * decltype(kVAngular)::unit) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= decltype(kAAngular){0}) {
+    if (kAAngular <= 0.0 * decltype(kAAngular)::unit) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
 
-    double A1 = -(kVLinear.value() / kALinear.value() +
-                  kVAngular.value() / kAAngular.value());
-    double A2 = -(kVLinear.value() / kALinear.value() -
-                  kVAngular.value() / kAAngular.value());
-    double B1 = 1.0 / kALinear.value() + 1.0 / kAAngular.value();
-    double B2 = 1.0 / kALinear.value() - 1.0 / kAAngular.value();
+    double A1 = -(mp::value(kVLinear) / mp::value(kALinear) +
+                  mp::value(kVAngular) / mp::value(kAAngular));
+    double A2 = -(mp::value(kVLinear) / mp::value(kALinear) -
+                  mp::value(kVAngular) / mp::value(kAAngular));
+    double B1 = 1.0 / mp::value(kALinear) + 1.0 / mp::value(kAAngular);
+    double B2 = 1.0 / mp::value(kALinear) - 1.0 / mp::value(kAAngular);
 
     A1 /= 2.0;
     A2 /= 2.0;
@@ -272,22 +260,24 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth) {
-    if (kVLinear <= decltype(kVLinear){0}) {
+      mp::quantity<mp::V / (mp::m / mp::s)> kVLinear,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+      mp::quantity<mp::V / (mp::rad / mp::s)> kVAngular,
+      mp::quantity<mp::V / (mp::rad / mp::s2)> kAAngular,
+      mp::quantity<mp::m> trackwidth) {
+    if (kVLinear <= 0.0 * decltype(kVLinear)::unit) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= decltype(kALinear){0}) {
+    if (kALinear <= 0.0 * decltype(kALinear)::unit) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= decltype(kVAngular){0}) {
+    if (kVAngular <= 0.0 * decltype(kVAngular)::unit) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= decltype(kAAngular){0}) {
+    if (kAAngular <= 0.0 * decltype(kAAngular)::unit) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
-    if (trackwidth <= 0_m) {
+    if (trackwidth <= 0.0 * mp::m) {
       throw std::domain_error("r must be greater than zero.");
     }
 
@@ -302,9 +292,9 @@ class WPILIB_DLLEXPORT LinearSystemId {
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
     // to V/(m/s).
-    return IdentifyDrivetrainSystem(kVLinear, kALinear,
-                                    kVAngular * 2.0 / trackwidth * 1_rad,
-                                    kAAngular * 2.0 / trackwidth * 1_rad);
+    return IdentifyDrivetrainSystem(
+        kVLinear, kALinear, kVAngular * 2.0 / trackwidth * 1.0 * mp::rad,
+        kAAngular * 2.0 / trackwidth * 1.0 * mp::rad);
   }
 
   /**
@@ -318,18 +308,17 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<1, 1, 1> FlywheelSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
+      DCMotor motor, mp::quantity<mp::kg * mp::m2> J, double gearing) {
+    if (J <= 0.0 * mp::kg * mp::m2) {
       throw std::domain_error("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    Matrixd<1, 1> A{
-        {(-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-             .value()}};
-    Matrixd<1, 1> B{{(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<1, 1> A{{mp::value(-gcem::pow(gearing, 2) * motor.Kt /
+                               (motor.Kv * motor.R * J))}};
+    Matrixd<1, 1> B{{mp::value(gearing * motor.Kt / (motor.R * J))}};
     Matrixd<1, 1> C{{1.0}};
     Matrixd<1, 1> D{{0.0}};
 
@@ -349,19 +338,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/sysid">https://github.com/wpilibsuite/sysid</a>
    */
   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      DCMotor motor, units::kilogram_square_meter_t J, double gearing) {
-    if (J <= 0_kg_sq_m) {
+      DCMotor motor, mp::quantity<mp::kg * mp::m2> J, double gearing) {
+    if (J <= 0.0 * mp::kg * mp::m2) {
       throw std::domain_error("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
       throw std::domain_error("gearing must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{
-        {0.0, 1.0},
-        {0.0, (-gcem::pow(gearing, 2) * motor.Kt / (motor.Kv * motor.R * J))
-                  .value()}};
-    Matrixd<2, 1> B{{0.0}, {(gearing * motor.Kt / (motor.R * J)).value()}};
+    Matrixd<2, 2> A{{0.0, 1.0},
+                    {0.0, mp::value(-gcem::pow(gearing, 2) * motor.Kt /
+                                    (motor.Kv * motor.R * J))}};
+    Matrixd<2, 1> B{{0.0}, {mp::value(gearing * motor.Kt / (motor.R * J))}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -389,21 +377,20 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *
    * @throws std::domain_error if kV < 0 or kA <= 0.
    */
-  template <typename Distance>
-    requires std::same_as<units::meter, Distance> ||
-             std::same_as<units::radian, Distance>
+  template <mp::Unit auto Distance>
+    requires(Distance == mp::m) || (Distance == mp::rad)
   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      decltype(1_V / Velocity_t<Distance>(1)) kV,
-      decltype(1_V / Acceleration_t<Distance>(1)) kA) {
-    if (kV < decltype(kV){0}) {
+      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
+      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
+    if (kV < 0.0 * decltype(kV)::unit) {
       throw std::domain_error("Kv must be greater than or equal to zero.");
     }
-    if (kA <= decltype(kA){0}) {
+    if (kA <= 0.0 * decltype(kA)::unit) {
       throw std::domain_error("Ka must be greater than zero.");
     }
 
-    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -kV.value() / kA.value()}};
-    Matrixd<2, 1> B{0.0, 1.0 / kA.value()};
+    Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -mp::value(kV) / mp::value(kA)}};
+    Matrixd<2, 1> B{0.0, 1.0 / mp::value(kA)};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 1> D{{0.0}, {0.0}};
 
@@ -426,18 +413,18 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *         gearing <= 0.
    */
   static constexpr LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
-      const DCMotor& motor, units::kilogram_t mass, units::meter_t r,
-      units::meter_t rb, units::kilogram_square_meter_t J, double gearing) {
-    if (mass <= 0_kg) {
+      const DCMotor& motor, mp::quantity<mp::kg> mass, mp::quantity<mp::m> r,
+      mp::quantity<mp::m> rb, mp::quantity<mp::kg * mp::m2> J, double gearing) {
+    if (mass <= 0.0 * mp::kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
-    if (r <= 0_m) {
+    if (r <= 0.0 * mp::m) {
       throw std::domain_error("r must be greater than zero.");
     }
-    if (rb <= 0_m) {
+    if (rb <= 0.0 * mp::m) {
       throw std::domain_error("rb must be greater than zero.");
     }
-    if (J <= 0_kg_sq_m) {
+    if (J <= 0.0 * mp::kg * mp::m2) {
       throw std::domain_error("J must be greater than zero.");
     }
     if (gearing <= 0.0) {
@@ -445,17 +432,17 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     auto C1 = -gcem::pow(gearing, 2) * motor.Kt /
-              (motor.Kv * motor.R * units::math::pow<2>(r));
+              (motor.Kv * motor.R * mp::pow<2>(r));
     auto C2 = gearing * motor.Kt / (motor.R * r);
 
-    Matrixd<2, 2> A{{((1 / mass + units::math::pow<2>(rb) / J) * C1).value(),
-                     ((1 / mass - units::math::pow<2>(rb) / J) * C1).value()},
-                    {((1 / mass - units::math::pow<2>(rb) / J) * C1).value(),
-                     ((1 / mass + units::math::pow<2>(rb) / J) * C1).value()}};
-    Matrixd<2, 2> B{{((1 / mass + units::math::pow<2>(rb) / J) * C2).value(),
-                     ((1 / mass - units::math::pow<2>(rb) / J) * C2).value()},
-                    {((1 / mass - units::math::pow<2>(rb) / J) * C2).value(),
-                     ((1 / mass + units::math::pow<2>(rb) / J) * C2).value()}};
+    Matrixd<2, 2> A{{mp::value((1 / mass + mp::pow<2>(rb) / J) * C1),
+                     mp::value((1 / mass - mp::pow<2>(rb) / J) * C1)},
+                    {mp::value((1 / mass - mp::pow<2>(rb) / J) * C1),
+                     mp::value((1 / mass + mp::pow<2>(rb) / J) * C1)}};
+    Matrixd<2, 2> B{{mp::value((1 / mass + mp::pow<2>(rb) / J) * C2),
+                     mp::value((1 / mass - mp::pow<2>(rb) / J) * C2)},
+                    {mp::value((1 / mass - mp::pow<2>(rb) / J) * C2),
+                     mp::value((1 / mass + mp::pow<2>(rb) / J) * C2)}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 

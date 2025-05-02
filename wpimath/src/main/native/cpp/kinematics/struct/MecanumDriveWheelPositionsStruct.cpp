@@ -16,17 +16,17 @@ using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
 frc::MecanumDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
   return frc::MecanumDriveWheelPositions{
-      units::meter_t{wpi::UnpackStruct<double, kFrontLeftOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kFrontRightOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kRearLeftOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kRearRightOff>(data)},
+      wpi::UnpackStruct<double, kFrontLeftOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kFrontRightOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kRearLeftOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kRearRightOff>(data) * mp::m,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::MecanumDriveWheelPositions& value) {
-  wpi::PackStruct<kFrontLeftOff>(data, value.frontLeft.value());
-  wpi::PackStruct<kFrontRightOff>(data, value.frontRight.value());
-  wpi::PackStruct<kRearLeftOff>(data, value.rearLeft.value());
-  wpi::PackStruct<kRearRightOff>(data, value.rearRight.value());
+  wpi::PackStruct<kFrontLeftOff>(data, mp::value(value.frontLeft));
+  wpi::PackStruct<kFrontRightOff>(data, mp::value(value.frontRight));
+  wpi::PackStruct<kRearLeftOff>(data, mp::value(value.rearLeft));
+  wpi::PackStruct<kRearRightOff>(data, mp::value(value.rearRight));
 }

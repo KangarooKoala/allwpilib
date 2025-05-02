@@ -8,7 +8,7 @@ using namespace frc;
 
 DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     DifferentialDriveKinematics& kinematics, const Rotation3d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
+    mp::quantity<mp::m> leftDistance, mp::quantity<mp::m> rightDistance,
     const Pose3d& initialPose)
     : DifferentialDrivePoseEstimator3d{
           kinematics,          gyroAngle,   leftDistance,
@@ -17,7 +17,7 @@ DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
 
 DifferentialDrivePoseEstimator3d::DifferentialDrivePoseEstimator3d(
     DifferentialDriveKinematics& kinematics, const Rotation3d& gyroAngle,
-    units::meter_t leftDistance, units::meter_t rightDistance,
+    mp::quantity<mp::m> leftDistance, mp::quantity<mp::m> rightDistance,
     const Pose3d& initialPose, const wpi::array<double, 4>& stateStdDevs,
     const wpi::array<double, 4>& visionMeasurementStdDevs)
     : PoseEstimator3d(kinematics, m_odometryImpl, stateStdDevs,

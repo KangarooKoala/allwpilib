@@ -8,7 +8,7 @@
 
 using namespace frc;
 
-Debouncer::Debouncer(units::second_t debounceTime, DebounceType type)
+Debouncer::Debouncer(mp::quantity<mp::s> debounceTime, DebounceType type)
     : m_debounceTime(debounceTime), m_debounceType(type) {
   m_baseline = m_debounceType == DebounceType::kFalling;
   ResetTimer();

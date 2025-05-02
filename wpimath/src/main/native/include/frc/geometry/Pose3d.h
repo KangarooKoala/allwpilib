@@ -19,6 +19,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Translation3d.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -53,8 +54,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @param z The z component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose3d(units::meter_t x, units::meter_t y, units::meter_t z,
-                   Rotation3d rotation)
+  constexpr Pose3d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                   mp::quantity<mp::m> z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -84,8 +85,8 @@ class WPILIB_DLLEXPORT Pose3d {
    * @see Translation3d(Translation2d)
    */
   constexpr explicit Pose3d(const Pose2d& pose)
-      : m_translation{pose.X(), pose.Y(), 0_m},
-        m_rotation{0_rad, 0_rad, pose.Rotation().Radians()} {}
+      : m_translation{pose.X(), pose.Y(), 0.0 * mp::m},
+        m_rotation{0.0 * mp::rad, 0.0 * mp::rad, pose.Rotation().Radians()} {}
 
   /**
    * Transforms the pose by the given transformation and returns the new
@@ -126,21 +127,21 @@ class WPILIB_DLLEXPORT Pose3d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the pose's translation.
    *
    * @return The z component of the pose's translation.
    */
-  constexpr units::meter_t Z() const { return m_translation.Z(); }
+  constexpr mp::quantity<mp::m> Z() const { return m_translation.Z(); }
 
   /**
    * Returns the underlying rotation.
@@ -259,8 +260,9 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+                       mp::value((this->Rotation() - a.Rotation()).Angle())) <
+                   gcem::abs(
+                       mp::value((this->Rotation() - b.Rotation()).Angle()));
           }
           return aDistance < bDistance;
         });
@@ -284,8 +286,9 @@ class WPILIB_DLLEXPORT Pose3d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Angle().value()) <
-                   gcem::abs((this->Rotation() - b.Rotation()).Angle().value());
+                       mp::value((this->Rotation() - a.Rotation()).Angle())) <
+                   gcem::abs(
+                       mp::value((this->Rotation() - b.Rotation()).Angle()));
           }
           return aDistance < bDistance;
         });
