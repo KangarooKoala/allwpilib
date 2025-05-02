@@ -9,13 +9,7 @@
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "units/acceleration.h"
-#include "units/angular_acceleration.h"
-#include "units/angular_velocity.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -40,15 +34,19 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * right wheels, in meters.
    */
   constexpr DifferentialDriveFeedforward(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, units::meter_t trackwidth)
-      // See LinearSystemId::IdentifyDrivetrainSystem(decltype(1_V / 1_mps),
-      // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
-      // 1_rad_per_s_sq))
-      : DifferentialDriveFeedforward{kVLinear, kALinear,
-                                     kVAngular * 2.0 / trackwidth * 1_rad,
-                                     kAAngular * 2.0 / trackwidth * 1_rad} {}
+      mp::quantity<mp::V / (mp::m / mp::s)> kVLinear,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+      mp::quantity<mp::V / (mp::rad / mp::s)> kVAngular,
+      mp::quantity<mp::V / (mp::rad / mp::s2)> kAAngular,
+      mp::quantity<mp::m> trackwidth)
+      // See LinearSystemId::IdentifyDrivetrainSystem(
+      // mp::quantity<mp::V / (mp::m / mp::s)>,
+      // mp::quantity<mp::V / (mp::m / mp::s2)>,
+      // mp::quantity<mp::V / (mp::rad / mp::s)>,
+      // mp::quantity<mp::V / (mp::rad / mp::s2)>)
+      : DifferentialDriveFeedforward{
+            kVLinear, kALinear, kVAngular * 2.0 / trackwidth * 1.0 * mp::rad,
+            kAAngular * 2.0 / trackwidth * 1.0 * mp::rad} {}
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
@@ -61,10 +59,11 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param kAAngular The angular acceleration gain in volts per (meters per
    * second squared).
    */
-  constexpr DifferentialDriveFeedforward(decltype(1_V / 1_mps) kVLinear,
-                                         decltype(1_V / 1_mps_sq) kALinear,
-                                         decltype(1_V / 1_mps) kVAngular,
-                                         decltype(1_V / 1_mps_sq) kAAngular)
+  constexpr DifferentialDriveFeedforward(
+      mp::quantity<mp::V / (mp::m / mp::s)> kVLinear,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+      mp::quantity<mp::V / (mp::m / mp::s)> kVAngular,
+      mp::quantity<mp::V / (mp::m / mp::s2)> kAAngular)
       : m_plant{frc::LinearSystemId::IdentifyDrivetrainSystem(
             kVLinear, kALinear, kVAngular, kAAngular)},
         m_kVLinear{kVLinear},
@@ -87,15 +86,15 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param dt Discretization timestep.
    */
   DifferentialDriveWheelVoltages Calculate(
-      units::meters_per_second_t currentLeftVelocity,
-      units::meters_per_second_t nextLeftVelocity,
-      units::meters_per_second_t currentRightVelocity,
-      units::meters_per_second_t nextRightVelocity, units::second_t dt);
+      mp::quantity<mp::m / mp::s> currentLeftVelocity,
+      mp::quantity<mp::m / mp::s> nextLeftVelocity,
+      mp::quantity<mp::m / mp::s> currentRightVelocity,
+      mp::quantity<mp::m / mp::s> nextRightVelocity, mp::quantity<mp::s> dt);
 
-  decltype(1_V / 1_mps) m_kVLinear;
-  decltype(1_V / 1_mps_sq) m_kALinear;
-  decltype(1_V / 1_mps) m_kVAngular;
-  decltype(1_V / 1_mps_sq) m_kAAngular;
+  mp::quantity<mp::V / (mp::m / mp::s)> m_kVLinear;
+  mp::quantity<mp::V / (mp::m / mp::s2)> m_kALinear;
+  mp::quantity<mp::V / (mp::m / mp::s)> m_kVAngular;
+  mp::quantity<mp::V / (mp::m / mp::s2)> m_kAAngular;
 };
 }  // namespace frc
 

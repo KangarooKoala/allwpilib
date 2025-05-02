@@ -9,14 +9,15 @@
 #include "frc/DARE.h"
 #include "frc/MathUtil.h"
 #include "frc/system/Discretization.h"
+#include "frc/units.h"
 
 using namespace frc;
 
 DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
-    const Pose2d& currentPose, units::meters_per_second_t leftVelocity,
-    units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
-    units::meters_per_second_t leftVelocityRef,
-    units::meters_per_second_t rightVelocityRef) {
+    const Pose2d& currentPose, mp::quantity<mp::m / mp::s> leftVelocity,
+    mp::quantity<mp::m / mp::s> rightVelocity, const Pose2d& poseRef,
+    mp::quantity<mp::m / mp::s> leftVelocityRef,
+    mp::quantity<mp::m / mp::s> rightVelocityRef) {
   // This implements the linear time-varying differential drive controller in
   // theorem 8.7.4 of https://controls-in-frc.link/
   //
@@ -26,30 +27,32 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
   //     [vₗ]
   //     [vᵣ]
 
-  units::meters_per_second_t velocity{(leftVelocity + rightVelocity) / 2.0};
+  mp::quantity<mp::m / mp::s> velocity{(leftVelocity + rightVelocity) / 2.0};
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
   // let the system stop.
-  if (units::math::abs(velocity) < 1e-4_mps) {
-    velocity = 1e-4_mps;
+  if (mp::abs(velocity) < 1e-4 * mp::m / mp::s) {
+    velocity = 1e-4 * mp::m / mp::s;
   }
 
-  Eigen::Vector<double, 5> r{poseRef.X().value(), poseRef.Y().value(),
-                             poseRef.Rotation().Radians().value(),
-                             leftVelocityRef.value(), rightVelocityRef.value()};
-  Eigen::Vector<double, 5> x{currentPose.X().value(), currentPose.Y().value(),
-                             currentPose.Rotation().Radians().value(),
-                             leftVelocity.value(), rightVelocity.value()};
+  Eigen::Vector<double, 5> r{mp::value(poseRef.X()), mp::value(poseRef.Y()),
+                             mp::value(poseRef.Rotation().Radians()),
+                             mp::value(leftVelocityRef),
+                             mp::value(rightVelocityRef)};
+  Eigen::Vector<double, 5> x{mp::value(currentPose.X()),
+                             mp::value(currentPose.Y()),
+                             mp::value(currentPose.Rotation().Radians()),
+                             mp::value(leftVelocity), mp::value(rightVelocity)};
 
   m_error = r - x;
-  m_error(2) = frc::AngleModulus(units::radian_t{m_error(2)}).value();
+  m_error(2) = mp::value(frc::AngleModulus(m_error(2) * mp::rad));
 
-  Eigen::Matrix<double, 5, 5> A{
-      {0.0, 0.0, 0.0, 0.5, 0.5},
-      {0.0, 0.0, velocity.value(), 0.0, 0.0},
-      {0.0, 0.0, 0.0, -1.0 / m_trackwidth.value(), 1.0 / m_trackwidth.value()},
-      {0.0, 0.0, 0.0, m_A(0, 0), m_A(0, 1)},
-      {0.0, 0.0, 0.0, m_A(1, 0), m_A(1, 1)}};
+  Eigen::Matrix<double, 5, 5> A{{0.0, 0.0, 0.0, 0.5, 0.5},
+                                {0.0, 0.0, mp::value(velocity), 0.0, 0.0},
+                                {0.0, 0.0, 0.0, -1.0 / mp::value(m_trackwidth),
+                                 1.0 / mp::value(m_trackwidth)},
+                                {0.0, 0.0, 0.0, m_A(0, 0), m_A(0, 1)},
+                                {0.0, 0.0, 0.0, m_A(1, 0), m_A(1, 1)}};
   Eigen::Matrix<double, 5, 2> B{{0.0, 0.0},
                                 {0.0, 0.0},
                                 {0.0, 0.0},
@@ -76,6 +79,5 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
 
   Eigen::Vector2d u = K * inRobotFrame * m_error;
 
-  return DifferentialDriveWheelVoltages{units::volt_t{u(0)},
-                                        units::volt_t{u(1)}};
+  return DifferentialDriveWheelVoltages{u(0) * mp::V, u(1) * mp::V};
 }

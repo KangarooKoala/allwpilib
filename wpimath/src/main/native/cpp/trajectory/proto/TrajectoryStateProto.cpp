@@ -27,11 +27,11 @@ wpi::Protobuf<frc::Trajectory::State>::Unpack(InputStream& stream) {
   }
 
   return frc::Trajectory::State{
-      units::second_t{msg.time},
-      units::meters_per_second_t{msg.velocity},
-      units::meters_per_second_squared_t{msg.acceleration},
+      msg.time * mp::s,
+      msg.velocity * mp::m / mp::s,
+      msg.acceleration * mp::m / mp::s2,
       std::move(ipose[0]),
-      units::curvature_t{msg.curvature},
+      msg.curvature * mp::rad / mp::m,
   };
 }
 
@@ -39,11 +39,11 @@ bool wpi::Protobuf<frc::Trajectory::State>::Pack(
     OutputStream& stream, const frc::Trajectory::State& value) {
   wpi::PackCallback pose{&value.pose};
   wpi_proto_ProtobufTrajectoryState msg{
-      .time = value.t.value(),
-      .velocity = value.velocity.value(),
-      .acceleration = value.acceleration.value(),
+      .time = mp::value(value.t),
+      .velocity = mp::value(value.velocity),
+      .acceleration = mp::value(value.acceleration),
       .pose = pose.Callback(),
-      .curvature = value.curvature.value(),
+      .curvature = mp::value(value.curvature),
   };
   return stream.Encode(msg);
 }

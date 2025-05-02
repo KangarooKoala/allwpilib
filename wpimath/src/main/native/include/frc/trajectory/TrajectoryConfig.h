@@ -18,8 +18,7 @@
 #include "frc/trajectory/constraint/MecanumDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h"
 #include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "units/acceleration.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -39,8 +38,8 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * @param maxVelocity The max velocity of the trajectory.
    * @param maxAcceleration The max acceleration of the trajectory.
    */
-  TrajectoryConfig(units::meters_per_second_t maxVelocity,
-                   units::meters_per_second_squared_t maxAcceleration)
+  TrajectoryConfig(mp::quantity<mp::m / mp::s> maxVelocity,
+                   mp::quantity<mp::m / mp::s2> maxAcceleration)
       : m_maxVelocity(maxVelocity), m_maxAcceleration(maxAcceleration) {}
 
   TrajectoryConfig(const TrajectoryConfig&) = delete;
@@ -53,7 +52,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the start velocity of the trajectory.
    * @param startVelocity The start velocity of the trajectory.
    */
-  void SetStartVelocity(units::meters_per_second_t startVelocity) {
+  void SetStartVelocity(mp::quantity<mp::m / mp::s> startVelocity) {
     m_startVelocity = startVelocity;
   }
 
@@ -61,7 +60,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the end velocity of the trajectory.
    * @param endVelocity The end velocity of the trajectory.
    */
-  void SetEndVelocity(units::meters_per_second_t endVelocity) {
+  void SetEndVelocity(mp::quantity<mp::m / mp::s> endVelocity) {
     m_endVelocity = endVelocity;
   }
 
@@ -116,25 +115,25 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the starting velocity of the trajectory.
    * @return The starting velocity of the trajectory.
    */
-  units::meters_per_second_t StartVelocity() const { return m_startVelocity; }
+  mp::quantity<mp::m / mp::s> StartVelocity() const { return m_startVelocity; }
 
   /**
    * Returns the ending velocity of the trajectory.
    * @return The ending velocity of the trajectory.
    */
-  units::meters_per_second_t EndVelocity() const { return m_endVelocity; }
+  mp::quantity<mp::m / mp::s> EndVelocity() const { return m_endVelocity; }
 
   /**
    * Returns the maximum velocity of the trajectory.
    * @return The maximum velocity of the trajectory.
    */
-  units::meters_per_second_t MaxVelocity() const { return m_maxVelocity; }
+  mp::quantity<mp::m / mp::s> MaxVelocity() const { return m_maxVelocity; }
 
   /**
    * Returns the maximum acceleration of the trajectory.
    * @return The maximum acceleration of the trajectory.
    */
-  units::meters_per_second_squared_t MaxAcceleration() const {
+  mp::quantity<mp::m / mp::s2> MaxAcceleration() const {
     return m_maxAcceleration;
   }
 
@@ -154,10 +153,10 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
   bool IsReversed() const { return m_reversed; }
 
  private:
-  units::meters_per_second_t m_startVelocity = 0_mps;
-  units::meters_per_second_t m_endVelocity = 0_mps;
-  units::meters_per_second_t m_maxVelocity;
-  units::meters_per_second_squared_t m_maxAcceleration;
+  mp::quantity<mp::m / mp::s> m_startVelocity = 0.0 * mp::m / mp::s;
+  mp::quantity<mp::m / mp::s> m_endVelocity = 0.0 * mp::m / mp::s;
+  mp::quantity<mp::m / mp::s> m_maxVelocity;
+  mp::quantity<mp::m / mp::s2> m_maxAcceleration;
   std::vector<std::unique_ptr<TrajectoryConstraint>> m_constraints;
   bool m_reversed = false;
 };

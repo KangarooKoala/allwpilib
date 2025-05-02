@@ -8,7 +8,7 @@
 
 #include <wpi/timestamp.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -21,12 +21,12 @@ namespace frc {
  *
  * @see TrapezoidProfile
  */
-template <class Unit>
+template <mp::Unit auto Unit>
 class SlewRateLimiter {
  public:
-  using Unit_t = units::unit_t<Unit>;
-  using Rate = units::compound_unit<Unit, units::inverse<units::seconds>>;
-  using Rate_t = units::unit_t<Rate>;
+  using Unit_t = mp::quantity<Unit>;
+  using Rate = Unit / mp::s;
+  using Rate_t = mp::quantity<Rate>;
 
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate
@@ -41,12 +41,11 @@ class SlewRateLimiter {
    * @param initialValue The initial value of the input.
    */
   SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
-                  Unit_t initialValue = Unit_t{0})
+                  Unit_t initialValue = 0.0 * Unit)
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
-        m_prevTime{
-            units::microsecond_t{wpi::math::MathSharedStore::GetTimestamp()}} {}
+        m_prevTime{wpi::math::MathSharedStore::GetTimestamp() * mp::ms} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and
@@ -65,8 +64,9 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    units::second_t currentTime = wpi::math::MathSharedStore::GetTimestamp();
-    units::second_t elapsedTime = currentTime - m_prevTime;
+    mp::quantity<mp::s> currentTime =
+        wpi::math::MathSharedStore::GetTimestamp();
+    mp::quantity<mp::s> elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
         std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
                    m_positiveRateLimit * elapsedTime);
@@ -96,6 +96,6 @@ class SlewRateLimiter {
   Rate_t m_positiveRateLimit;
   Rate_t m_negativeRateLimit;
   Unit_t m_prevVal;
-  units::second_t m_prevTime;
+  mp::quantity<mp::s> m_prevTime;
 };
 }  // namespace frc

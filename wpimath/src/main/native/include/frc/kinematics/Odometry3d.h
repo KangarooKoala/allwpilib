@@ -13,6 +13,7 @@
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
 #include "frc/kinematics/Kinematics.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -126,10 +127,10 @@ class WPILIB_DLLEXPORT Odometry3d {
         m_kinematics.ToTwist2d(m_previousWheelPositions, wheelPositions);
     Twist3d twist{twist2d.dx,
                   twist2d.dy,
-                  0_m,
-                  units::radian_t{angle_difference(0)},
-                  units::radian_t{angle_difference(1)},
-                  units::radian_t{angle_difference(2)}};
+                  0.0 * mp::m,
+                  angle_difference(0) * mp::rad,
+                  angle_difference(1) * mp::rad,
+                  angle_difference(2) * mp::rad};
 
     auto newPose = m_pose.Exp(twist);
 

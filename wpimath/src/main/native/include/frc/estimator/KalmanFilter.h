@@ -17,7 +17,7 @@
 #include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -69,7 +69,7 @@ class KalmanFilter {
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const StateArray& stateStdDevs,
-               const OutputArray& measurementStdDevs, units::second_t dt) {
+               const OutputArray& measurementStdDevs, mp::quantity<mp::s> dt) {
     m_plant = &plant;
 
     m_contQ = MakeCovMatrix(stateStdDevs);
@@ -181,7 +181,7 @@ class KalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  void Predict(const InputVector& u, mp::quantity<mp::s> dt) {
     // Find discrete A and Q
     StateMatrix discA;
     StateMatrix discQ;
@@ -254,7 +254,7 @@ class KalmanFilter {
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   StateMatrix m_initP;
 };

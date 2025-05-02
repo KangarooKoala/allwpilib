@@ -8,8 +8,7 @@
 
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
-#include "units/angular_velocity.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -26,17 +25,17 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   /**
    * Velocity along the x-axis. (Fwd is +)
    */
-  units::meters_per_second_t vx = 0_mps;
+  mp::quantity<mp::m / mp::s> vx = 0.0 * mp::m / mp::s;
 
   /**
    * Velocity along the y-axis. (Left is +)
    */
-  units::meters_per_second_t vy = 0_mps;
+  mp::quantity<mp::m / mp::s> vy = 0.0 * mp::m / mp::s;
 
   /**
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
-  units::radians_per_second_t omega = 0_rad_per_s;
+  mp::quantity<mp::rad / mp::s> omega = 0.0 * mp::rad / mp::s;
 
   /**
    * Creates a Twist2d from ChassisSpeeds.
@@ -45,7 +44,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    *
    * @return Twist2d.
    */
-  constexpr Twist2d ToTwist2d(units::second_t dt) const {
+  constexpr Twist2d ToTwist2d(mp::quantity<mp::s> dt) const {
     return Twist2d{vx * dt, vy * dt, omega * dt};
   }
 
@@ -68,7 +67,7 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
    * @param dt The duration of the timestep the speeds should be applied for.
    * @return Discretized ChassisSpeeds.
    */
-  constexpr ChassisSpeeds Discretize(units::second_t dt) const {
+  constexpr ChassisSpeeds Discretize(mp::quantity<mp::s> dt) const {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
     Pose2d desiredDeltaPose{vx * dt, vy * dt, omega * dt};
@@ -95,10 +94,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds ToRobotRelative(const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
-            .RotateBy(-robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+        Translation2d{mp::value(vx) * mp::m, mp::value(vy) * mp::m}.RotateBy(
+            -robotAngle);
+    return {mp::value(rotated.X()) * mp::m / mp::s,
+            mp::value(rotated.Y()) * mp::m / mp::s, omega};
   }
 
   /**
@@ -115,10 +114,10 @@ struct WPILIB_DLLEXPORT ChassisSpeeds {
   constexpr ChassisSpeeds ToFieldRelative(const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
     auto rotated =
-        Translation2d{units::meter_t{vx.value()}, units::meter_t{vy.value()}}
-            .RotateBy(robotAngle);
-    return {units::meters_per_second_t{rotated.X().value()},
-            units::meters_per_second_t{rotated.Y().value()}, omega};
+        Translation2d{mp::value(vx) * mp::m, mp::value(vy) * mp::m}.RotateBy(
+            robotAngle);
+    return {mp::value(rotated.X()) * mp::m / mp::s,
+            mp::value(rotated.Y()) * mp::m / mp::s, omega};
   }
 
   /**

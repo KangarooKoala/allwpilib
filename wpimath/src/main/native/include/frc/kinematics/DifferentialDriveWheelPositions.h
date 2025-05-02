@@ -7,7 +7,7 @@
 #include <wpi/MathExtras.h>
 #include <wpi/SymbolExports.h>
 
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -17,12 +17,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
   /**
    * Distance driven by the left side.
    */
-  units::meter_t left = 0_m;
+  mp::quantity<mp::m> left = 0.0 * mp::m;
 
   /**
    * Distance driven by the right side.
    */
-  units::meter_t right = 0_m;
+  mp::quantity<mp::m> right = 0.0 * mp::m;
 
   /**
    * Checks equality between this DifferentialDriveWheelPositions and another

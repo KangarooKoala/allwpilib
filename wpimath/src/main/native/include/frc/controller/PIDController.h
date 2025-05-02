@@ -16,7 +16,7 @@
 #include <wpi/sendable/SendableRegistry.h>
 
 #include "frc/MathUtil.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT PIDController
    *               default is 20 milliseconds. Must be positive.
    */
   constexpr PIDController(double Kp, double Ki, double Kd,
-                          units::second_t period = 20_ms)
+                          mp::quantity<mp::s> period = 20.0 * mp::ms)
       : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
     bool invalidGains = false;
     if (Kp < 0.0) {
@@ -63,11 +63,11 @@ class WPILIB_DLLEXPORT PIDController
       wpi::math::MathSharedStore::ReportWarning("PID gains defaulted to 0.");
     }
 
-    if (period <= 0_s) {
+    if (period <= 0.0 * mp::s) {
       wpi::math::MathSharedStore::ReportError(
           "Controller period must be a positive number, got {}!",
-          period.value());
-      m_period = 20_ms;
+          mp::value(period));
+      m_period = 20.0 * mp::ms;
       wpi::math::MathSharedStore::ReportWarning(
           "Controller period defaulted to 20ms.");
     }
@@ -175,7 +175,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The period of the controller.
    */
-  constexpr units::second_t GetPeriod() const { return m_period; }
+  constexpr mp::quantity<mp::s> GetPeriod() const { return m_period; }
 
   /**
    * Gets the error tolerance of this controller. Defaults to 0.05.
@@ -240,7 +240,7 @@ class WPILIB_DLLEXPORT PIDController
       m_error = m_setpoint - m_measurement;
     }
 
-    m_errorDerivative = (m_error - m_prevError) / m_period.value();
+    m_errorDerivative = (m_error - m_prevError) / mp::value(m_period);
   }
 
   /**
@@ -365,7 +365,7 @@ class WPILIB_DLLEXPORT PIDController
       m_error = m_setpoint - m_measurement;
     }
 
-    m_errorDerivative = (m_error - m_prevError) / m_period.value();
+    m_errorDerivative = (m_error - m_prevError) / mp::value(m_period);
 
     // If the absolute value of the position error is outside of IZone, reset
     // the total error
@@ -373,7 +373,7 @@ class WPILIB_DLLEXPORT PIDController
       m_totalError = 0;
     } else if (m_Ki != 0) {
       m_totalError =
-          std::clamp(m_totalError + m_error * m_period.value(),
+          std::clamp(m_totalError + m_error * mp::value(m_period),
                      m_minimumIntegral / m_Ki, m_maximumIntegral / m_Ki);
     }
 
@@ -419,7 +419,7 @@ class WPILIB_DLLEXPORT PIDController
   double m_iZone = std::numeric_limits<double>::infinity();
 
   // The period (in seconds) of the control loop running this controller
-  units::second_t m_period;
+  mp::quantity<mp::s> m_period;
 
   double m_maximumIntegral = 1.0;
 

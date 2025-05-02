@@ -9,7 +9,7 @@
 #include <fmt/format.h>
 #include <wpi/SymbolExports.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace wpi::math {
 
@@ -21,7 +21,7 @@ class WPILIB_DLLEXPORT MathShared {
                               fmt::format_args args) = 0;
   virtual void ReportUsage(std::string_view resource,
                            std::string_view data) = 0;
-  virtual units::second_t GetTimestamp() = 0;
+  virtual mp::quantity<mp::s> GetTimestamp() = 0;
 
   template <typename S, typename... Args>
   inline void ReportError(const S& format, Args&&... args) {
@@ -62,7 +62,7 @@ class WPILIB_DLLEXPORT MathSharedStore {
     GetMathShared().ReportUsage(resource, data);
   }
 
-  static units::second_t GetTimestamp() {
+  static mp::quantity<mp::s> GetTimestamp() {
     return GetMathShared().GetTimestamp();
   }
 };

@@ -20,8 +20,7 @@
 #include "frc/kinematics/Kinematics.h"
 #include "frc/kinematics/SwerveModulePosition.h"
 #include "frc/kinematics/SwerveModuleState.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -71,8 +70,8 @@ class SwerveDriveKinematics
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).value(),
-        0, 1, (+m_modules[i].X()).value();
+        1, 0, mp::value(-m_modules[i].Y()),
+        0, 1, mp::value(+m_modules[i].X());
       // clang-format on
     }
 
@@ -87,8 +86,8 @@ class SwerveDriveKinematics
     for (size_t i = 0; i < NumModules; i++) {
       // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) <<
-        1, 0, (-m_modules[i].Y()).value(),
-        0, 1, (+m_modules[i].X()).value();
+        1, 0, mp::value(-m_modules[i].Y()),
+        0, 1, mp::value(+m_modules[i].X());
       // clang-format on
     }
 
@@ -145,7 +144,7 @@ class SwerveDriveKinematics
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
    * DesaturateWheelSpeeds(wpi::array<SwerveModuleState, NumModules>*,
-   * units::meters_per_second_t) function to rectify this issue. In addition,
+   * mp::quantity<mp::m / mp::s>) function to rectify this issue. In addition,
    * you can leverage the power of C++17 to directly assign the module states to
    * variables:
    *
@@ -158,10 +157,11 @@ class SwerveDriveKinematics
       const Translation2d& centerOfRotation = Translation2d{}) const {
     wpi::array<SwerveModuleState, NumModules> moduleStates(wpi::empty_array);
 
-    if (chassisSpeeds.vx == 0_mps && chassisSpeeds.vy == 0_mps &&
-        chassisSpeeds.omega == 0_rad_per_s) {
+    if (chassisSpeeds.vx == 0.0 * mp::m / mp::s &&
+        chassisSpeeds.vy == 0.0 * mp::m / mp::s &&
+        chassisSpeeds.omega == 0.0 * mp::rad / mp::s) {
       for (size_t i = 0; i < NumModules; i++) {
-        moduleStates[i] = {0_mps, m_moduleHeadings[i]};
+        moduleStates[i] = {0.0 * mp::m / mp::s, m_moduleHeadings[i]};
       }
 
       return moduleStates;
@@ -173,27 +173,30 @@ class SwerveDriveKinematics
         // clang-format off
       m_inverseKinematics.template block<2, 3>(i * 2, 0) =
         Matrixd<2, 3>{
-          {1, 0, (-m_modules[i].Y() + centerOfRotation.Y()).value()},
-          {0, 1, (+m_modules[i].X() - centerOfRotation.X()).value()}};
+          {1, 0, mp::value(-m_modules[i].Y() + centerOfRotation.Y())},
+          {0, 1, mp::value(+m_modules[i].X() - centerOfRotation.X())}};
         // clang-format on
       }
       m_previousCoR = centerOfRotation;
     }
 
-    Eigen::Vector3d chassisSpeedsVector{chassisSpeeds.vx.value(),
-                                        chassisSpeeds.vy.value(),
-                                        chassisSpeeds.omega.value()};
+    Eigen::Vector3d chassisSpeedsVector{mp::value(chassisSpeeds.vx),
+                                        mp::value(chassisSpeeds.vy),
+                                        mp::value(chassisSpeeds.omega)};
 
     Matrixd<NumModules * 2, 1> moduleStateMatrix =
         m_inverseKinematics * chassisSpeedsVector;
 
     for (size_t i = 0; i < NumModules; i++) {
-      units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
-      units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
+      mp::quantity<mp::m / mp::s> x =
+          moduleStateMatrix(i * 2, 0) * mp::m / mp::s;
+      mp::quantity<mp::m / mp::s> y =
+          moduleStateMatrix(i * 2 + 1, 0) * mp::m / mp::s;
 
-      auto speed = units::math::hypot(x, y);
-      auto rotation = speed > 1e-6_mps ? Rotation2d{x.value(), y.value()}
-                                       : m_moduleHeadings[i];
+      auto speed = mp::hypot(x, y);
+      auto rotation = speed > 1e-6 * mp::m / mp::s
+                          ? Rotation2d{mp::value(x), mp::value(y)}
+                          : m_moduleHeadings[i];
 
       moduleStates[i] = {speed, rotation};
       m_moduleHeadings[i] = rotation;
@@ -245,17 +248,18 @@ class SwerveDriveKinematics
 
     for (size_t i = 0; i < NumModules; ++i) {
       SwerveModuleState module = moduleStates[i];
-      moduleStateMatrix(i * 2, 0) = module.speed.value() * module.angle.Cos();
+      moduleStateMatrix(i * 2, 0) =
+          mp::value(module.speed) * module.angle.Cos();
       moduleStateMatrix(i * 2 + 1, 0) =
-          module.speed.value() * module.angle.Sin();
+          mp::value(module.speed) * module.angle.Sin();
     }
 
     Eigen::Vector3d chassisSpeedsVector =
         m_forwardKinematics.solve(moduleStateMatrix);
 
-    return {units::meters_per_second_t{chassisSpeedsVector(0)},
-            units::meters_per_second_t{chassisSpeedsVector(1)},
-            units::radians_per_second_t{chassisSpeedsVector(2)}};
+    return {chassisSpeedsVector(0) * mp::m / mp::s,
+            chassisSpeedsVector(1) * mp::m / mp::s,
+            chassisSpeedsVector(2) * mp::rad / mp::s};
   }
 
   /**
@@ -298,17 +302,16 @@ class SwerveDriveKinematics
     for (size_t i = 0; i < NumModules; ++i) {
       SwerveModulePosition module = moduleDeltas[i];
       moduleDeltaMatrix(i * 2, 0) =
-          module.distance.value() * module.angle.Cos();
+          mp::value(module.distance) * module.angle.Cos();
       moduleDeltaMatrix(i * 2 + 1, 0) =
-          module.distance.value() * module.angle.Sin();
+          mp::value(module.distance) * module.angle.Sin();
     }
 
     Eigen::Vector3d chassisDeltaVector =
         m_forwardKinematics.solve(moduleDeltaMatrix);
 
-    return {units::meter_t{chassisDeltaVector(0)},
-            units::meter_t{chassisDeltaVector(1)},
-            units::radian_t{chassisDeltaVector(2)}};
+    return {chassisDeltaVector(0) * mp::m, chassisDeltaVector(1) * mp::m,
+            chassisDeltaVector(2) * mp::rad};
   }
 
   Twist2d ToTwist2d(
@@ -344,15 +347,14 @@ class SwerveDriveKinematics
    */
   static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
-      units::meters_per_second_t attainableMaxSpeed) {
+      mp::quantity<mp::m / mp::s> attainableMaxSpeed) {
     auto& states = *moduleStates;
     auto realMaxSpeed =
-        units::math::abs(std::max_element(states.begin(), states.end(),
-                                          [](const auto& a, const auto& b) {
-                                            return units::math::abs(a.speed) <
-                                                   units::math::abs(b.speed);
-                                          })
-                             ->speed);
+        mp::abs(std::max_element(states.begin(), states.end(),
+                                 [](const auto& a, const auto& b) {
+                                   return mp::abs(a.speed) < mp::abs(b.speed);
+                                 })
+                    ->speed);
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (auto& module : states) {
@@ -390,36 +392,35 @@ class SwerveDriveKinematics
   static void DesaturateWheelSpeeds(
       wpi::array<SwerveModuleState, NumModules>* moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      units::meters_per_second_t attainableMaxModuleSpeed,
-      units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-      units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+      mp::quantity<mp::m / mp::s> attainableMaxModuleSpeed,
+      mp::quantity<mp::m / mp::s> attainableMaxRobotTranslationSpeed,
+      mp::quantity<mp::rad / mp::s> attainableMaxRobotRotationSpeed) {
     auto& states = *moduleStates;
 
     auto realMaxSpeed =
-        units::math::abs(std::max_element(states.begin(), states.end(),
-                                          [](const auto& a, const auto& b) {
-                                            return units::math::abs(a.speed) <
-                                                   units::math::abs(b.speed);
-                                          })
-                             ->speed);
+        mp::abs(std::max_element(states.begin(), states.end(),
+                                 [](const auto& a, const auto& b) {
+                                   return mp::abs(a.speed) < mp::abs(b.speed);
+                                 })
+                    ->speed);
 
-    if (attainableMaxRobotTranslationSpeed == 0_mps ||
-        attainableMaxRobotRotationSpeed == 0_rad_per_s ||
-        realMaxSpeed == 0_mps) {
+    if (attainableMaxRobotTranslationSpeed == 0.0 * mp::m / mp::s ||
+        attainableMaxRobotRotationSpeed == 0.0 * mp::rad / mp::s ||
+        realMaxSpeed == 0.0 * mp::m / mp::s) {
       return;
     }
 
     auto translationalK =
-        units::math::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
+        mp::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
         attainableMaxRobotTranslationSpeed;
 
-    auto rotationalK = units::math::abs(desiredChassisSpeed.omega) /
-                       attainableMaxRobotRotationSpeed;
+    auto rotationalK =
+        mp::abs(desiredChassisSpeed.omega) / attainableMaxRobotRotationSpeed;
 
-    auto k = units::math::max(translationalK, rotationalK);
+    auto k = std::max(translationalK, rotationalK);
 
-    auto scale = units::math::min(k * attainableMaxModuleSpeed / realMaxSpeed,
-                                  units::scalar_t{1});
+    auto scale =
+        std::min(k * attainableMaxModuleSpeed / realMaxSpeed, 1.0 * mp::one);
     for (auto& module : states) {
       module.speed = module.speed * scale;
     }

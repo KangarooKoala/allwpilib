@@ -9,9 +9,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
-#include "units/acceleration.h"
-#include "units/curvature.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 namespace frc {
 /**
@@ -38,14 +36,14 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
     /**
      * The minimum acceleration.
      */
-    units::meters_per_second_squared_t minAcceleration{
-        -std::numeric_limits<double>::max()};
+    mp::quantity<mp::m / mp::s2> minAcceleration =
+        -std::numeric_limits<double>::max() * mp::m / mp::s2;
 
     /**
      * The maximum acceleration.
      */
-    units::meters_per_second_squared_t maxAcceleration{
-        std::numeric_limits<double>::max()};
+    mp::quantity<mp::m / mp::s2> maxAcceleration =
+        std::numeric_limits<double>::max() * mp::m / mp::s2;
   };
 
   /**
@@ -58,9 +56,9 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    *
    * @return The absolute maximum velocity.
    */
-  constexpr virtual units::meters_per_second_t MaxVelocity(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t velocity) const = 0;
+  constexpr virtual mp::quantity<mp::m / mp::s> MaxVelocity(
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> velocity) const = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
@@ -73,7 +71,7 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    * @return The min and max acceleration bounds.
    */
   constexpr virtual MinMax MinMaxAcceleration(
-      const Pose2d& pose, units::curvature_t curvature,
-      units::meters_per_second_t speed) const = 0;
+      const Pose2d& pose, mp::quantity<mp::rad / mp::m> curvature,
+      mp::quantity<mp::m / mp::s> speed) const = 0;
 };
 }  // namespace frc

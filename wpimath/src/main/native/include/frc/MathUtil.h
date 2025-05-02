@@ -12,12 +12,8 @@
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
-#include "units/angle.h"
-#include "units/base.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
+#include "mp-units/format.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -34,20 +30,34 @@ namespace frc {
  * @return The value after the deadband is applied.
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
-constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
+  requires std::is_arithmetic_v<T> || mp::Quantity<T>
+constexpr T ApplyDeadband(
+    T value, T deadband, T maxMagnitude = [] {
+      if constexpr (std::is_arithmetic_v<T>) {
+        return T{1.0};
+      } else {
+        return 1.0 * T::unit;
+      }
+    }()) {
+  constexpr T zero = [] {
+    if constexpr (std::is_arithmetic_v<T>) {
+      return T{0.0};
+    } else {
+      return 0.0 * T::unit;
+    }
+  }();
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
     magnitude = gcem::abs(value);
   } else {
-    magnitude = units::math::abs(value);
+    magnitude = mp::abs(value);
   }
 
   if (magnitude < deadband) {
-    return T{0.0};
+    return zero;
   }
 
-  if (value > T{0.0}) {
+  if (value > zero) {
     // Map deadband to 0 and map max to max with a linear relationship.
     //
     //   y - y₁ = m(x - x₁)
@@ -106,11 +116,11 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
   T modulus = maximumInput - minimumInput;
 
   // Wrap input if it's above the maximum input
-  int numMax = (input - minimumInput) / modulus;
+  int numMax = static_cast<int>((input - minimumInput) / modulus);
   input -= numMax * modulus;
 
   // Wrap input if it's below the minimum input
-  int numMin = (input - maximumInput) / modulus;
+  int numMin = static_cast<int>((input - maximumInput) / modulus);
   input -= numMin * modulus;
 
   return input;
@@ -127,12 +137,12 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || mp::Quantity<T>
 constexpr bool IsNear(T expected, T actual, T tolerance) {
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(expected - actual) < tolerance;
   } else {
-    return units::math::abs(expected - actual) < tolerance;
+    return mp::abs(expected - actual) < tolerance;
   }
 }
 
@@ -156,7 +166,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || mp::Quantity<T>
 constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   T errorBound = (max - min) / 2.0;
   T error = frc::InputModulus<T>(expected - actual, -errorBound, errorBound);
@@ -164,7 +174,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(error) < tolerance;
   } else {
-    return units::math::abs(error) < tolerance;
+    return mp::abs(error) < tolerance;
   }
 }
 
@@ -174,10 +184,9 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
  * @param angle Angle to wrap.
  */
 WPILIB_DLLEXPORT
-constexpr units::radian_t AngleModulus(units::radian_t angle) {
-  return InputModulus<units::radian_t>(angle,
-                                       units::radian_t{-std::numbers::pi},
-                                       units::radian_t{std::numbers::pi});
+constexpr mp::quantity<mp::rad> AngleModulus(mp::quantity<mp::rad> angle) {
+  return InputModulus<mp::quantity<mp::rad>>(angle, -std::numbers::pi * mp::rad,
+                                             std::numbers::pi * mp::rad);
 }
 
 // floorDiv and floorMod algorithms taken from Java
@@ -229,21 +238,21 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
  */
 constexpr Translation2d SlewRateLimit(const Translation2d& current,
                                       const Translation2d& next,
-                                      units::second_t dt,
-                                      units::meters_per_second_t maxVelocity) {
-  if (maxVelocity < 0_mps) {
+                                      mp::quantity<mp::s> dt,
+                                      mp::quantity<mp::m / mp::s> maxVelocity) {
+  if (maxVelocity < 0 * mp::m / mp::s) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);
     return next;
   }
   Translation2d diff = next - current;
-  units::meter_t dist = diff.Norm();
-  if (dist < 1e-9_m) {
+  mp::quantity<mp::m> dist = diff.Norm();
+  if (dist < 1e-9 * mp::m) {
     return next;
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    return current + diff * (maxVelocity * dt / dist);
+    return current + diff * double{maxVelocity * dt / dist};
   }
   return next;
 }
@@ -259,21 +268,21 @@ constexpr Translation2d SlewRateLimit(const Translation2d& current,
  */
 constexpr Translation3d SlewRateLimit(const Translation3d& current,
                                       const Translation3d& next,
-                                      units::second_t dt,
-                                      units::meters_per_second_t maxVelocity) {
-  if (maxVelocity < 0_mps) {
+                                      mp::quantity<mp::s> dt,
+                                      mp::quantity<mp::m / mp::s> maxVelocity) {
+  if (maxVelocity < 0 * mp::m / mp::s) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);
     return next;
   }
   Translation3d diff = next - current;
-  units::meter_t dist = diff.Norm();
-  if (dist < 1e-9_m) {
+  mp::quantity<mp::m> dist = diff.Norm();
+  if (dist < 1e-9 * mp::m) {
     return next;
   }
   if (dist > maxVelocity * dt) {
     // Move maximum allowed amount in direction of the difference
-    return current + diff * (maxVelocity * dt / dist);
+    return current + diff * double{maxVelocity * dt / dist};
   }
   return next;
 }

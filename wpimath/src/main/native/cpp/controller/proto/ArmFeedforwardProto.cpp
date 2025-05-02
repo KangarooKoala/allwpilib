@@ -16,20 +16,20 @@ std::optional<frc::ArmFeedforward> wpi::Protobuf<frc::ArmFeedforward>::Unpack(
   }
 
   return frc::ArmFeedforward{
-      units::volt_t{msg.ks},
-      units::volt_t{msg.kg},
-      units::unit_t<frc::ArmFeedforward::kv_unit>{msg.kv},
-      units::unit_t<frc::ArmFeedforward::ka_unit>{msg.ka},
+      msg.ks * mp::V,
+      msg.kg * mp::V,
+      msg.kv * frc::ArmFeedforward::kv_unit,
+      msg.ka * frc::ArmFeedforward::ka_unit,
   };
 }
 
 bool wpi::Protobuf<frc::ArmFeedforward>::Pack(
     OutputStream& stream, const frc::ArmFeedforward& value) {
   wpi_proto_ProtobufArmFeedforward msg{
-      .ks = value.GetKs().value(),
-      .kg = value.GetKg().value(),
-      .kv = value.GetKv().value(),
-      .ka = value.GetKa().value(),
+      .ks = mp::value(value.GetKs()),
+      .kg = mp::value(value.GetKg()),
+      .kv = mp::value(value.GetKv()),
+      .ka = mp::value(value.GetKa()),
       .dt = 0,
   };
   return stream.Encode(msg);

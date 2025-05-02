@@ -14,20 +14,20 @@ wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Unpack(InputStream& stream) {
   }
 
   return frc::MecanumDriveWheelSpeeds{
-      units::meters_per_second_t{msg.front_left},
-      units::meters_per_second_t{msg.front_right},
-      units::meters_per_second_t{msg.rear_left},
-      units::meters_per_second_t{msg.rear_right},
+      msg.front_left * mp::m / mp::s,
+      msg.front_right * mp::m / mp::s,
+      msg.rear_left * mp::m / mp::s,
+      msg.rear_right * mp::m / mp::s,
   };
 }
 
 bool wpi::Protobuf<frc::MecanumDriveWheelSpeeds>::Pack(
     OutputStream& stream, const frc::MecanumDriveWheelSpeeds& value) {
   wpi_proto_ProtobufMecanumDriveWheelSpeeds msg{
-      .front_left = value.frontLeft.value(),
-      .front_right = value.frontRight.value(),
-      .rear_left = value.rearLeft.value(),
-      .rear_right = value.rearRight.value(),
+      .front_left = mp::value(value.frontLeft),
+      .front_right = mp::value(value.frontRight),
+      .rear_left = mp::value(value.rearLeft),
+      .rear_right = mp::value(value.rearRight),
   };
   return stream.Encode(msg);
 }

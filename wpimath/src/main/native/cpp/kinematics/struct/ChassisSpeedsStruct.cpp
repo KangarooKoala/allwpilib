@@ -14,15 +14,15 @@ using StructType = wpi::Struct<frc::ChassisSpeeds>;
 
 frc::ChassisSpeeds StructType::Unpack(std::span<const uint8_t> data) {
   return frc::ChassisSpeeds{
-      units::meters_per_second_t{wpi::UnpackStruct<double, kVxOff>(data)},
-      units::meters_per_second_t{wpi::UnpackStruct<double, kVyOff>(data)},
-      units::radians_per_second_t{wpi::UnpackStruct<double, kOmegaOff>(data)},
+      wpi::UnpackStruct<double, kVxOff>(data) * mp::m / mp::s,
+      wpi::UnpackStruct<double, kVyOff>(data) * mp::m / mp::s,
+      wpi::UnpackStruct<double, kOmegaOff>(data) * mp::rad / mp::s,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::ChassisSpeeds& value) {
-  wpi::PackStruct<kVxOff>(data, value.vx.value());
-  wpi::PackStruct<kVyOff>(data, value.vy.value());
-  wpi::PackStruct<kOmegaOff>(data, value.omega.value());
+  wpi::PackStruct<kVxOff>(data, mp::value(value.vx));
+  wpi::PackStruct<kVyOff>(data, mp::value(value.vy));
+  wpi::PackStruct<kOmegaOff>(data, mp::value(value.omega));
 }

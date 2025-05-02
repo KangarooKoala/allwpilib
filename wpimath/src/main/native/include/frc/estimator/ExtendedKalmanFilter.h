@@ -18,7 +18,7 @@
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
 #include "frc/system/NumericalJacobian.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -77,7 +77,7 @@ class ExtendedKalmanFilter {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       std::function<OutputVector(const StateVector&, const InputVector&)> h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      units::second_t dt)
+      mp::quantity<mp::s> dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
     m_contQ = MakeCovMatrix(stateStdDevs);
     m_contR = MakeCovMatrix(measurementStdDevs);
@@ -165,7 +165,7 @@ class ExtendedKalmanFilter {
           residualFuncY,
       std::function<StateVector(const StateVector&, const StateVector&)>
           addFuncX,
-      units::second_t dt)
+      mp::quantity<mp::s> dt)
       : m_f(std::move(f)),
         m_h(std::move(h)),
         m_residualFuncY(std::move(residualFuncY)),
@@ -284,7 +284,7 @@ class ExtendedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, units::second_t dt) {
+  void Predict(const InputVector& u, mp::quantity<mp::s> dt) {
     // Find continuous A
     StateMatrix contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -420,7 +420,7 @@ class ExtendedKalmanFilter {
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  units::second_t m_dt;
+  mp::quantity<mp::s> m_dt;
 
   StateMatrix m_initP;
 };

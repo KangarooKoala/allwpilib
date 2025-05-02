@@ -7,17 +7,21 @@
 #include <wpi/protobuf/Protobuf.h>
 
 #include "frc/controller/SimpleMotorFeedforward.h"
+#include "frc/units.h"
 #include "pb.h"
-#include "units/length.h"
 #include "wpimath/protobuf/controller.npb.h"
 
 // Everything is converted into units for
-// frc::SimpleMotorFeedforward<units::meters> or
-// frc::SimpleMotorFeedforward<units::radians>
+// frc::SimpleMotorFeedforward<mp::m> or
+// frc::SimpleMotorFeedforward<mp::rad>
 
-template <class Distance>
-  requires units::length_unit<Distance> || units::angle_unit<Distance>
+template <mp::Unit auto Distance>
+  requires mp::UnitOf<Distance, mp::length> || mp::UnitOf<Distance, mp::angle>
 struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
+  // Because all instantiations of
+  // wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> use the same
+  // MessageStruct type, it doesn't matter if we use Distance or
+  // mp::get_base_unit(Distance) in InputStream and OutputStream.
   using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
   using InputStream =
       wpi::ProtoInputStream<frc::SimpleMotorFeedforward<Distance>>;
@@ -26,34 +30,30 @@ struct wpi::Protobuf<frc::SimpleMotorFeedforward<Distance>> {
 
   static std::optional<frc::SimpleMotorFeedforward<Distance>> Unpack(
       InputStream& stream) {
-    using BaseUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    using BaseFeedforward =
+        frc::SimpleMotorFeedforward<mp::get_base_unit(Distance)>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
       return {};
     }
 
     return frc::SimpleMotorFeedforward<Distance>{
-        units::volt_t{msg.ks},
-        units::unit_t<typename BaseFeedforward::kv_unit>{msg.kv},
-        units::unit_t<typename BaseFeedforward::ka_unit>{msg.ka},
-        units::second_t{msg.dt},
+        msg.ks * mp::V,
+        msg.kv * BaseFeedforward::kv_unit,
+        msg.ka * BaseFeedforward::ka_unit,
+        msg.dt * mp::s,
     };
   }
 
   static bool Pack(OutputStream& stream,
                    const frc::SimpleMotorFeedforward<Distance>& value) {
-    using BaseUnit =
-        units::unit<std::ratio<1>, units::traits::base_unit_of<Distance>>;
-    using BaseFeedforward = frc::SimpleMotorFeedforward<BaseUnit>;
+    using BaseFeedforward =
+        frc::SimpleMotorFeedforward<mp::get_base_unit(Distance)>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
-        .ks = value.GetKs().value(),
-        .kv = units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
-                  .value(),
-        .ka = units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
-                  .value(),
-        .dt = units::second_t{value.GetDt()}.value(),
+        .ks = mp::value(value.GetKs().in(mp::V)),
+        .kv = mp::value(value.GetKv().in(BaseFeedforward::kv_unit)),
+        .ka = mp::value(value.GetKa().in(BaseFeedforward::ka_unit)),
+        .dt = mp::value(value.GetDt().in(mp::s)),
     };
     return stream.Encode(msg);
   }

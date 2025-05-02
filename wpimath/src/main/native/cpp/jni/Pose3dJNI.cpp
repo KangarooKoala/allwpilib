@@ -8,6 +8,7 @@
 
 #include "edu_wpi_first_math_jni_Pose3dJNI.h"
 #include "frc/geometry/Pose3d.h"
+#include "frc/units.h"
 
 using namespace wpi::java;
 
@@ -26,19 +27,18 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_exp
    jdouble twistRy, jdouble twistRz)
 {
   frc::Pose3d pose{
-      units::meter_t{poseX}, units::meter_t{poseY}, units::meter_t{poseZ},
+      poseX * mp::m, poseY * mp::m, poseZ * mp::m,
       frc::Rotation3d{frc::Quaternion{poseQw, poseQx, poseQy, poseQz}}};
-  frc::Twist3d twist{units::meter_t{twistDx},  units::meter_t{twistDy},
-                     units::meter_t{twistDz},  units::radian_t{twistRx},
-                     units::radian_t{twistRy}, units::radian_t{twistRz}};
+  frc::Twist3d twist{twistDx * mp::m,   twistDy * mp::m,   twistDz * mp::m,
+                     twistRx * mp::rad, twistRy * mp::rad, twistRz * mp::rad};
 
   frc::Pose3d result = pose.Exp(twist);
 
   const auto& resultQuaternion = result.Rotation().GetQuaternion();
   return MakeJDoubleArray(
-      env, {{result.X().value(), result.Y().value(), result.Z().value(),
-             resultQuaternion.W(), resultQuaternion.X(), resultQuaternion.Y(),
-             resultQuaternion.Z()}});
+      env, {{mp::value(result.X()), mp::value(result.Y()),
+             mp::value(result.Z()), resultQuaternion.W(), resultQuaternion.X(),
+             resultQuaternion.Y(), resultQuaternion.Z()}});
 }
 
 /*
@@ -54,17 +54,17 @@ Java_edu_wpi_first_math_jni_Pose3dJNI_log
    jdouble endQy, jdouble endQz)
 {
   frc::Pose3d startPose{
-      units::meter_t{startX}, units::meter_t{startY}, units::meter_t{startZ},
+      startX * mp::m, startY * mp::m, startZ * mp::m,
       frc::Rotation3d{frc::Quaternion{startQw, startQx, startQy, startQz}}};
   frc::Pose3d endPose{
-      units::meter_t{endX}, units::meter_t{endY}, units::meter_t{endZ},
+      endX * mp::m, endY * mp::m, endZ * mp::m,
       frc::Rotation3d{frc::Quaternion{endQw, endQx, endQy, endQz}}};
 
   frc::Twist3d result = startPose.Log(endPose);
 
-  return MakeJDoubleArray(
-      env, {{result.dx.value(), result.dy.value(), result.dz.value(),
-             result.rx.value(), result.ry.value(), result.rz.value()}});
+  return MakeJDoubleArray(env, {{mp::value(result.dx), mp::value(result.dy),
+                                 mp::value(result.dz), mp::value(result.rx),
+                                 mp::value(result.ry), mp::value(result.rz)}});
 }
 
 }  // extern "C"

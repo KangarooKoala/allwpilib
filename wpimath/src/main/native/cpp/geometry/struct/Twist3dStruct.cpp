@@ -17,20 +17,20 @@ using StructType = wpi::Struct<frc::Twist3d>;
 
 frc::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   return frc::Twist3d{
-      units::meter_t{wpi::UnpackStruct<double, kDxOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kDyOff>(data)},
-      units::meter_t{wpi::UnpackStruct<double, kDzOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRxOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRyOff>(data)},
-      units::radian_t{wpi::UnpackStruct<double, kRzOff>(data)},
+      wpi::UnpackStruct<double, kDxOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kDyOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kDzOff>(data) * mp::m,
+      wpi::UnpackStruct<double, kRxOff>(data) * mp::rad,
+      wpi::UnpackStruct<double, kRyOff>(data) * mp::rad,
+      wpi::UnpackStruct<double, kRzOff>(data) * mp::rad,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data, const frc::Twist3d& value) {
-  wpi::PackStruct<kDxOff>(data, value.dx.value());
-  wpi::PackStruct<kDyOff>(data, value.dy.value());
-  wpi::PackStruct<kDzOff>(data, value.dz.value());
-  wpi::PackStruct<kRxOff>(data, value.rx.value());
-  wpi::PackStruct<kRyOff>(data, value.ry.value());
-  wpi::PackStruct<kRzOff>(data, value.rz.value());
+  wpi::PackStruct<kDxOff>(data, mp::value(value.dx));
+  wpi::PackStruct<kDyOff>(data, mp::value(value.dy));
+  wpi::PackStruct<kDzOff>(data, mp::value(value.dz));
+  wpi::PackStruct<kRxOff>(data, mp::value(value.rx));
+  wpi::PackStruct<kRyOff>(data, mp::value(value.ry));
+  wpi::PackStruct<kRzOff>(data, mp::value(value.rz));
 }

@@ -14,20 +14,20 @@ wpi::Protobuf<frc::MecanumDriveWheelPositions>::Unpack(InputStream& stream) {
   }
 
   return frc::MecanumDriveWheelPositions{
-      units::meter_t{msg.front_left},
-      units::meter_t{msg.front_right},
-      units::meter_t{msg.rear_left},
-      units::meter_t{msg.rear_right},
+      msg.front_left * mp::m,
+      msg.front_right * mp::m,
+      msg.rear_left * mp::m,
+      msg.rear_right * mp::m,
   };
 }
 
 bool wpi::Protobuf<frc::MecanumDriveWheelPositions>::Pack(
     OutputStream& stream, const frc::MecanumDriveWheelPositions& value) {
   wpi_proto_ProtobufMecanumDriveWheelPositions msg{
-      .front_left = value.frontLeft.value(),
-      .front_right = value.frontRight.value(),
-      .rear_left = value.rearLeft.value(),
-      .rear_right = value.rearRight.value(),
+      .front_left = mp::value(value.frontLeft),
+      .front_right = mp::value(value.frontRight),
+      .rear_left = mp::value(value.rearLeft),
+      .rear_right = mp::value(value.rearRight),
   };
   return stream.Encode(msg);
 }

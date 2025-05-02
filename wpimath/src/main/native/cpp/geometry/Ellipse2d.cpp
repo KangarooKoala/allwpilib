@@ -6,6 +6,8 @@
 
 #include <sleipnir/optimization/OptimizationProblem.hpp>
 
+#include "frc/units.h"
+
 using namespace frc;
 
 Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
@@ -26,25 +28,24 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
     // Point on ellipse
     auto x = problem.DecisionVariable();
-    x.SetValue(rotPoint.X().value());
+    x.SetValue(mp::value(rotPoint.X()));
     auto y = problem.DecisionVariable();
-    y.SetValue(rotPoint.Y().value());
+    y.SetValue(mp::value(rotPoint.Y()));
 
-    problem.Minimize(slp::pow(x - rotPoint.X().value(), 2) +
-                     slp::pow(y - rotPoint.Y().value(), 2));
+    problem.Minimize(slp::pow(x - mp::value(rotPoint.X()), 2) +
+                     slp::pow(y - mp::value(rotPoint.Y()), 2));
 
     // (x − x_c)²/a² + (y − y_c)²/b² = 1
     // b²(x − x_c)² + a²(y − y_c)² = a²b²
-    double a2 = m_xSemiAxis.value() * m_xSemiAxis.value();
-    double b2 = m_ySemiAxis.value() * m_ySemiAxis.value();
-    problem.SubjectTo(b2 * slp::pow(x - m_center.X().value(), 2) +
-                          a2 * slp::pow(y - m_center.Y().value(), 2) ==
+    double a2 = mp::value(m_xSemiAxis) * mp::value(m_xSemiAxis);
+    double b2 = mp::value(m_ySemiAxis) * mp::value(m_ySemiAxis);
+    problem.SubjectTo(b2 * slp::pow(x - mp::value(m_center.X()), 2) +
+                          a2 * slp::pow(y - mp::value(m_center.Y()), 2) ==
                       a2 * b2);
 
     problem.Solve();
 
-    rotPoint = frc::Translation2d{units::meter_t{x.Value()},
-                                  units::meter_t{y.Value()}};
+    rotPoint = frc::Translation2d{x.Value() * mp::m, y.Value() * mp::m};
   }
 
   // Undo rotation

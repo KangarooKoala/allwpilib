@@ -16,7 +16,7 @@
 #include "frc/MathUtil.h"
 #include "frc/controller/PIDController.h"
 #include "frc/trajectory/TrapezoidProfile.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 namespace detail {
@@ -28,18 +28,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
  * Implements a PID control loop whose setpoint is constrained by a trapezoid
  * profile.
  */
-template <class Distance>
+template <mp::Unit auto Distance>
 class ProfiledPIDController
     : public wpi::Sendable,
       public wpi::SendableHelper<ProfiledPIDController<Distance>> {
  public:
-  using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Velocity_t = units::unit_t<Velocity>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using Acceleration_t = units::unit_t<Acceleration>;
+  using Distance_t = mp::quantity<Distance>;
+  inline static constexpr auto Velocity = Distance / mp::s;
+  using Velocity_t = mp::quantity<Velocity>;
+  inline static constexpr auto Acceleration = Velocity / mp::s;
+  using Acceleration_t = mp::quantity<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
@@ -57,7 +55,7 @@ class ProfiledPIDController
    */
   constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
                                   Constraints constraints,
-                                  units::second_t period = 20_ms)
+                                  mp::quantity<mp::s> period = 20.0 * mp::ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
@@ -157,7 +155,7 @@ class ProfiledPIDController
    *
    * @return The period of the controller.
    */
-  constexpr units::second_t GetPeriod() const {
+  constexpr mp::quantity<mp::s> GetPeriod() const {
     return m_controller.GetPeriod();
   }
 
@@ -201,7 +199,7 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  constexpr void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  constexpr void SetGoal(Distance_t goal) { m_goal = {goal, 0.0 * Velocity}; }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -261,8 +259,8 @@ class ProfiledPIDController
    */
   constexpr void EnableContinuousInput(Distance_t minimumInput,
                                        Distance_t maximumInput) {
-    m_controller.EnableContinuousInput(minimumInput.value(),
-                                       maximumInput.value());
+    m_controller.EnableContinuousInput(mp::value(minimumInput),
+                                       mp::value(maximumInput));
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
   }
@@ -296,11 +294,12 @@ class ProfiledPIDController
    * @param positionTolerance Position error which is tolerable.
    * @param velocityTolerance Velocity error which is tolerable.
    */
-  constexpr void SetTolerance(Distance_t positionTolerance,
-                              Velocity_t velocityTolerance = Velocity_t{
-                                  std::numeric_limits<double>::infinity()}) {
-    m_controller.SetTolerance(positionTolerance.value(),
-                              velocityTolerance.value());
+  constexpr void SetTolerance(
+      Distance_t positionTolerance,
+      Velocity_t velocityTolerance = std::numeric_limits<double>::infinity() *
+                                     Velocity) {
+    m_controller.SetTolerance(mp::value(positionTolerance),
+                              mp::value(velocityTolerance));
   }
 
   /**
@@ -309,14 +308,14 @@ class ProfiledPIDController
    * @return The error.
    */
   constexpr Distance_t GetPositionError() const {
-    return Distance_t{m_controller.GetError()};
+    return m_controller.GetError() * Distance;
   }
 
   /**
    * Returns the change in error per second.
    */
   constexpr Velocity_t GetVelocityError() const {
-    return Velocity_t{m_controller.GetErrorDerivative()};
+    return m_controller.GetErrorDerivative() * Velocity;
   }
 
   /**
@@ -344,8 +343,8 @@ class ProfiledPIDController
     }
 
     m_setpoint = m_profile.Calculate(GetPeriod(), m_setpoint, m_goal);
-    return m_controller.Calculate(measurement.value(),
-                                  m_setpoint.position.value());
+    return m_controller.Calculate(mp::value(measurement),
+                                  mp::value(m_setpoint.position));
   }
 
   /**
@@ -411,7 +410,7 @@ class ProfiledPIDController
    * velocity is assumed to be zero.
    */
   constexpr void Reset(Distance_t measuredPosition) {
-    Reset(measuredPosition, Velocity_t{0});
+    Reset(measuredPosition, 0.0 * Velocity);
   }
 
   void InitSendable(wpi::SendableBuilder& builder) override {
@@ -426,27 +425,28 @@ class ProfiledPIDController
         "izone", [this] { return GetIZone(); },
         [this](double value) { SetIZone(value); });
     builder.AddDoubleProperty(
-        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
+        "maxVelocity",
+        [this] { return mp::value(GetConstraints().maxVelocity); },
         [this](double value) {
           SetConstraints(
-              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
+              Constraints{value * Velocity, GetConstraints().maxAcceleration});
         });
     builder.AddDoubleProperty(
         "maxAcceleration",
-        [this] { return GetConstraints().maxAcceleration.value(); },
+        [this] { return mp::value(GetConstraints().maxAcceleration); },
         [this](double value) {
           SetConstraints(
-              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
+              Constraints{GetConstraints().maxVelocity, value * Acceleration});
         });
     builder.AddDoubleProperty(
-        "goal", [this] { return GetGoal().position.value(); },
-        [this](double value) { SetGoal(Distance_t{value}); });
+        "goal", [this] { return mp::value(GetGoal().position); },
+        [this](double value) { SetGoal(value * Distance); });
   }
 
  private:
   PIDController m_controller;
-  Distance_t m_minimumInput{0};
-  Distance_t m_maximumInput{0};
+  Distance_t m_minimumInput = 0.0 * Distance;
+  Distance_t m_maximumInput = 0.0 * Distance;
 
   typename frc::TrapezoidProfile<Distance>::Constraints m_constraints;
   TrapezoidProfile<Distance> m_profile;

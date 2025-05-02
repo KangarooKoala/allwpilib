@@ -15,7 +15,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -161,7 +161,7 @@ class LinearSystem {
    * @param dt       Timestep for model update.
    */
   StateVector CalculateX(const StateVector& x, const InputVector& clampedU,
-                         units::second_t dt) const {
+                         mp::quantity<mp::s> dt) const {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);

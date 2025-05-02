@@ -18,7 +18,7 @@
 #include "frc/fmt/Eigen.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/LinearSystem.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -60,7 +60,7 @@ class LinearQuadraticRegulator {
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt)
+                           mp::quantity<mp::s> dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   /**
@@ -80,7 +80,7 @@ class LinearQuadraticRegulator {
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
                            const StateArray& Qelems, const InputArray& Relems,
-                           units::second_t dt)
+                           mp::quantity<mp::s> dt)
       : LinearQuadraticRegulator(A, B, MakeCostMatrix(Qelems),
                                  MakeCostMatrix(Relems), dt) {}
 
@@ -98,7 +98,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, Inputs>& B,
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
-                           units::second_t dt) {
+                           mp::quantity<mp::s> dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -153,7 +153,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
                            const Matrixd<States, Inputs>& N,
-                           units::second_t dt) {
+                           mp::quantity<mp::s> dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -291,7 +291,8 @@ class LinearQuadraticRegulator {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         units::second_t dt, units::second_t inputDelay) {
+                         mp::quantity<mp::s> dt,
+                         mp::quantity<mp::s> inputDelay) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);

@@ -16,7 +16,7 @@
 #include "frc/geometry/Rotation2d.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Twist2d.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -50,7 +50,8 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose2d(units::meter_t x, units::meter_t y, Rotation2d rotation)
+  constexpr Pose2d(mp::quantity<mp::m> x, mp::quantity<mp::m> y,
+                   Rotation2d rotation)
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -111,14 +112,14 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr units::meter_t X() const { return m_translation.X(); }
+  constexpr mp::quantity<mp::m> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr units::meter_t Y() const { return m_translation.Y(); }
+  constexpr mp::quantity<mp::m> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.
@@ -214,7 +215,8 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param twist The change in pose in the robot's coordinate frame since the
    * previous pose update. For example, if a non-holonomic robot moves forward
    * 0.01 meters and changes angle by 0.5 degrees since the previous pose
-   * update, the twist would be Twist2d{0.01_m, 0_m, 0.5_deg}.
+   * update, the twist would be Twist2d{0.01 * mp::m, 0.0 * mp::m, 0.5 *
+   * mp::deg}.
    *
    * @return The new pose of the robot.
    */
@@ -255,9 +257,9 @@ class WPILIB_DLLEXPORT Pose2d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Radians().value()) <
+                       mp::value((this->Rotation() - a.Rotation()).Radians())) <
                    gcem::abs(
-                       (this->Rotation() - b.Rotation()).Radians().value());
+                       mp::value((this->Rotation() - b.Rotation()).Radians()));
           }
           return aDistance < bDistance;
         });
@@ -277,9 +279,9 @@ class WPILIB_DLLEXPORT Pose2d {
           // If the distances are equal sort by difference in rotation
           if (aDistance == bDistance) {
             return gcem::abs(
-                       (this->Rotation() - a.Rotation()).Radians().value()) <
+                       mp::value((this->Rotation() - a.Rotation()).Radians())) <
                    gcem::abs(
-                       (this->Rotation() - b.Rotation()).Radians().value());
+                       mp::value((this->Rotation() - b.Rotation()).Radians()));
           }
           return aDistance < bDistance;
         });
@@ -323,7 +325,7 @@ constexpr Pose2d Pose2d::RelativeTo(const Pose2d& other) const {
 constexpr Pose2d Pose2d::Exp(const Twist2d& twist) const {
   const auto dx = twist.dx;
   const auto dy = twist.dy;
-  const auto dtheta = twist.dtheta.value();
+  const auto dtheta = mp::value(twist.dtheta);
 
   const auto sinTheta = gcem::sin(dtheta);
   const auto cosTheta = gcem::cos(dtheta);
@@ -345,7 +347,7 @@ constexpr Pose2d Pose2d::Exp(const Twist2d& twist) const {
 
 constexpr Twist2d Pose2d::Log(const Pose2d& end) const {
   const auto transform = end.RelativeTo(*this);
-  const auto dtheta = transform.Rotation().Radians().value();
+  const auto dtheta = mp::value(transform.Rotation().Radians());
   const auto halfDtheta = dtheta / 2.0;
 
   const auto cosMinusOne = transform.Rotation().Cos() - 1;
@@ -364,7 +366,7 @@ constexpr Twist2d Pose2d::Log(const Pose2d& end) const {
           {halfThetaByTanOfHalfDtheta, -halfDtheta}) *
       gcem::hypot(halfThetaByTanOfHalfDtheta, halfDtheta);
 
-  return {translationPart.X(), translationPart.Y(), units::radian_t{dtheta}};
+  return {translationPart.X(), translationPart.Y(), dtheta * mp::rad};
 }
 
 }  // namespace frc

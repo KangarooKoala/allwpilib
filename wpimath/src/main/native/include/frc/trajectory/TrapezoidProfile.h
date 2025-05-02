@@ -4,10 +4,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <type_traits>
 
-#include "units/math.h"
-#include "units/time.h"
+#include "frc/units.h"
 #include "wpimath/MathShared.h"
 
 namespace frc {
@@ -42,16 +42,14 @@ namespace frc {
  * `Calculate()` and to determine when the profile has completed via
  * `IsFinished()`.
  */
-template <class Distance>
+template <mp::Unit auto Distance>
 class TrapezoidProfile {
  public:
-  using Distance_t = units::unit_t<Distance>;
-  using Velocity =
-      units::compound_unit<Distance, units::inverse<units::seconds>>;
-  using Velocity_t = units::unit_t<Velocity>;
-  using Acceleration =
-      units::compound_unit<Velocity, units::inverse<units::seconds>>;
-  using Acceleration_t = units::unit_t<Acceleration>;
+  using Distance_t = mp::quantity<Distance>;
+  inline static constexpr auto Velocity = Distance / mp::s;
+  using Velocity_t = mp::quantity<Velocity>;
+  inline static constexpr auto Acceleration = Velocity / mp::s;
+  using Acceleration_t = mp::quantity<Acceleration>;
 
   /**
    * Profile constraints.
@@ -59,10 +57,10 @@ class TrapezoidProfile {
   class Constraints {
    public:
     /// Maximum velocity.
-    Velocity_t maxVelocity{0};
+    Velocity_t maxVelocity = 0.0 * Velocity;
 
     /// Maximum acceleration.
-    Acceleration_t maxAcceleration{0};
+    Acceleration_t maxAcceleration = 0.0 * Acceleration;
 
     /**
      * Default constructor.
@@ -94,10 +92,10 @@ class TrapezoidProfile {
   class State {
    public:
     /// The position at this state.
-    Distance_t position{0};
+    Distance_t position = 0.0 * Distance;
 
     /// The velocity at this state.
-    Velocity_t velocity{0};
+    Velocity_t velocity = 0.0 * Velocity;
 
     constexpr bool operator==(const State&) const = default;
   };
@@ -125,7 +123,7 @@ class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(units::second_t t, State current, State goal) {
+  constexpr State Calculate(mp::quantity<mp::s> t, State current, State goal) {
     m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = Direct(current);
     goal = Direct(goal);
@@ -136,12 +134,13 @@ class TrapezoidProfile {
     // Deal with a possibly truncated motion profile (with nonzero initial or
     // final velocity) by calculating the parameters as if the profile began and
     // ended at zero velocity
-    units::second_t cutoffBegin =
+    mp::quantity<mp::s> cutoffBegin =
         m_current.velocity / m_constraints.maxAcceleration;
     Distance_t cutoffDistBegin =
         cutoffBegin * cutoffBegin * m_constraints.maxAcceleration / 2.0;
 
-    units::second_t cutoffEnd = goal.velocity / m_constraints.maxAcceleration;
+    mp::quantity<mp::s> cutoffEnd =
+        goal.velocity / m_constraints.maxAcceleration;
     Distance_t cutoffDistEnd =
         cutoffEnd * cutoffEnd * m_constraints.maxAcceleration / 2.0;
 
@@ -150,7 +149,7 @@ class TrapezoidProfile {
 
     Distance_t fullTrapezoidDist =
         cutoffDistBegin + (goal.position - m_current.position) + cutoffDistEnd;
-    units::second_t accelerationTime =
+    mp::quantity<mp::s> accelerationTime =
         m_constraints.maxVelocity / m_constraints.maxAcceleration;
 
     Distance_t fullSpeedDist =
@@ -158,10 +157,10 @@ class TrapezoidProfile {
         accelerationTime * accelerationTime * m_constraints.maxAcceleration;
 
     // Handle the case where the profile never reaches full speed
-    if (fullSpeedDist < Distance_t{0}) {
+    if (fullSpeedDist < 0.0 * Distance) {
       accelerationTime =
-          units::math::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
-      fullSpeedDist = Distance_t{0};
+          mp::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
+      fullSpeedDist = 0.0 * Distance;
     }
 
     m_endAccel = accelerationTime - cutoffBegin;
@@ -182,7 +181,7 @@ class TrapezoidProfile {
     } else if (t <= m_endDecel) {
       result.velocity =
           goal.velocity + (m_endDecel - t) * m_constraints.maxAcceleration;
-      units::second_t timeLeft = m_endDecel - t;
+      mp::quantity<mp::s> timeLeft = m_endDecel - t;
       result.position =
           goal.position -
           (goal.velocity + timeLeft * m_constraints.maxAcceleration / 2.0) *
@@ -201,12 +200,12 @@ class TrapezoidProfile {
    * @return The time left until a target distance in the profile is reached, or
    * zero if no goal was set.
    */
-  constexpr units::second_t TimeLeftUntil(Distance_t target) const {
+  constexpr mp::quantity<mp::s> TimeLeftUntil(Distance_t target) const {
     Distance_t position = m_current.position * m_direction;
     Velocity_t velocity = m_current.velocity * m_direction;
 
-    units::second_t endAccel = m_endAccel * m_direction;
-    units::second_t endFullSpeed = m_endFullSpeed * m_direction - endAccel;
+    mp::quantity<mp::s> endAccel = m_endAccel * m_direction;
+    mp::quantity<mp::s> endFullSpeed = m_endFullSpeed * m_direction - endAccel;
 
     if (target < position) {
       endAccel *= -1.0;
@@ -214,25 +213,25 @@ class TrapezoidProfile {
       velocity *= -1.0;
     }
 
-    endAccel = units::math::max(endAccel, 0_s);
-    endFullSpeed = units::math::max(endFullSpeed, 0_s);
+    endAccel = std::max(endAccel, 0.0 * mp::s);
+    endFullSpeed = std::max(endFullSpeed, 0.0 * mp::s);
 
     const Acceleration_t acceleration = m_constraints.maxAcceleration;
     const Acceleration_t deceleration = -m_constraints.maxAcceleration;
 
-    Distance_t distToTarget = units::math::abs(target - position);
+    Distance_t distToTarget = mp::abs(target - position);
 
-    if (distToTarget < Distance_t{1e-6}) {
-      return 0_s;
+    if (distToTarget < 1e-6 * Distance) {
+      return 0.0 * mp::s;
     }
 
     Distance_t accelDist =
         velocity * endAccel + 0.5 * acceleration * endAccel * endAccel;
 
     Velocity_t decelVelocity;
-    if (endAccel > 0_s) {
-      decelVelocity = units::math::sqrt(
-          units::math::abs(velocity * velocity + 2 * acceleration * accelDist));
+    if (endAccel > 0.0 * mp::s) {
+      decelVelocity =
+          mp::sqrt(mp::abs(velocity * velocity + 2 * acceleration * accelDist));
     } else {
       decelVelocity = velocity;
     }
@@ -242,27 +241,27 @@ class TrapezoidProfile {
 
     if (accelDist > distToTarget) {
       accelDist = distToTarget;
-      fullSpeedDist = Distance_t{0};
-      decelDist = Distance_t{0};
+      fullSpeedDist = 0.0 * Distance;
+      decelDist = 0.0 * Distance;
     } else if (accelDist + fullSpeedDist > distToTarget) {
       fullSpeedDist = distToTarget - accelDist;
-      decelDist = Distance_t{0};
+      decelDist = 0.0 * Distance;
     } else {
       decelDist = distToTarget - fullSpeedDist - accelDist;
     }
 
-    units::second_t accelTime =
-        (-velocity + units::math::sqrt(units::math::abs(
-                         velocity * velocity + 2 * acceleration * accelDist))) /
+    mp::quantity<mp::s> accelTime =
+        (-velocity + mp::sqrt(mp::abs(velocity * velocity +
+                                      2 * acceleration * accelDist))) /
         acceleration;
 
-    units::second_t decelTime =
-        (-decelVelocity +
-         units::math::sqrt(units::math::abs(decelVelocity * decelVelocity +
-                                            2 * deceleration * decelDist))) /
+    mp::quantity<mp::s> decelTime =
+        (-decelVelocity + mp::sqrt(mp::abs(decelVelocity * decelVelocity +
+                                           2 * deceleration * decelDist))) /
         deceleration;
 
-    units::second_t fullSpeedTime = fullSpeedDist / m_constraints.maxVelocity;
+    mp::quantity<mp::s> fullSpeedTime =
+        fullSpeedDist / m_constraints.maxVelocity;
 
     return accelTime + fullSpeedTime + decelTime;
   }
@@ -273,7 +272,7 @@ class TrapezoidProfile {
    * @return The total time the profile takes to reach the goal, or zero if no
    * goal was set.
    */
-  constexpr units::second_t TotalTime() const { return m_endDecel; }
+  constexpr mp::quantity<mp::s> TotalTime() const { return m_endDecel; }
 
   /**
    * Returns true if the profile has reached the goal.
@@ -284,7 +283,7 @@ class TrapezoidProfile {
    * @param t The time since the beginning of the profile.
    * @return True if the profile has reached the goal.
    */
-  constexpr bool IsFinished(units::second_t t) const {
+  constexpr bool IsFinished(mp::quantity<mp::s> t) const {
     return t >= TotalTime();
   }
 
@@ -316,9 +315,9 @@ class TrapezoidProfile {
   Constraints m_constraints;
   State m_current;
 
-  units::second_t m_endAccel = 0_s;
-  units::second_t m_endFullSpeed = 0_s;
-  units::second_t m_endDecel = 0_s;
+  mp::quantity<mp::s> m_endAccel = 0 * mp::s;
+  mp::quantity<mp::s> m_endFullSpeed = 0 * mp::s;
+  mp::quantity<mp::s> m_endDecel = 0 * mp::s;
 };
 
 }  // namespace frc

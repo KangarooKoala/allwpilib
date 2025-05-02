@@ -14,7 +14,7 @@
 #include <wpi/SymbolExports.h>
 
 #include "frc/geometry/Pose2d.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -39,7 +39,7 @@ class TimeInterpolatableBuffer {
    * @param historySize  The history size of the buffer.
    * @param func The function used to interpolate between values.
    */
-  TimeInterpolatableBuffer(units::second_t historySize,
+  TimeInterpolatableBuffer(mp::quantity<mp::s> historySize,
                            std::function<T(const T&, const T&, double)> func)
       : m_historySize(historySize), m_interpolatingFunc(func) {}
 
@@ -49,7 +49,7 @@ class TimeInterpolatableBuffer {
    *
    * @param historySize  The history size of the buffer.
    */
-  explicit TimeInterpolatableBuffer(units::second_t historySize)
+  explicit TimeInterpolatableBuffer(mp::quantity<mp::s> historySize)
       : m_historySize(historySize),
         m_interpolatingFunc([](const T& start, const T& end, double t) {
           return wpi::Lerp(start, end, t);
@@ -61,7 +61,7 @@ class TimeInterpolatableBuffer {
    * @param time   The timestamp of the sample.
    * @param sample The sample object.
    */
-  void AddSample(units::second_t time, T sample) {
+  void AddSample(mp::quantity<mp::s> time, T sample) {
     // Add the new state into the vector
     if (m_pastSnapshots.size() == 0 || time > m_pastSnapshots.back().first) {
       m_pastSnapshots.emplace_back(time, sample);
@@ -98,7 +98,7 @@ class TimeInterpolatableBuffer {
    *
    * @param time The time at which to sample the buffer.
    */
-  std::optional<T> Sample(units::second_t time) const {
+  std::optional<T> Sample(mp::quantity<mp::s> time) const {
     if (m_pastSnapshots.empty()) {
       return {};
     }
@@ -138,27 +138,28 @@ class TimeInterpolatableBuffer {
    * Grant access to the internal sample buffer. Used in Pose Estimation to
    * replay odometry inputs stored within this buffer.
    */
-  std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() {
+  std::vector<std::pair<mp::quantity<mp::s>, T>>& GetInternalBuffer() {
     return m_pastSnapshots;
   }
 
   /**
    * Grant access to the internal sample buffer.
    */
-  const std::vector<std::pair<units::second_t, T>>& GetInternalBuffer() const {
+  const std::vector<std::pair<mp::quantity<mp::s>, T>>& GetInternalBuffer()
+      const {
     return m_pastSnapshots;
   }
 
  private:
-  units::second_t m_historySize;
-  std::vector<std::pair<units::second_t, T>> m_pastSnapshots;
+  mp::quantity<mp::s> m_historySize;
+  std::vector<std::pair<mp::quantity<mp::s>, T>> m_pastSnapshots;
   std::function<T(const T&, const T&, double)> m_interpolatingFunc;
 };
 
 // Template specialization to ensure that Pose2d uses pose exponential
 template <>
 inline TimeInterpolatableBuffer<Pose2d>::TimeInterpolatableBuffer(
-    units::second_t historySize)
+    mp::quantity<mp::s> historySize)
     : m_historySize(historySize),
       m_interpolatingFunc([](const Pose2d& start, const Pose2d& end, double t) {
         if (t < 0) {

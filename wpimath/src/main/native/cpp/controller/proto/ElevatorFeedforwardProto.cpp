@@ -16,20 +16,20 @@ wpi::Protobuf<frc::ElevatorFeedforward>::Unpack(InputStream& stream) {
   }
 
   return frc::ElevatorFeedforward{
-      units::volt_t{msg.ks},
-      units::volt_t{msg.kg},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{msg.kv},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{msg.ka},
+      msg.ks * mp::V,
+      msg.kg * mp::V,
+      msg.kv * frc::ElevatorFeedforward::kv_unit,
+      msg.ka * frc::ElevatorFeedforward::ka_unit,
   };
 }
 
 bool wpi::Protobuf<frc::ElevatorFeedforward>::Pack(
     OutputStream& stream, const frc::ElevatorFeedforward& value) {
   wpi_proto_ProtobufElevatorFeedforward msg{
-      .ks = value.GetKs().value(),
-      .kg = value.GetKg().value(),
-      .kv = value.GetKv().value(),
-      .ka = value.GetKa().value(),
+      .ks = mp::value(value.GetKs()),
+      .kg = mp::value(value.GetKg()),
+      .kv = mp::value(value.GetKv()),
+      .ka = mp::value(value.GetKa()),
       .dt = 0,
   };
   return stream.Encode(msg);

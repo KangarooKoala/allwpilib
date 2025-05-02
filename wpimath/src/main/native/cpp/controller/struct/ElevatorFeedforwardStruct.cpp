@@ -15,19 +15,19 @@ using StructType = wpi::Struct<frc::ElevatorFeedforward>;
 
 frc::ElevatorFeedforward StructType::Unpack(std::span<const uint8_t> data) {
   return frc::ElevatorFeedforward{
-      units::volt_t{wpi::UnpackStruct<double, kKsOff>(data)},
-      units::volt_t{wpi::UnpackStruct<double, kKgOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::kv_unit>{
-          wpi::UnpackStruct<double, kKvOff>(data)},
-      units::unit_t<frc::ElevatorFeedforward::ka_unit>{
-          wpi::UnpackStruct<double, kKaOff>(data)},
+      wpi::UnpackStruct<double, kKsOff>(data) * mp::V,
+      wpi::UnpackStruct<double, kKgOff>(data) * mp::V,
+      wpi::UnpackStruct<double, kKvOff>(data) *
+          frc::ElevatorFeedforward::kv_unit,
+      wpi::UnpackStruct<double, kKaOff>(data) *
+          frc::ElevatorFeedforward::ka_unit,
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const frc::ElevatorFeedforward& value) {
-  wpi::PackStruct<kKsOff>(data, value.GetKs().value());
-  wpi::PackStruct<kKgOff>(data, value.GetKg().value());
-  wpi::PackStruct<kKvOff>(data, value.GetKv().value());
-  wpi::PackStruct<kKaOff>(data, value.GetKa().value());
+  wpi::PackStruct<kKsOff>(data, mp::value(value.GetKs()));
+  wpi::PackStruct<kKgOff>(data, mp::value(value.GetKg()));
+  wpi::PackStruct<kKvOff>(data, mp::value(value.GetKv()));
+  wpi::PackStruct<kKaOff>(data, mp::value(value.GetKa()));
 }

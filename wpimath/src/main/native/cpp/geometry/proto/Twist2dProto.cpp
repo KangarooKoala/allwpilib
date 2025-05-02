@@ -14,18 +14,18 @@ std::optional<frc::Twist2d> wpi::Protobuf<frc::Twist2d>::Unpack(
   }
 
   return frc::Twist2d{
-      units::meter_t{msg.dx},
-      units::meter_t{msg.dy},
-      units::radian_t{msg.dtheta},
+      msg.dx * mp::m,
+      msg.dy * mp::m,
+      msg.dtheta * mp::rad,
   };
 }
 
 bool wpi::Protobuf<frc::Twist2d>::Pack(OutputStream& stream,
                                        const frc::Twist2d& value) {
   wpi_proto_ProtobufTwist2d msg{
-      .dx = value.dx.value(),
-      .dy = value.dy.value(),
-      .dtheta = value.dtheta.value(),
+      .dx = mp::value(value.dx),
+      .dy = mp::value(value.dy),
+      .dtheta = mp::value(value.dtheta),
   };
   return stream.Encode(msg);
 }

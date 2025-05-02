@@ -11,11 +11,7 @@
 
 #include "frc/controller/DifferentialDriveWheelVoltages.h"
 #include "frc/system/LinearSystem.h"
-#include "units/acceleration.h"
-#include "units/angular_acceleration.h"
-#include "units/length.h"
-#include "units/velocity.h"
-#include "units/voltage.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -38,9 +34,9 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @param maxAngularAccel The maximum angular acceleration.
    */
   DifferentialDriveAccelerationLimiter(
-      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-      units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel)
+      LinearSystem<2, 2, 2> system, mp::quantity<mp::m> trackwidth,
+      mp::quantity<mp::m / mp::s2> maxLinearAccel,
+      mp::quantity<mp::rad / mp::s2> maxAngularAccel)
       : DifferentialDriveAccelerationLimiter(system, trackwidth,
                                              -maxLinearAccel, maxLinearAccel,
                                              maxAngularAccel) {}
@@ -58,10 +54,10 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * than maximum linear acceleration
    */
   DifferentialDriveAccelerationLimiter(
-      LinearSystem<2, 2, 2> system, units::meter_t trackwidth,
-      units::meters_per_second_squared_t minLinearAccel,
-      units::meters_per_second_squared_t maxLinearAccel,
-      units::radians_per_second_squared_t maxAngularAccel)
+      LinearSystem<2, 2, 2> system, mp::quantity<mp::m> trackwidth,
+      mp::quantity<mp::m / mp::s2> minLinearAccel,
+      mp::quantity<mp::m / mp::s2> maxLinearAccel,
+      mp::quantity<mp::rad / mp::s2> maxAngularAccel)
       : m_system{std::move(system)},
         m_trackwidth{trackwidth},
         m_minLinearAccel{minLinearAccel},
@@ -83,16 +79,16 @@ class WPILIB_DLLEXPORT DifferentialDriveAccelerationLimiter {
    * @return The constrained wheel voltages.
    */
   DifferentialDriveWheelVoltages Calculate(
-      units::meters_per_second_t leftVelocity,
-      units::meters_per_second_t rightVelocity, units::volt_t leftVoltage,
-      units::volt_t rightVoltage);
+      mp::quantity<mp::m / mp::s> leftVelocity,
+      mp::quantity<mp::m / mp::s> rightVelocity,
+      mp::quantity<mp::V> leftVoltage, mp::quantity<mp::V> rightVoltage);
 
  private:
   LinearSystem<2, 2, 2> m_system;
-  units::meter_t m_trackwidth;
-  units::meters_per_second_squared_t m_minLinearAccel;
-  units::meters_per_second_squared_t m_maxLinearAccel;
-  units::radians_per_second_squared_t m_maxAngularAccel;
+  mp::quantity<mp::m> m_trackwidth;
+  mp::quantity<mp::m / mp::s2> m_minLinearAccel;
+  mp::quantity<mp::m / mp::s2> m_maxLinearAccel;
+  mp::quantity<mp::rad / mp::s2> m_maxAngularAccel;
 };
 
 }  // namespace frc

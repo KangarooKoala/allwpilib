@@ -7,18 +7,21 @@
 #include <Eigen/Core>
 
 #include "frc/controller/LinearPlantInversionFeedforward.h"
+#include "frc/units.h"
 
 using namespace frc;
 
 DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
-    units::meters_per_second_t currentLeftVelocity,
-    units::meters_per_second_t nextLeftVelocity,
-    units::meters_per_second_t currentRightVelocity,
-    units::meters_per_second_t nextRightVelocity, units::second_t dt) {
+    mp::quantity<mp::m / mp::s> currentLeftVelocity,
+    mp::quantity<mp::m / mp::s> nextLeftVelocity,
+    mp::quantity<mp::m / mp::s> currentRightVelocity,
+    mp::quantity<mp::m / mp::s> nextRightVelocity, mp::quantity<mp::s> dt) {
   frc::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
 
-  Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};
-  Eigen::Vector2d nextR{nextLeftVelocity, nextRightVelocity};
+  Eigen::Vector2d r{mp::value(currentLeftVelocity),
+                    mp::value(currentRightVelocity)};
+  Eigen::Vector2d nextR{mp::value(nextLeftVelocity),
+                        mp::value(nextRightVelocity)};
   auto u = feedforward.Calculate(r, nextR);
-  return {units::volt_t{u(0)}, units::volt_t{u(1)}};
+  return {u(0) * mp::V, u(1) * mp::V};
 }
