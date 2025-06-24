@@ -23,7 +23,9 @@
 #include "frc/geometry/Rotation3d.h"
 #include "frc/kinematics/DifferentialDriveOdometry.h"
 #include "frc/kinematics/DifferentialDriveOdometry3d.h"
+#include "frc/kinematics/SD2.h"
 #include "frc/kinematics/SwerveDesaturator.h"
+#include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/length.h"
 #include "units/math.h"
 #include "units/time.h"
@@ -202,12 +204,32 @@ TEST(TimeTest, Time) {
     wpi::array<frc::Translation2d, 4> modules{
         frc::Translation2d{0.5_m, 0_m}, frc::Translation2d{0.5_m, 0_m},
         frc::Translation2d{0.5_m, 0.2_m}, frc::Translation2d{0.5_m, 0.2_m}};
+    frc::SwerveDriveKinematics<4> kinematics{modules};
 
     TimeSuite(
         "Full solve",
         [&] {
           frc::SwerveDesaturator::DesaturatedDiscretize(
               continuousSpeeds, dt, maxModuleSpeed, modules);
+        },
+        [] {});
+
+    TimeSuite(
+        "SD3",
+        [&] {
+          sd2::DesaturatedDiscretize(continuousSpeeds, dt, maxModuleSpeed,
+                                     modules);
+        },
+        [] {});
+
+    TimeSuite(
+        "Separate",
+        [&] {
+          frc::ChassisSpeeds discretized =
+              frc::ChassisSpeeds::Discretize(continuousSpeeds, dt);
+          wpi::array<frc::SwerveModuleState, 4> moduleStates =
+              kinematics.ToSwerveModuleStates(discretized);
+          kinematics.DesaturateWheelSpeeds(&moduleStates, maxModuleSpeed);
         },
         [] {});
   }

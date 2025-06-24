@@ -13,6 +13,7 @@
 
 #include "frc/geometry/Translation2d.h"
 #include "frc/kinematics/ChassisSpeeds.h"
+#include "frc/kinematics/SD2.h"
 #include "frc/kinematics/SwerveDesaturator.h"
 #include "frc/kinematics/SwerveDriveKinematics.h"
 #include "units/angular_velocity.h"
@@ -20,7 +21,38 @@
 #include "units/time.h"
 #include "units/velocity.h"
 
+inline constexpr enum Version {
+  SD1,
+  SD2,
+  SD3,
+} VERSION = SD3;
+
 static constexpr double kEpsilon = 1e-9;
+
+frc::ChassisSpeeds GetChassisSpeeds(
+    const frc::ChassisSpeeds& speeds, units::second_t dt,
+    units::meters_per_second_t maxModuleSpeed,
+    const wpi::array<frc::Translation2d, 4>& modules) {
+  wpi::print("  -- SD --\n");
+  auto sdOutputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(
+      speeds, dt, maxModuleSpeed, modules, true);
+  wpi::print("  -- SD2 --\n");
+  auto sd2OutputSpeeds = sd2::DesaturatedDiscretize(speeds, dt, maxModuleSpeed,
+                                                    modules, true, false);
+  wpi::print("  -- SD3 --\n");
+  auto sd3OutputSpeeds = sd2::DesaturatedDiscretize(speeds, dt, maxModuleSpeed,
+                                                    modules, true, true);
+  switch (VERSION) {
+    case SD1:
+      return sdOutputSpeeds;
+    case SD2:
+      return sd2OutputSpeeds;
+    case SD3:
+      return sd3OutputSpeeds;
+    default:
+      return frc::ChassisSpeeds{};
+  }
+}
 
 frc::ChassisSpeeds Undiscretize(const frc::ChassisSpeeds& speeds,
                                 units::second_t dt) {
@@ -57,7 +89,7 @@ TEST(SwerveDesaturatorTest, StraightUnsaturated) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto expected = frc::ChassisSpeeds::Discretize(speeds, dt);
 
   EXPECT_NEAR(outputSpeeds.vx.value(), expected.vx.value(), kEpsilon);
@@ -74,7 +106,7 @@ TEST(SwerveDesaturatorTest, StraightAllSaturated) {
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
 
   auto maxRealSpeed = 0_mps;
@@ -96,7 +128,7 @@ TEST(SwerveDesaturatorTest, CurvedUnsaturated) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto expected = frc::ChassisSpeeds::Discretize(speeds, dt);
 
   EXPECT_NEAR(outputSpeeds.vx.value(), expected.vx.value(), kEpsilon);
@@ -113,7 +145,7 @@ TEST(SwerveDesaturatorTest, CurvedOneSaturated) {
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
 
   auto maxRealSpeed = 0_mps;
@@ -136,7 +168,7 @@ TEST(SwerveDesaturatorTest, CurvedAllSaturated) {
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
 
   auto maxRealSpeed = 0_mps;
@@ -159,7 +191,7 @@ TEST(SwerveDesaturatorTest, ReverseSlope) {
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
 
   auto maxRealSpeed = 0_mps;
@@ -182,7 +214,7 @@ TEST(SwerveDesaturatorTest, PositiveLocalMin) {
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
   auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
 
   auto maxRealSpeed = 0_mps;
