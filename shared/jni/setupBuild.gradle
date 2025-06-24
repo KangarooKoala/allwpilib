@@ -260,9 +260,6 @@ model {
                                 test.systemProperty 'java.library.path', filePath
                                 run.dependsOn it.tasks.install
                                 run.systemProperty 'java.library.path', filePath
-                                jmh {
-                                    jvmArgs = ["-Djava.library.path=$filePath"]
-                                }
 
                                 found = true
                             }

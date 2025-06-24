@@ -164,4 +164,7 @@
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
     <Class name="edu.wpi.first.epilogue.EpilogueConfiguration" />
   </Match>
+  <Match>
+    <Package name="edu.wpi.first.math.jmh_generated" />
+  </Match>
 </FindBugsFilter>
