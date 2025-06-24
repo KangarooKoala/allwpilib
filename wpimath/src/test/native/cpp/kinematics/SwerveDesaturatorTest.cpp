@@ -81,6 +81,36 @@ void ExpectScaled(const frc::ChassisSpeeds& lhs,
       << errorMessage;
 }
 
+void TestUnsaturated(const frc::ChassisSpeeds& speeds, units::second_t dt,
+                     units::meters_per_second_t maxModuleSpeed,
+                     const wpi::array<frc::Translation2d, 4>& modules) {
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
+  auto undiscretized = Undiscretize(outputSpeeds, dt);
+
+  EXPECT_NEAR(speeds.vx.value(), undiscretized.vx.value(), kEpsilon);
+  EXPECT_NEAR(speeds.vy.value(), undiscretized.vy.value(), kEpsilon);
+  EXPECT_NEAR(speeds.omega.value(), undiscretized.omega.value(), kEpsilon);
+}
+
+void TestSaturated(const frc::ChassisSpeeds& speeds, units::second_t dt,
+                   units::meters_per_second_t maxModuleSpeed,
+                   const wpi::array<frc::Translation2d, 4>& modules) {
+  frc::SwerveDriveKinematics<4> kinematics{modules};
+
+  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
+  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
+
+  auto realMaxSpeed = 0_mps;
+  for (auto module : outputStates) {
+    if (module.speed > realMaxSpeed) {
+      realMaxSpeed = module.speed;
+    }
+  }
+
+  EXPECT_NEAR(maxModuleSpeed.value(), realMaxSpeed.value(), kEpsilon);
+  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+}
+
 TEST(SwerveDesaturatorTest, StraightUnsaturated) {
   frc::ChassisSpeeds speeds{0.5_mps, 0.0_mps, 0.0_rad_per_s};
   auto dt = 0.02_s;
@@ -89,12 +119,7 @@ TEST(SwerveDesaturatorTest, StraightUnsaturated) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto expected = frc::ChassisSpeeds::Discretize(speeds, dt);
-
-  EXPECT_NEAR(outputSpeeds.vx.value(), expected.vx.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.vy.value(), expected.vy.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.omega.value(), expected.omega.value(), kEpsilon);
+  TestUnsaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, StraightAllSaturated) {
@@ -104,20 +129,8 @@ TEST(SwerveDesaturatorTest, StraightAllSaturated) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, CurvedUnsaturated) {
@@ -128,12 +141,7 @@ TEST(SwerveDesaturatorTest, CurvedUnsaturated) {
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto expected = frc::ChassisSpeeds::Discretize(speeds, dt);
-
-  EXPECT_NEAR(outputSpeeds.vx.value(), expected.vx.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.vy.value(), expected.vy.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.omega.value(), expected.omega.value(), kEpsilon);
+  TestUnsaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, CurvedOneSaturated) {
@@ -143,20 +151,8 @@ TEST(SwerveDesaturatorTest, CurvedOneSaturated) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, CurvedAllSaturated) {
@@ -166,20 +162,8 @@ TEST(SwerveDesaturatorTest, CurvedAllSaturated) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
       frc::Translation2d{-1_m, 1_m}, frc::Translation2d{-1_m, -1_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, ReverseSlope) {
@@ -189,20 +173,8 @@ TEST(SwerveDesaturatorTest, ReverseSlope) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m},
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, PositiveLocalMin) {
@@ -212,20 +184,8 @@ TEST(SwerveDesaturatorTest, PositiveLocalMin) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m},
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = GetChassisSpeeds(speeds, dt, maxModuleSpeed, modules);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, SeparateRanges) {
@@ -239,12 +199,7 @@ TEST(SwerveDesaturatorTest, SeparateRanges) {
       frc::Translation2d{1_m, 0_m}, frc::Translation2d{1_m, 0_m}};
   frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
-  auto expected = frc::ChassisSpeeds::Discretize(speeds, dt);
-
-  EXPECT_NEAR(outputSpeeds.vx.value(), expected.vx.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.vy.value(), expected.vy.value(), kEpsilon);
-  EXPECT_NEAR(outputSpeeds.omega.value(), expected.omega.value(), kEpsilon);
+  TestUnsaturated(speeds, dt, maxModuleSpeed, modules);
 }
 
 TEST(SwerveDesaturatorTest, InvalidatedResult) {
@@ -254,18 +209,6 @@ TEST(SwerveDesaturatorTest, InvalidatedResult) {
   wpi::array<frc::Translation2d, 4> modules{
       frc::Translation2d{0.5_m, 0_m}, frc::Translation2d{0.5_m, 0_m},
       frc::Translation2d{0.5_m, 0.2_m}, frc::Translation2d{0.5_m, 0.2_m}};
-  frc::SwerveDriveKinematics<4> kinematics{modules};
 
-  auto outputSpeeds = frc::SwerveDesaturator::DesaturatedDiscretize(speeds, dt, maxModuleSpeed, modules, true);
-  auto outputStates = kinematics.ToSwerveModuleStates(outputSpeeds);
-
-  auto maxRealSpeed = 0_mps;
-  for (auto module : outputStates) {
-    if (module.speed > maxRealSpeed) {
-      maxRealSpeed = module.speed;
-    }
-  }
-
-  EXPECT_NEAR(maxModuleSpeed.value(), maxRealSpeed.value(), kEpsilon);
-  ExpectScaled(speeds, Undiscretize(outputSpeeds, dt));
+  TestSaturated(speeds, dt, maxModuleSpeed, modules);
 }
