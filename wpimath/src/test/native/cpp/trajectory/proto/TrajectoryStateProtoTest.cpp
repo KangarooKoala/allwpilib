@@ -13,10 +13,11 @@ namespace {
 
 using ProtoType = wpi::Protobuf<frc::Trajectory::State>;
 
-const Trajectory::State kExpectedData = Trajectory::State{
-    1.91_s, 4.4_mps, 17.4_mps_sq,
-    Pose2d{Translation2d{1.74_m, 19.1_m}, Rotation2d{22.9_rad}},
-    units::curvature_t{0.174}};
+const Trajectory::State kExpectedData =
+    Trajectory::State{1.91 * mp::s, 4.4 * mp::m / mp::s, 17.4 * mp::m / mp::s2,
+                      Pose2d{Translation2d{1.74 * mp::m, 19.1 * mp::m},
+                             Rotation2d{22.9 * mp::rad}},
+                      0.174 * mp::rad / mp::m};
 }  // namespace
 
 TEST(TrajectoryStateProtoTest, Roundtrip) {
@@ -27,10 +28,12 @@ TEST(TrajectoryStateProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.t.value(), unpacked_data->t.value());
-  EXPECT_EQ(kExpectedData.velocity.value(), unpacked_data->velocity.value());
-  EXPECT_EQ(kExpectedData.acceleration.value(),
-            unpacked_data->acceleration.value());
+  EXPECT_EQ(mp::value(kExpectedData.t), mp::value(unpacked_data->t));
+  EXPECT_EQ(mp::value(kExpectedData.velocity),
+            mp::value(unpacked_data->velocity));
+  EXPECT_EQ(mp::value(kExpectedData.acceleration),
+            mp::value(unpacked_data->acceleration));
   EXPECT_EQ(kExpectedData.pose, unpacked_data->pose);
-  EXPECT_EQ(kExpectedData.curvature.value(), unpacked_data->curvature.value());
+  EXPECT_EQ(mp::value(kExpectedData.curvature),
+            mp::value(unpacked_data->curvature));
 }

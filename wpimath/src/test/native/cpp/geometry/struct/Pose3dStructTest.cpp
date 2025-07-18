@@ -12,7 +12,7 @@ namespace {
 
 using StructType = wpi::Struct<frc::Pose3d>;
 const Pose3d kExpectedData{
-    Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
+    Pose3d{Translation3d{1.1 * mp::m, 2.2 * mp::m, 1.1 * mp::m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}}};
 }  // namespace
 

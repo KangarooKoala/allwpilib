@@ -6,16 +6,18 @@
 
 #include "frc/controller/ImplicitModelFollower.h"
 #include "frc/system/plant/LinearSystemId.h"
+#include "frc/units.h"
 
 namespace frc {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
-  constexpr auto dt = 5_ms;
+  constexpr auto dt = 5.0 * mp::ms;
 
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
+
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   ImplicitModelFollower<2, 2> imf{plant, plant};
 
@@ -24,7 +26,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 
   // Forward
   Vectord<2> u{12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
@@ -34,7 +36,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 
   // Backward
   u = Vectord<2>{-12.0, -12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
@@ -44,7 +46,7 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 
   // Rotate CCW
   u = Vectord<2>{-12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
@@ -54,17 +56,17 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 }
 
 TEST(ImplicitModelFollowerTest, SlowerRefModel) {
-  constexpr auto dt = 5_ms;
+  constexpr auto dt = 5.0 * mp::ms;
 
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   // Linear acceleration is slower, but angular acceleration is the same
   auto plantRef = LinearSystemId::IdentifyDrivetrainSystem(
-      Kv_t{1.0}, Ka_t{2.0}, Kv_t{1.0}, Ka_t{1.0});
+      1.0 * Kv_unit, 2.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   ImplicitModelFollower<2, 2> imf{plant, plantRef};
 
@@ -73,7 +75,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
 
   // Forward
   Vectord<2> u{12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
@@ -85,7 +87,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   x.setZero();
   xImf.setZero();
   u = Vectord<2>{-12.0, -12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
@@ -97,7 +99,7 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
   x.setZero();
   xImf.setZero();
   u = Vectord<2>{-12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 

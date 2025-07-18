@@ -12,7 +12,9 @@ namespace {
 
 using StructType = wpi::Struct<frc::Rectangle2d>;
 const Rectangle2d kExpectedData{
-    Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}}, 1.2_m, 2.3_m};
+    Pose2d{Translation2d{0.191 * mp::m, 2.2 * mp::m},
+           Rotation2d{22.9 * mp::rad}},
+    1.2 * mp::m, 2.3 * mp::m};
 }  // namespace
 
 TEST(Rectangle2dStructTest, Roundtrip) {

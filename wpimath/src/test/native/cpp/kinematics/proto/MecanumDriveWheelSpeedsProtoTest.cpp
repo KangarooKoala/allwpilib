@@ -12,7 +12,8 @@ using namespace frc;
 namespace {
 
 const MecanumDriveWheelSpeeds kExpectedData =
-    MecanumDriveWheelSpeeds{2.29_mps, 17.4_mps, 4.4_mps, 0.229_mps};
+    MecanumDriveWheelSpeeds{2.29 * mp::m / mp::s, 17.4 * mp::m / mp::s,
+                            4.4 * mp::m / mp::s, 0.229 * mp::m / mp::s};
 }  // namespace
 
 TEST(MecanumDriveWheelSpeedsProtoTest, Roundtrip) {
@@ -23,9 +24,12 @@ TEST(MecanumDriveWheelSpeedsProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data->frontLeft.value());
-  EXPECT_EQ(kExpectedData.frontRight.value(),
-            unpacked_data->frontRight.value());
-  EXPECT_EQ(kExpectedData.rearLeft.value(), unpacked_data->rearLeft.value());
-  EXPECT_EQ(kExpectedData.rearRight.value(), unpacked_data->rearRight.value());
+  EXPECT_EQ(mp::value(kExpectedData.frontLeft),
+            mp::value(unpacked_data->frontLeft));
+  EXPECT_EQ(mp::value(kExpectedData.frontRight),
+            mp::value(unpacked_data->frontRight));
+  EXPECT_EQ(mp::value(kExpectedData.rearLeft),
+            mp::value(unpacked_data->rearLeft));
+  EXPECT_EQ(mp::value(kExpectedData.rearRight),
+            mp::value(unpacked_data->rearRight));
 }

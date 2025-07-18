@@ -9,35 +9,36 @@
 
 #include "frc/kinematics/DifferentialDriveKinematics.h"
 #include "frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h"
+#include "frc/units-usc.h"
+#include "frc/units.h"
 #include "trajectory/TestTrajectory.h"
-#include "units/time.h"
 
 using namespace frc;
 
 TEST(DifferentialDriveKinematicsConstraintTest, Constraint) {
-  const auto maxVelocity = 12_fps;
-  const DifferentialDriveKinematics kinematics{27_in};
+  const auto maxVelocity = 12.0 * mp::ft / mp::s;
+  const DifferentialDriveKinematics kinematics{27.0 * mp::in};
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12.0 * mp::ft / mp::s, 12.0 * mp::ft / mp::s2);
   config.AddConstraint(
       DifferentialDriveKinematicsConstraint(kinematics, maxVelocity));
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  units::second_t time = 0_s;
-  units::second_t dt = 20_ms;
-  units::second_t duration = trajectory.TotalTime();
+  mp::quantity<mp::s> time = 0.0 * mp::s;
+  mp::quantity<mp::s> dt = 20.0 * mp::ms;
+  mp::quantity<mp::s> duration = trajectory.TotalTime();
 
   while (time < duration) {
     const Trajectory::State point = trajectory.Sample(time);
     time += dt;
 
-    const ChassisSpeeds chassisSpeeds{point.velocity, 0_mps,
+    const ChassisSpeeds chassisSpeeds{point.velocity, 0.0 * mp::m / mp::s,
                                       point.velocity * point.curvature};
 
     auto [left, right] = kinematics.ToWheelSpeeds(chassisSpeeds);
 
-    EXPECT_TRUE(left < maxVelocity + 0.05_mps);
-    EXPECT_TRUE(right < maxVelocity + 0.05_mps);
+    EXPECT_TRUE(left < maxVelocity + 0.05 * mp::m / mp::s);
+    EXPECT_TRUE(right < maxVelocity + 0.05 * mp::m / mp::s);
   }
 }

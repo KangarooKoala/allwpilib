@@ -6,12 +6,16 @@
 
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
+#include "frc/units.h"
 
 TEST(TrajectoryConcatenateTest, States) {
   auto t1 = frc::TrajectoryGenerator::GenerateTrajectory(
-      {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
+      {}, {}, {1.0 * mp::m, 1.0 * mp::m, 0.0 * mp::deg},
+      {2.0 * mp::m / mp::s, 2.0 * mp::m / mp::s2});
   auto t2 = frc::TrajectoryGenerator::GenerateTrajectory(
-      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
+      {1.0 * mp::m, 1.0 * mp::m, 0.0 * mp::deg}, {},
+      {2.0 * mp::m, 2.0 * mp::m, 45.0 * mp::deg},
+      {2.0 * mp::m / mp::s, 2.0 * mp::m / mp::s2});
 
   auto t = t1 + t2;
 
@@ -20,8 +24,8 @@ TEST(TrajectoryConcatenateTest, States) {
     const auto& state = t.States()[i];
 
     // Make sure that the timestamps are strictly increasing.
-    EXPECT_GT(state.t.value(), time);
-    time = state.t.value();
+    EXPECT_GT(mp::value(state.t), time);
+    time = mp::value(state.t);
 
     // Ensure that the states in t are the same as those in t1 and t2.
     if (i < t1.States().size()) {

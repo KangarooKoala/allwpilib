@@ -11,8 +11,8 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::Transform2d>;
-const Transform2d kExpectedData{
-    Transform2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{4.4_rad}}};
+const Transform2d kExpectedData{Transform2d{
+    Translation2d{0.191 * mp::m, 2.2 * mp::m}, Rotation2d{4.4 * mp::rad}}};
 }  // namespace
 
 TEST(Transform2dStructTest, Roundtrip) {

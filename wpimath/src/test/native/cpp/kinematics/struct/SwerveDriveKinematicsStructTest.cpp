@@ -14,8 +14,10 @@ struct SwerveDriveKinematicsStructTestData {
   using Type = SwerveDriveKinematics<4>;
 
   inline static const Type kTestData{
-      frc::Translation2d{1.0_m, 0.9_m}, frc::Translation2d{1.1_m, -0.8_m},
-      frc::Translation2d{-1.2_m, 0.7_m}, frc::Translation2d{-1.3_m, -0.6_m}};
+      frc::Translation2d{1.0 * mp::m, 0.9 * mp::m},
+      frc::Translation2d{1.1 * mp::m, -0.8 * mp::m},
+      frc::Translation2d{-1.2 * mp::m, 0.7 * mp::m},
+      frc::Translation2d{-1.3 * mp::m, -0.6 * mp::m}};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetModules(), data.GetModules());

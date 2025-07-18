@@ -10,11 +10,11 @@
 
 #include <gtest/gtest.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
+static constexpr auto kFilterStep = 5.0 * mp::ms;
+static constexpr auto kFilterTime = 2.0 * mp::s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr int32_t kMovAvgTaps = 6;
 
@@ -51,8 +51,8 @@ TEST_P(LinearFilterNoiseTest, NoiseReduce) {
   std::mt19937 gen{rd()};
   std::normal_distribution<double> distr{0.0, 10.0};
 
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    double theory = GetData(t.value());
+  for (auto t = 0.0 * mp::s; t < kFilterTime; t += kFilterStep) {
+    double theory = GetData(mp::value(t));
     double noise = distr(gen);
     filterError += std::abs(m_filter.Calculate(theory + noise) - theory);
     noiseGenError += std::abs(noise - theory);

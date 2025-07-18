@@ -7,33 +7,33 @@
 #include "frc/MathUtil.h"
 #include "frc/controller/LTVUnicycleController.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/math.h"
+#include "frc/units.h"
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(units::math::abs(val1 - val2), eps)
+#define EXPECT_NEAR_UNITS(val1, val2, eps) EXPECT_LE(mp::abs(val1 - val2), eps)
 
-static constexpr units::meter_t kTolerance{1 / 12.0};
-static constexpr units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
-                                                   180.0};
+static constexpr mp::quantity<mp::m> kTolerance = (1.0 / 12.0) * mp::m;
+static constexpr mp::quantity<mp::rad> kAngularTolerance =
+    2.0 * std::numbers::pi / 180.0 * mp::rad;
 
 TEST(LTVUnicycleControllerTest, ReachesReference) {
-  constexpr units::second_t kDt = 20_ms;
+  constexpr mp::quantity<mp::s> kDt = 20.0 * mp::ms;
 
   frc::LTVUnicycleController controller{{0.0625, 0.125, 2.5}, {4.0, 4.0}, kDt};
-  frc::Pose2d robotPose{2.7_m, 23_m, 0_deg};
+  frc::Pose2d robotPose{2.7 * mp::m, 23.0 * mp::m, 0.0 * mp::deg};
 
-  auto waypoints = std::vector{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto waypoints =
+      std::vector{frc::Pose2d{2.75 * mp::m, 22.521 * mp::m, 0.0 * mp::rad},
+                  frc::Pose2d{24.73 * mp::m, 19.68 * mp::m, 5.846 * mp::rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8 * mp::m / mp::s, 0.1 * mp::m / mp::s2});
 
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {
+  for (size_t i = 0; i < mp::value(totalTime / kDt); ++i) {
     auto state = trajectory.Sample(kDt * i);
     auto [vx, vy, omega] = controller.Calculate(robotPose, state);
     static_cast<void>(vy);
 
-    robotPose = robotPose.Exp(frc::Twist2d{vx * kDt, 0_m, omega * kDt});
+    robotPose = robotPose.Exp(frc::Twist2d{vx * kDt, 0.0 * mp::m, omega * kDt});
   }
 
   auto& endPose = trajectory.States().back().pose;
@@ -41,5 +41,5 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   EXPECT_NEAR_UNITS(endPose.Y(), robotPose.Y(), kTolerance);
   EXPECT_NEAR_UNITS(frc::AngleModulus(endPose.Rotation().Radians() -
                                       robotPose.Rotation().Radians()),
-                    0_rad, kAngularTolerance);
+                    0.0 * mp::rad, kAngularTolerance);
 }

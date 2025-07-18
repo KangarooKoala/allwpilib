@@ -7,33 +7,29 @@
 #include "../../ProtoTestBase.h"
 #include "frc/controller/SimpleMotorFeedforward.h"
 #include "frc/controller/proto/SimpleMotorFeedforwardProto.h"
-#include "units/acceleration.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 using namespace frc;
 
-template <typename T>
+template <mp::Unit auto Distance>
 struct SimpleMotorFeedforwardProtoTestData {
-  using Type = SimpleMotorFeedforward<T>;
+  using Type = SimpleMotorFeedforward<Distance>;
 
   inline static const Type kTestData = {
-      units::volt_t{0.4}, units::volt_t{4.0} / (units::unit_t<T>{1} / 1_s),
-      units::volt_t{0.7} / (units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
+      0.4 * mp::V, 4.0 * mp::V / (Distance / mp::s),
+      0.7 * mp::V / (Distance / mp::s2), 25.0 * mp::ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
-    EXPECT_EQ(testData.GetKv().value(), data.GetKv().value());
-    EXPECT_EQ(testData.GetKa().value(), data.GetKa().value());
-    EXPECT_EQ(testData.GetDt().value(), data.GetDt().value());
+    EXPECT_EQ(mp::value(testData.GetKs()), mp::value(data.GetKs()));
+    EXPECT_EQ(mp::value(testData.GetKv()), mp::value(data.GetKv()));
+    EXPECT_EQ(mp::value(testData.GetKa()), mp::value(data.GetKa()));
+    EXPECT_EQ(mp::value(testData.GetDt()), mp::value(data.GetDt()));
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardMeters, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::meters>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardFeet, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::feet>);
-INSTANTIATE_TYPED_TEST_SUITE_P(
-    SimpleMotorFeedforwardRadians, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<units::radians>);
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforwardMeters, ProtoTest,
+                               SimpleMotorFeedforwardProtoTestData<mp::m>);
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforwardFeet, ProtoTest,
+                               SimpleMotorFeedforwardProtoTestData<mp::cm>);
+INSTANTIATE_TYPED_TEST_SUITE_P(SimpleMotorFeedforwardRadians, ProtoTest,
+                               SimpleMotorFeedforwardProtoTestData<mp::rad>);

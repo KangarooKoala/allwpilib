@@ -10,6 +10,7 @@
 #include "frc/EigenCore.h"
 #include "frc/system/Discretization.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/units.h"
 
 // Check that for a simple second-order system that we can easily analyze
 // analytically,
@@ -19,7 +20,7 @@ TEST(DiscretizationTest, DiscretizeA) {
   frc::Vectord<2> x0{1, 1};
   frc::Matrixd<2, 2> discA;
 
-  frc::DiscretizeA<2>(contA, 1_s, &discA);
+  frc::DiscretizeA<2>(contA, 1.0 * mp::s, &discA);
   frc::Vectord<2> x1Discrete = discA * x0;
 
   // We now have pos = vel = 1 and accel = 0, which should give us:
@@ -39,7 +40,7 @@ TEST(DiscretizationTest, DiscretizeAB) {
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 1> discB;
 
-  frc::DiscretizeAB<2, 1>(contA, contB, 1_s, &discA, &discB);
+  frc::DiscretizeAB<2, 1>(contA, contB, 1.0 * mp::s, &discA, &discB);
   frc::Vectord<2> x1Discrete = discA * x0 + discB * u;
 
   // We now have pos = vel = accel = 1, which should give us:
@@ -56,20 +57,20 @@ TEST(DiscretizationTest, DiscretizeSlowModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
   frc::Matrixd<2, 2> contQ{{1, 0}, {0, 1}};
 
-  constexpr auto dt = 1_s;
+  constexpr auto dt = 1.0 * mp::s;
 
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   frc::Matrixd<2, 2> discQIntegrated =
-      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
+      frc::RKDP<std::function<frc::Matrixd<2, 2>(mp::quantity<mp::s>,
                                                  const frc::Matrixd<2, 2>&)>,
                 frc::Matrixd<2, 2>>(
-          [&](units::second_t t, const frc::Matrixd<2, 2>&) {
-            return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                      (contA.transpose() * t.value()).exp());
+          [&](mp::quantity<mp::s> t, const frc::Matrixd<2, 2>&) {
+            return frc::Matrixd<2, 2>((contA * mp::value(t)).exp() * contQ *
+                                      (contA.transpose() * mp::value(t)).exp());
           },
-          0_s, frc::Matrixd<2, 2>::Zero(), dt);
+          0.0 * mp::s, frc::Matrixd<2, 2>::Zero(), dt);
 
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 2> discQ;
@@ -88,20 +89,20 @@ TEST(DiscretizationTest, DiscretizeFastModelAQ) {
   frc::Matrixd<2, 2> contA{{0, 1}, {0, -1406.29}};
   frc::Matrixd<2, 2> contQ{{0.0025, 0}, {0, 1}};
 
-  constexpr auto dt = 5_ms;
+  constexpr auto dt = 5.0 * mp::ms;
 
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   frc::Matrixd<2, 2> discQIntegrated =
-      frc::RKDP<std::function<frc::Matrixd<2, 2>(units::second_t,
+      frc::RKDP<std::function<frc::Matrixd<2, 2>(mp::quantity<mp::s>,
                                                  const frc::Matrixd<2, 2>&)>,
                 frc::Matrixd<2, 2>>(
-          [&](units::second_t t, const frc::Matrixd<2, 2>&) {
-            return frc::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
-                                      (contA.transpose() * t.value()).exp());
+          [&](mp::quantity<mp::s> t, const frc::Matrixd<2, 2>&) {
+            return frc::Matrixd<2, 2>((contA * mp::value(t)).exp() * contQ *
+                                      (contA.transpose() * mp::value(t)).exp());
           },
-          0_s, frc::Matrixd<2, 2>::Zero(), dt);
+          0.0 * mp::s, frc::Matrixd<2, 2>::Zero(), dt);
 
   frc::Matrixd<2, 2> discA;
   frc::Matrixd<2, 2> discQ;
@@ -118,7 +119,7 @@ TEST(DiscretizationTest, DiscretizeR) {
   frc::Matrixd<2, 2> contR{{2.0, 0.0}, {0.0, 1.0}};
   frc::Matrixd<2, 2> discRTruth{{4.0, 0.0}, {0.0, 2.0}};
 
-  frc::Matrixd<2, 2> discR = frc::DiscretizeR<2>(contR, 500_ms);
+  frc::Matrixd<2, 2> discR = frc::DiscretizeR<2>(contR, 500.0 * mp::ms);
 
   EXPECT_LT((discRTruth - discR).norm(), 1e-10)
       << "Expected these to be nearly equal:\ndiscR:\n"

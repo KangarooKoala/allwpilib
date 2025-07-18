@@ -13,11 +13,11 @@
 #include <gtest/gtest.h>
 #include <wpi/array.h>
 
-#include "units/time.h"
+#include "frc/units.h"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
+static constexpr auto kFilterStep = 5.0 * mp::ms;
+static constexpr auto kFilterTime = 2.0 * mp::s;
 static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
 static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
 static constexpr double kHighPassTimeConstant = 0.006631;
@@ -106,8 +106,8 @@ class LinearFilterOutputTest
  */
 TEST_P(LinearFilterOutputTest, Output) {
   double filterOutput = 0.0;
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    filterOutput = m_filter.Calculate(m_data(t.value()));
+  for (auto t = 0.0 * mp::s; t < kFilterTime; t += kFilterStep) {
+    filterOutput = m_filter.Calculate(m_data(mp::value(t)));
   }
 
   RecordProperty("LinearFilterOutput", filterOutput);
@@ -121,7 +121,7 @@ INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                                          kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
+void AssertCentralResults(F&& f, DfDx&& dfdx, mp::quantity<mp::s> h, double min,
                           double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
@@ -135,10 +135,10 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
       frc::LinearFilter<double>::FiniteDifference<Derivative, Samples>(stencil,
                                                                        h);
 
-  for (int i = min / h.value(); i < max / h.value(); ++i) {
+  for (int i = min / mp::value(h); i < max / mp::value(h); ++i) {
     // Let filter initialize
-    if (i < static_cast<int>(min / h.value()) + Samples) {
-      filter.Calculate(f(i * h.value()));
+    if (i < static_cast<int>(min / mp::value(h)) + Samples) {
+      filter.Calculate(f(i * mp::value(h)));
       continue;
     }
 
@@ -146,30 +146,30 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
     // half the window size in the past.
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()),
-                filter.Calculate(f(i * h.value())),
-                std::pow(h.value(), Samples - Derivative));
+    EXPECT_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * mp::value(h)),
+                filter.Calculate(f(i * mp::value(h))),
+                std::pow(mp::value(h), Samples - Derivative));
   }
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
-                           double max) {
+void AssertBackwardResults(F&& f, DfDx&& dfdx, mp::quantity<mp::s> h,
+                           double min, double max) {
   auto filter =
       frc::LinearFilter<double>::BackwardFiniteDifference<Derivative, Samples>(
           h);
 
-  for (int i = min / h.value(); i < max / h.value(); ++i) {
+  for (int i = min / mp::value(h); i < max / mp::value(h); ++i) {
     // Let filter initialize
-    if (i < static_cast<int>(min / h.value()) + Samples) {
-      filter.Calculate(f(i * h.value()));
+    if (i < static_cast<int>(min / mp::value(h)) + Samples) {
+      filter.Calculate(f(i * mp::value(h)));
       continue;
     }
 
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx(i * h.value()), filter.Calculate(f(i * h.value())),
-                10.0 * std::pow(h.value(), Samples - Derivative));
+    EXPECT_NEAR(dfdx(i * mp::value(h)), filter.Calculate(f(i * mp::value(h))),
+                10.0 * std::pow(mp::value(h), Samples - Derivative));
   }
 }
 
@@ -177,7 +177,7 @@ void AssertBackwardResults(F&& f, DfDx&& dfdx, units::second_t h, double min,
  * Test central finite difference.
  */
 TEST(LinearFilterOutputTest, CentralFiniteDifference) {
-  constexpr auto h = 5_ms;
+  constexpr auto h = 5.0 * mp::ms;
 
   AssertCentralResults<1, 3>(
       [](double x) {
@@ -250,7 +250,7 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
  * Test backward finite difference.
  */
 TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
-  constexpr auto h = 5_ms;
+  constexpr auto h = 5.0 * mp::ms;
 
   AssertBackwardResults<1, 2>(
       [](double x) {

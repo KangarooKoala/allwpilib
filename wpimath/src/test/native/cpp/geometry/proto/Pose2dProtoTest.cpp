@@ -11,8 +11,8 @@ using namespace frc;
 
 namespace {
 
-const Pose2d kExpectedData =
-    Pose2d{Translation2d{0.191_m, 2.2_m}, Rotation2d{22.9_rad}};
+const Pose2d kExpectedData = Pose2d{Translation2d{0.191 * mp::m, 2.2 * mp::m},
+                                    Rotation2d{22.9 * mp::rad}};
 }  // namespace
 
 TEST(Pose2dProtoTest, Roundtrip) {

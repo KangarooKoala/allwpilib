@@ -11,8 +11,8 @@ using namespace frc;
 
 namespace {
 
-const ChassisSpeeds kExpectedData =
-    ChassisSpeeds{2.29_mps, 2.2_mps, 0.3504_rad_per_s};
+const ChassisSpeeds kExpectedData = ChassisSpeeds{
+    2.29 * mp::m / mp::s, 2.2 * mp::m / mp::s, 0.3504 * mp::rad / mp::s};
 }  // namespace
 
 TEST(ChassisSpeedsProtoTest, Roundtrip) {
@@ -23,7 +23,7 @@ TEST(ChassisSpeedsProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.vx.value(), unpacked_data->vx.value());
-  EXPECT_EQ(kExpectedData.vy.value(), unpacked_data->vy.value());
-  EXPECT_EQ(kExpectedData.omega.value(), unpacked_data->omega.value());
+  EXPECT_EQ(mp::value(kExpectedData.vx), mp::value(unpacked_data->vx));
+  EXPECT_EQ(mp::value(kExpectedData.vy), mp::value(unpacked_data->vy));
+  EXPECT_EQ(mp::value(kExpectedData.omega), mp::value(unpacked_data->omega));
 }

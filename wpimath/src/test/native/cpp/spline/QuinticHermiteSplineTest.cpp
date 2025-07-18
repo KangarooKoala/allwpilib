@@ -11,8 +11,7 @@
 #include "frc/spline/QuinticHermiteSpline.h"
 #include "frc/spline/SplineHelper.h"
 #include "frc/spline/SplineParameterizer.h"
-#include "units/angle.h"
-#include "units/length.h"
+#include "frc/units.h"
 
 using namespace frc;
 
@@ -30,44 +29,47 @@ class QuinticHermiteSplineTest : public ::testing::Test {
 
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = p0.first.Log(p1.first);
-      EXPECT_LT(std::abs(twist.dx.value()),
-                SplineParameterizer::kMaxDx.value());
-      EXPECT_LT(std::abs(twist.dy.value()),
-                SplineParameterizer::kMaxDy.value());
-      EXPECT_LT(std::abs(twist.dtheta.value()),
-                SplineParameterizer::kMaxDtheta.value());
+      EXPECT_LT(std::abs(mp::value(twist.dx)),
+                mp::value(SplineParameterizer::kMaxDx));
+      EXPECT_LT(std::abs(mp::value(twist.dy)),
+                mp::value(SplineParameterizer::kMaxDy));
+      EXPECT_LT(std::abs(mp::value(twist.dtheta)),
+                mp::value(SplineParameterizer::kMaxDtheta));
     }
 
     // Check first point.
-    EXPECT_NEAR(poses.front().first.X().value(), a.X().value(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Y().value(), a.Y().value(), 1E-9);
-    EXPECT_NEAR(poses.front().first.Rotation().Radians().value(),
-                a.Rotation().Radians().value(), 1E-9);
+    EXPECT_NEAR(mp::value(poses.front().first.X()), mp::value(a.X()), 1E-9);
+    EXPECT_NEAR(mp::value(poses.front().first.Y()), mp::value(a.Y()), 1E-9);
+    EXPECT_NEAR(mp::value(poses.front().first.Rotation().Radians()),
+                mp::value(a.Rotation().Radians()), 1E-9);
 
     // Check last point.
-    EXPECT_NEAR(poses.back().first.X().value(), b.X().value(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Y().value(), b.Y().value(), 1E-9);
-    EXPECT_NEAR(poses.back().first.Rotation().Radians().value(),
-                b.Rotation().Radians().value(), 1E-9);
+    EXPECT_NEAR(mp::value(poses.back().first.X()), mp::value(b.X()), 1E-9);
+    EXPECT_NEAR(mp::value(poses.back().first.Y()), mp::value(b.Y()), 1E-9);
+    EXPECT_NEAR(mp::value(poses.back().first.Rotation().Radians()),
+                mp::value(b.Rotation().Radians()), 1E-9);
   }
 };
 }  // namespace frc
 
 TEST_F(QuinticHermiteSplineTest, StraightLine) {
-  Run(Pose2d{}, Pose2d{3_m, 0_m, 0_deg});
+  Run(Pose2d{}, Pose2d{3.0 * mp::m, 0.0 * mp::m, 0.0 * mp::deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, SimpleSCurve) {
-  Run(Pose2d{}, Pose2d{1_m, 1_m, 0_deg});
+  Run(Pose2d{}, Pose2d{1.0 * mp::m, 1.0 * mp::m, 0.0 * mp::deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, SquigglyCurve) {
-  Run(Pose2d{0_m, 0_m, 90_deg}, Pose2d{-1_m, 0_m, 90_deg});
+  Run(Pose2d{0.0 * mp::m, 0.0 * mp::m, 90.0 * mp::deg},
+      Pose2d{-1.0 * mp::m, 0.0 * mp::m, 90.0 * mp::deg});
 }
 
 TEST_F(QuinticHermiteSplineTest, ThrowsOnMalformed) {
-  EXPECT_THROW(Run(Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}),
+  EXPECT_THROW(Run(Pose2d{0.0 * mp::m, 0.0 * mp::m, 0.0 * mp::deg},
+                   Pose2d{1.0 * mp::m, 0.0 * mp::m, 180.0 * mp::deg}),
                SplineParameterizer::MalformedSplineException);
-  EXPECT_THROW(Run(Pose2d{10_m, 10_m, 90_deg}, Pose2d{10_m, 11_m, -90_deg}),
+  EXPECT_THROW(Run(Pose2d{10.0 * mp::m, 10.0 * mp::m, 90.0 * mp::deg},
+                   Pose2d{10.0 * mp::m, 11.0 * mp::m, -90.0 * mp::deg}),
                SplineParameterizer::MalformedSplineException);
 }

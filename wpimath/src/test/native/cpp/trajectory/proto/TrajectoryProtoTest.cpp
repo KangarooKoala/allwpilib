@@ -14,15 +14,18 @@ namespace {
 using ProtoType = wpi::Protobuf<frc::Trajectory>;
 
 const Trajectory kExpectedData = Trajectory{std::vector<frc::Trajectory::State>{
-    Trajectory::State{1.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(1.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{2.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(2.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}},
-    Trajectory::State{3.1_s, 2.2_mps, 3.3_mps_sq,
-                      Pose2d(Translation2d(3.1_m, 2.2_m), Rotation2d(2.2_rad)),
-                      units::curvature_t{6.6}}}};
+    Trajectory::State{1.1 * mp::s, 2.2 * mp::m / mp::s, 3.3 * mp::m / mp::s2,
+                      Pose2d(Translation2d(1.1 * mp::m, 2.2 * mp::m),
+                             Rotation2d(2.2 * mp::rad)),
+                      6.6 * mp::rad / mp::m},
+    Trajectory::State{2.1 * mp::s, 2.2 * mp::m / mp::s, 3.3 * mp::m / mp::s2,
+                      Pose2d(Translation2d(2.1 * mp::m, 2.2 * mp::m),
+                             Rotation2d(2.2 * mp::rad)),
+                      6.6 * mp::rad / mp::m},
+    Trajectory::State{3.1 * mp::s, 2.2 * mp::m / mp::s, 3.3 * mp::m / mp::s2,
+                      Pose2d(Translation2d(3.1 * mp::m, 2.2 * mp::m),
+                             Rotation2d(2.2 * mp::rad)),
+                      6.6 * mp::rad / mp::m}}};
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {

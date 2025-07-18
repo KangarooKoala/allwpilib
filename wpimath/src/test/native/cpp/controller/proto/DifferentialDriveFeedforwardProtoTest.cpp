@@ -13,14 +13,14 @@ struct DifferentialDriveFeedforwardProtoTestData {
   using Type = DifferentialDriveFeedforward;
 
   inline static const Type kTestData{
-      decltype(1_V / 1_mps){0.174}, decltype(1_V / 1_mps_sq){0.229},
-      decltype(1_V / 1_mps){4.4}, decltype(1_V / 1_mps_sq){4.5}};
+      0.174 * mp::V / (mp::m / mp::s), 0.229 * mp::V / (mp::m / mp::s2),
+      4.4 * mp::V / (mp::m / mp::s), 4.5 * mp::V / (mp::m / mp::s2)};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.m_kVLinear.value(), data.m_kVLinear.value());
-    EXPECT_EQ(testData.m_kALinear.value(), data.m_kALinear.value());
-    EXPECT_EQ(testData.m_kVAngular.value(), data.m_kVAngular.value());
-    EXPECT_EQ(testData.m_kAAngular.value(), data.m_kAAngular.value());
+    EXPECT_EQ(mp::value(testData.m_kVLinear), mp::value(data.m_kVLinear));
+    EXPECT_EQ(mp::value(testData.m_kALinear), mp::value(data.m_kALinear));
+    EXPECT_EQ(mp::value(testData.m_kVAngular), mp::value(data.m_kVAngular));
+    EXPECT_EQ(mp::value(testData.m_kAAngular), mp::value(data.m_kAAngular));
   }
 };
 

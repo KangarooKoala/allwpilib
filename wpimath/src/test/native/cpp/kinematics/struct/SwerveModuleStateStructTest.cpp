@@ -12,7 +12,7 @@ namespace {
 
 using StructType = wpi::Struct<frc::SwerveModuleState>;
 const SwerveModuleState kExpectedData{
-    SwerveModuleState{22.9_mps, Rotation2d{3.3_rad}}};
+    SwerveModuleState{22.9 * mp::m / mp::s, Rotation2d{3.3 * mp::rad}}};
 }  // namespace
 
 TEST(SwerveModuleStateStructTest, Roundtrip) {
@@ -22,6 +22,6 @@ TEST(SwerveModuleStateStructTest, Roundtrip) {
 
   SwerveModuleState unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.speed.value(), unpacked_data.speed.value());
+  EXPECT_EQ(mp::value(kExpectedData.speed), mp::value(unpacked_data.speed));
   EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
 }

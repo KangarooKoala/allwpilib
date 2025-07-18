@@ -11,9 +11,11 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::MecanumDriveKinematics>;
-const MecanumDriveKinematics kExpectedData{MecanumDriveKinematics{
-    Translation2d{19.1_m, 2.2_m}, Translation2d{35.04_m, 1.91_m},
-    Translation2d{1.74_m, 3.504_m}, Translation2d{3.504_m, 1.91_m}}};
+const MecanumDriveKinematics kExpectedData{
+    MecanumDriveKinematics{Translation2d{19.1 * mp::m, 2.2 * mp::m},
+                           Translation2d{35.04 * mp::m, 1.91 * mp::m},
+                           Translation2d{1.74 * mp::m, 3.504 * mp::m},
+                           Translation2d{3.504 * mp::m, 1.91 * mp::m}}};
 }  // namespace
 
 TEST(MecanumDriveKinematicsStructTest, Roundtrip) {

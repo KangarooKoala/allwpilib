@@ -14,6 +14,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/kinematics/MecanumDriveKinematics.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
+#include "frc/units.h"
 
 void testFollowTrajectory(
     const frc::MecanumDriveKinematics& kinematics,
@@ -24,8 +25,8 @@ void testFollowTrajectory(
     std::function<frc::Pose2d(frc::Trajectory::State&)>
         visionMeasurementGenerator,
     const frc::Pose2d& startingPose, const frc::Pose2d& endingPose,
-    const units::second_t dt, const units::second_t kVisionUpdateRate,
-    const units::second_t kVisionUpdateDelay, const bool checkError,
+    const mp::quantity<mp::s> dt, const mp::quantity<mp::s> kVisionUpdateRate,
+    const mp::quantity<mp::s> kVisionUpdateDelay, const bool checkError,
     const bool debug) {
   frc::MecanumDriveWheelPositions wheelPositions{};
 
@@ -35,10 +36,10 @@ void testFollowTrajectory(
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  units::second_t t = 0_s;
+  mp::quantity<mp::s> t = 0.0 * mp::s;
 
-  std::vector<std::pair<units::second_t, frc::Pose2d>> visionPoses;
-  std::vector<std::tuple<units::second_t, units::second_t, frc::Pose2d>>
+  std::vector<std::pair<mp::quantity<mp::s>, frc::Pose2d>> visionPoses;
+  std::vector<std::tuple<mp::quantity<mp::s>, mp::quantity<mp::s>, frc::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -57,9 +58,10 @@ void testFollowTrajectory(
         visionPoses.back().first + kVisionUpdateRate < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
-          frc::Transform2d{frc::Translation2d{distribution(generator) * 0.1_m,
-                                              distribution(generator) * 0.1_m},
-                           frc::Rotation2d{distribution(generator) * 0.05_rad}};
+          frc::Transform2d{
+              frc::Translation2d{distribution(generator) * 0.1 * mp::m,
+                                 distribution(generator) * 0.1 * mp::m},
+              frc::Rotation2d{distribution(generator) * 0.05 * mp::rad}};
       visionPoses.push_back({t, visionPose});
     }
 
@@ -85,22 +87,23 @@ void testFollowTrajectory(
 
     auto xhat = estimator.UpdateWithTime(
         t,
-        frc::Rotation3d{groundTruthState.pose.Rotation() +
-                        frc::Rotation2d{distribution(generator) * 0.05_rad} -
-                        trajectory.InitialPose().Rotation()},
+        frc::Rotation3d{
+            groundTruthState.pose.Rotation() +
+            frc::Rotation2d{distribution(generator) * 0.05 * mp::rad} -
+            trajectory.InitialPose().Rotation()},
         wheelPositions);
 
     if (debug) {
-      wpi::print(
-          "{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
-          xhat.Y().value(), xhat.Rotation().ToRotation2d().Radians().value(),
-          groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
-          groundTruthState.pose.Rotation().Radians().value());
+      wpi::print("{}, {}, {}, {}, {}, {}, {}\n", mp::value(t),
+                 mp::value(xhat.X()), mp::value(xhat.Y()),
+                 mp::value(xhat.Rotation().ToRotation2d().Radians()),
+                 mp::value(groundTruthState.pose.X()),
+                 mp::value(groundTruthState.pose.Y()),
+                 mp::value(groundTruthState.pose.Rotation().Radians()));
     }
 
-    double error = groundTruthState.pose.Translation()
-                       .Distance(xhat.Translation().ToTranslation2d())
-                       .value();
+    double error = mp::value(groundTruthState.pose.Translation().Distance(
+        xhat.Translation().ToTranslation2d()));
 
     if (error > maxError) {
       maxError = error;
@@ -113,29 +116,27 @@ void testFollowTrajectory(
   if (debug) {
     wpi::print("apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
-    units::second_t apply_time;
-    units::second_t measure_time;
+    mp::quantity<mp::s> apply_time;
+    mp::quantity<mp::s> measure_time;
     frc::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
-      wpi::print("{}, {}, {}, {}, {}\n", apply_time.value(),
-                 measure_time.value(), vision_pose.X().value(),
-                 vision_pose.Y().value(),
-                 vision_pose.Rotation().Radians().value());
+      wpi::print("{}, {}, {}, {}, {}\n", mp::value(apply_time),
+                 mp::value(measure_time), mp::value(vision_pose.X()),
+                 mp::value(vision_pose.Y()),
+                 mp::value(vision_pose.Rotation().Radians()));
     }
   }
 
-  EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.08);
-  EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.08);
-  EXPECT_NEAR(endingPose.Rotation().Radians().value(),
-              estimator.GetEstimatedPosition()
-                  .Rotation()
-                  .ToRotation2d()
-                  .Radians()
-                  .value(),
-              0.15);
+  EXPECT_NEAR(mp::value(endingPose.X()),
+              mp::value(estimator.GetEstimatedPosition().X()), 0.08);
+  EXPECT_NEAR(mp::value(endingPose.Y()),
+              mp::value(estimator.GetEstimatedPosition().Y()), 0.08);
+  EXPECT_NEAR(
+      mp::value(endingPose.Rotation().Radians()),
+      mp::value(
+          estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians()),
+      0.15);
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
@@ -146,8 +147,10 @@ void testFollowTrajectory(
 
 TEST(MecanumDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
@@ -156,27 +159,31 @@ TEST(MecanumDrivePoseEstimator3dTest, AccuracyFacingTrajectory) {
       frc::Pose3d{}, {0.1, 0.1, 0.1, 0.1}, {0.45, 0.45, 0.45, 0.45}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2.0_mps, 2.0_mps_sq));
+      std::vector{frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 45.0 * mp::deg},
+                  frc::Pose2d{3.0 * mp::m, 0.0 * mp::m, -90.0 * mp::deg},
+                  frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 135.0 * mp::deg},
+                  frc::Pose2d{-3.0 * mp::m, 0.0 * mp::m, -90.0 * mp::deg},
+                  frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 45.0 * mp::deg}},
+      frc::TrajectoryConfig(2.0 * mp::m / mp::s, 2.0 * mp::m / mp::s2));
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
       [&](frc::Trajectory::State& state) {
-        return frc::ChassisSpeeds{state.velocity, 0_mps,
+        return frc::ChassisSpeeds{state.velocity, 0.0 * mp::m / mp::s,
                                   state.velocity * state.curvature};
       },
       [&](frc::Trajectory::State& state) { return state.pose; },
-      trajectory.InitialPose(), {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms,
-      100_ms, 250_ms, true, false);
+      trajectory.InitialPose(),
+      {0.0 * mp::m, 0.0 * mp::m, frc::Rotation2d{45.0 * mp::deg}},
+      20.0 * mp::ms, 100.0 * mp::ms, 250.0 * mp::ms, true, false);
 }
 
 TEST(MecanumDrivePoseEstimator3dTest, BadInitialPose) {
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
@@ -185,34 +192,38 @@ TEST(MecanumDrivePoseEstimator3dTest, BadInitialPose) {
       frc::Pose3d{}, {0.1, 0.1, 0.1, 0.1}, {0.45, 0.45, 0.45, 0.1}};
 
   frc::Trajectory trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      std::vector{frc::Pose2d{0_m, 0_m, 45_deg}, frc::Pose2d{3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 135_deg},
-                  frc::Pose2d{-3_m, 0_m, -90_deg},
-                  frc::Pose2d{0_m, 0_m, 45_deg}},
-      frc::TrajectoryConfig(2.0_mps, 2.0_mps_sq));
+      std::vector{frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 45.0 * mp::deg},
+                  frc::Pose2d{3.0 * mp::m, 0.0 * mp::m, -90.0 * mp::deg},
+                  frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 135.0 * mp::deg},
+                  frc::Pose2d{-3.0 * mp::m, 0.0 * mp::m, -90.0 * mp::deg},
+                  frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 45.0 * mp::deg}},
+      frc::TrajectoryConfig(2.0 * mp::m / mp::s, 2.0 * mp::m / mp::s2));
 
-  for (units::degree_t offset_direction_degs = 0_deg;
-       offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
-    for (units::degree_t offset_heading_degs = 0_deg;
-         offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
+  for (mp::quantity<mp::deg> offset_direction_degs = 0.0 * mp::deg;
+       offset_direction_degs < 360.0 * mp::deg;
+       offset_direction_degs += 45.0 * mp::deg) {
+    for (mp::quantity<mp::deg> offset_heading_degs = 0.0 * mp::deg;
+         offset_heading_degs < 360.0 * mp::deg;
+         offset_heading_degs += 45.0 * mp::deg) {
       auto pose_offset = frc::Rotation2d{offset_direction_degs};
       auto heading_offset = frc::Rotation2d{offset_heading_degs};
 
       auto initial_pose =
           trajectory.InitialPose() +
-          frc::Transform2d{frc::Translation2d{pose_offset.Cos() * 1_m,
-                                              pose_offset.Sin() * 1_m},
+          frc::Transform2d{frc::Translation2d{pose_offset.Cos() * 1.0 * mp::m,
+                                              pose_offset.Sin() * 1.0 * mp::m},
                            heading_offset};
 
       testFollowTrajectory(
           kinematics, estimator, trajectory,
           [&](frc::Trajectory::State& state) {
-            return frc::ChassisSpeeds{state.velocity, 0_mps,
+            return frc::ChassisSpeeds{state.velocity, 0.0 * mp::m / mp::s,
                                       state.velocity * state.curvature};
           },
           [&](frc::Trajectory::State& state) { return state.pose; },
-          initial_pose, {0_m, 0_m, frc::Rotation2d{45_deg}}, 20_ms, 100_ms,
-          250_ms, false, false);
+          initial_pose,
+          {0.0 * mp::m, 0.0 * mp::m, frc::Rotation2d{45.0 * mp::deg}},
+          20.0 * mp::ms, 100.0 * mp::ms, 250.0 * mp::ms, false, false);
     }
   }
 }
@@ -224,8 +235,10 @@ TEST(MecanumDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   // outcome. If that were the case, after 1000 measurements, the estimated
   // pose would converge to that measurement.
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
 
   frc::MecanumDriveWheelPositions wheelPositions;
 
@@ -233,64 +246,79 @@ TEST(MecanumDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
       kinematics,
       frc::Rotation3d{},
       wheelPositions,
-      frc::Pose3d{1_m, 2_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 270_deg}},
+      frc::Pose3d{
+          1.0 * mp::m, 2.0 * mp::m, 0.0 * mp::m,
+          frc::Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 270.0 * mp::deg}},
       {0.1, 0.1, 0.1, 0.1},
       {0.45, 0.45, 0.45, 0.1}};
 
-  estimator.UpdateWithTime(0_s, frc::Rotation3d{}, wheelPositions);
+  estimator.UpdateWithTime(0.0 * mp::s, frc::Rotation3d{}, wheelPositions);
 
   for (int i = 0; i < 1000; i++) {
     estimator.AddVisionMeasurement(
-        frc::Pose3d{0_m, 0_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 0_deg}}, 0_s);
+        frc::Pose3d{
+            0.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+            frc::Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+        0.0 * mp::s);
     estimator.AddVisionMeasurement(
-        frc::Pose3d{3_m, 1_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 90_deg}}, 0_s);
+        frc::Pose3d{
+            3.0 * mp::m, 1.0 * mp::m, 0.0 * mp::m,
+            frc::Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 90.0 * mp::deg}},
+        0.0 * mp::s);
     estimator.AddVisionMeasurement(
-        frc::Pose3d{2_m, 4_m, 0_m, frc::Rotation3d{0_deg, 0_deg, 180_deg}},
-        0_s);
+        frc::Pose3d{
+            2.0 * mp::m, 4.0 * mp::m, 0.0 * mp::m,
+            frc::Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 180.0 * mp::deg}},
+        0.0 * mp::s);
   }
 
   {
-    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
-    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
-    auto dtheta = units::math::abs(
+    auto dx = mp::abs(estimator.GetEstimatedPosition().X() - 0.0 * mp::m);
+    auto dy = mp::abs(estimator.GetEstimatedPosition().Y() - 0.0 * mp::m);
+    auto dtheta = mp::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
-        0_deg);
+        0.0 * mp::deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.08 * mp::m || dy > 0.08 * mp::m ||
+                dtheta > 0.08 * mp::rad);
   }
 
   {
-    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
-    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
-    auto dtheta = units::math::abs(
+    auto dx = mp::abs(estimator.GetEstimatedPosition().X() - 3.0 * mp::m);
+    auto dy = mp::abs(estimator.GetEstimatedPosition().Y() - 1.0 * mp::m);
+    auto dtheta = mp::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
-        90_deg);
+        90.0 * mp::deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.08 * mp::m || dy > 0.08 * mp::m ||
+                dtheta > 0.08 * mp::rad);
   }
 
   {
-    auto dx = units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
-    auto dy = units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
-    auto dtheta = units::math::abs(
+    auto dx = mp::abs(estimator.GetEstimatedPosition().X() - 2.0 * mp::m);
+    auto dy = mp::abs(estimator.GetEstimatedPosition().Y() - 4.0 * mp::m);
+    auto dtheta = mp::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
-        180_deg);
+        180.0 * mp::deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    EXPECT_TRUE(dx > 0.08 * mp::m || dy > 0.08 * mp::m ||
+                dtheta > 0.08 * mp::rad);
   }
 }
 
 TEST(MecanumDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
 
   frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,    frc::Rotation3d{},    frc::MecanumDriveWheelPositions{},
       frc::Pose3d{}, {0.1, 0.1, 0.1, 0.1}, {0.45, 0.45, 0.45, 0.45}};
 
   // Add enough measurements to fill up the buffer
-  for (auto time = 0_s; time < 4_s; time += 20_ms) {
+  for (auto time = 0.0 * mp::s; time < 4.0 * mp::s; time += 20.0 * mp::ms) {
     estimator.UpdateWithTime(time, frc::Rotation3d{},
                              frc::MecanumDriveWheelPositions{});
   }
@@ -299,168 +327,209 @@ TEST(MecanumDrivePoseEstimator3dTest, TestDiscardStaleVisionMeasurements) {
 
   // Apply a vision measurement from 3 seconds ago
   estimator.AddVisionMeasurement(
-      frc::Pose3d{10_m, 10_m, 0_m, frc::Rotation3d{0_rad, 0_rad, 0.1_rad}}, 1_s,
-      {0.1, 0.1, 0.1, 0.1});
+      frc::Pose3d{10.0 * mp::m, 10.0 * mp::m, 0.0 * mp::m,
+                  frc::Rotation3d{0.0 * mp::rad, 0.0 * mp::rad, 0.1 * mp::rad}},
+      1.0 * mp::s, {0.1, 0.1, 0.1, 0.1});
 
-  EXPECT_NEAR(odometryPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Z().value(),
-              estimator.GetEstimatedPosition().Z().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Rotation().X().value(),
-              estimator.GetEstimatedPosition().Rotation().X().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Rotation().Y().value(),
-              estimator.GetEstimatedPosition().Rotation().Y().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Rotation().Z().value(),
-              estimator.GetEstimatedPosition().Rotation().Z().value(), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.X()),
+              mp::value(estimator.GetEstimatedPosition().X()), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.Y()),
+              mp::value(estimator.GetEstimatedPosition().Y()), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.Z()),
+              mp::value(estimator.GetEstimatedPosition().Z()), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.Rotation().X()),
+              mp::value(estimator.GetEstimatedPosition().Rotation().X()), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.Rotation().Y()),
+              mp::value(estimator.GetEstimatedPosition().Rotation().Y()), 1e-6);
+  EXPECT_NEAR(mp::value(odometryPose.Rotation().Z()),
+              mp::value(estimator.GetEstimatedPosition().Rotation().Z()), 1e-6);
 }
 
 TEST(MecanumDrivePoseEstimator3dTest, TestSampleAt) {
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
   frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,    frc::Rotation3d{},    frc::MecanumDriveWheelPositions{},
       frc::Pose3d{}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}};
 
   // Returns empty when null
-  EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
+  EXPECT_EQ(std::nullopt, estimator.SampleAt(1.0 * mp::s));
 
   // Add odometry measurements, but don't fill up the buffer
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    frc::MecanumDriveWheelPositions wheelPositions{
-        units::meter_t{time}, units::meter_t{time}, units::meter_t{time},
-        units::meter_t{time}};
-    estimator.UpdateWithTime(units::second_t{time}, frc::Rotation3d{},
-                             wheelPositions);
+    frc::MecanumDriveWheelPositions wheelPositions{time * mp::m, time * mp::m,
+                                                   time * mp::m, time * mp::m};
+    estimator.UpdateWithTime(time * mp::s, frc::Rotation3d{}, wheelPositions);
   }
 
   // Sample at an added time
-  EXPECT_EQ(std::optional(frc::Pose3d{1.02_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.02_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.02 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.02 * mp::s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(std::optional(frc::Pose3d{1.01_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.01_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.01 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.01 * mp::s));
   // Sampling before the oldest value returns the oldest value
-  EXPECT_EQ(std::optional(frc::Pose3d{1_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(0.5_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(0.5 * mp::s));
   // Sampling after the newest value returns the newest value
-  EXPECT_EQ(std::optional(frc::Pose3d{2_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{2.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(2.5 * mp::s));
 
   // Add a vision measurement after the odometry measurements (while keeping all
   // of the old odometry measurements)
   estimator.AddVisionMeasurement(
-      frc::Pose3d{2_m, 0_m, 0_m, frc::Rotation3d{0_rad, 0_rad, 1_rad}}, 2.2_s);
+      frc::Pose3d{2.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                  frc::Rotation3d{0.0 * mp::rad, 0.0 * mp::rad, 1.0 * mp::rad}},
+      2.2 * mp::s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(std::optional(frc::Pose3d{1.02_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(frc::Pose3d{1.01_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(frc::Pose3d{1_m, 0_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(0.5_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.02 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.02 * mp::s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.01 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.01 * mp::s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(0.5 * mp::s));
 
   // Add a vision measurement before the odometry measurements that's still in
   // the buffer
   estimator.AddVisionMeasurement(
-      frc::Pose3d{1_m, 0.2_m, 0_m, frc::Rotation3d{}}, 0.9_s);
+      frc::Pose3d{1.0 * mp::m, 0.2 * mp::m, 0.0 * mp::m, frc::Rotation3d{}},
+      0.9 * mp::s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-  EXPECT_EQ(std::optional(frc::Pose3d{1.02_m, 0.1_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.02_s));
-  EXPECT_EQ(std::optional(frc::Pose3d{1.01_m, 0.1_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(frc::Pose3d{1_m, 0.1_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(0.5_s));
-  EXPECT_EQ(std::optional(frc::Pose3d{2_m, 0.1_m, 0_m, frc::Rotation3d{}}),
-            estimator.SampleAt(2.5_s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.02 * mp::m, 0.1 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.02 * mp::s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.01 * mp::m, 0.1 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(1.01 * mp::s));
+  EXPECT_EQ(std::optional(frc::Pose3d{1.0 * mp::m, 0.1 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(0.5 * mp::s));
+  EXPECT_EQ(std::optional(frc::Pose3d{2.0 * mp::m, 0.1 * mp::m, 0.0 * mp::m,
+                                      frc::Rotation3d{}}),
+            estimator.SampleAt(2.5 * mp::s));
 }
 
 TEST(MecanumDrivePoseEstimator3dTest, TestReset) {
   frc::MecanumDriveKinematics kinematics{
-      frc::Translation2d{1_m, 1_m}, frc::Translation2d{1_m, -1_m},
-      frc::Translation2d{-1_m, -1_m}, frc::Translation2d{-1_m, 1_m}};
+      frc::Translation2d{1.0 * mp::m, 1.0 * mp::m},
+      frc::Translation2d{1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, -1.0 * mp::m},
+      frc::Translation2d{-1.0 * mp::m, 1.0 * mp::m}};
   frc::MecanumDrivePoseEstimator3d estimator{
       kinematics,
       frc::Rotation3d{},
       frc::MecanumDriveWheelPositions{},
-      frc::Pose3d{-1_m, -1_m, -1_m, frc::Rotation3d{0_rad, 0_rad, 1_rad}},
+      frc::Pose3d{-1.0 * mp::m, -1.0 * mp::m, -1.0 * mp::m,
+                  frc::Rotation3d{0.0 * mp::rad, 0.0 * mp::rad, 1.0 * mp::rad}},
       {1.0, 1.0, 1.0, 1.0},
       {1.0, 1.0, 1.0, 1.0}};
 
   // Test initial pose
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Rotation().Z().value());
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
+  EXPECT_DOUBLE_EQ(1,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test reset position
-  estimator.ResetPosition(frc::Rotation3d{}, {1_m, 1_m, 1_m, 1_m},
-                          frc::Pose3d{1_m, 0_m, 0_m, frc::Rotation3d{}});
+  estimator.ResetPosition(
+      frc::Rotation3d{}, {1.0 * mp::m, 1.0 * mp::m, 1.0 * mp::m, 1.0 * mp::m},
+      frc::Pose3d{1.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m, frc::Rotation3d{}});
 
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Z().value());
+  EXPECT_DOUBLE_EQ(1, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test orientation and wheel positions
-  estimator.Update(frc::Rotation3d{}, {2_m, 2_m, 2_m, 2_m});
+  estimator.Update(frc::Rotation3d{},
+                   {2.0 * mp::m, 2.0 * mp::m, 2.0 * mp::m, 2.0 * mp::m});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Z().value());
+  EXPECT_DOUBLE_EQ(2, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test reset rotation
-  estimator.ResetRotation(frc::Rotation3d{0_deg, 0_deg, 90_deg});
+  estimator.ResetRotation(
+      frc::Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 90.0 * mp::deg});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(2, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2,
-                   estimator.GetEstimatedPosition().Rotation().Z().value());
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test orientation
-  estimator.Update(frc::Rotation3d{}, {3_m, 3_m, 3_m, 3_m});
+  estimator.Update(frc::Rotation3d{},
+                   {3.0 * mp::m, 3.0 * mp::m, 3.0 * mp::m, 3.0 * mp::m});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(2, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(1, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2,
-                   estimator.GetEstimatedPosition().Rotation().Z().value());
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test reset translation
-  estimator.ResetTranslation(frc::Translation3d{-1_m, -1_m, -1_m});
+  estimator.ResetTranslation(
+      frc::Translation3d{-1.0 * mp::m, -1.0 * mp::m, -1.0 * mp::m});
 
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(-1, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
   EXPECT_DOUBLE_EQ(std::numbers::pi / 2,
-                   estimator.GetEstimatedPosition().Rotation().Z().value());
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 
   // Test reset pose
   estimator.ResetPose(frc::Pose3d{});
 
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Z().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Y().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Rotation().Z().value());
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().X()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Y()));
+  EXPECT_DOUBLE_EQ(0, mp::value(estimator.GetEstimatedPosition().Z()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().X()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Y()));
+  EXPECT_DOUBLE_EQ(0,
+                   mp::value(estimator.GetEstimatedPosition().Rotation().Z()));
 }

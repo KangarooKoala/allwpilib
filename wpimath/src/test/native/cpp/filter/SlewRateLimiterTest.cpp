@@ -6,47 +6,48 @@
 #include <wpi/timestamp.h>
 
 #include "frc/filter/SlewRateLimiter.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
-static units::second_t now = 0_s;
+static mp::quantity<mp::s> now = 0.0 * mp::s;
 
 class SlewRateLimiterTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl(
+        [] { return static_cast<uint64_t>(mp::value(now.in(mp::µs))); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
-  WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+  // WPI_SetNowImpl([] { return
+  // static_cast<uint64_t>(mp::value(now.in(mp::µs))); });
 
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  frc::SlewRateLimiter<mp::m> limiter(1.0 * mp::m / mp::s);
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
-  EXPECT_LT(limiter.Calculate(2_m), 2_m);
+  EXPECT_LT(limiter.Calculate(2.0 * mp::m), 2.0 * mp::m);
 }
 
 TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps);
+  frc::SlewRateLimiter<mp::m> limiter(1.0 * mp::m / mp::s);
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
-  EXPECT_EQ(limiter.Calculate(0.5_m), 0.5_m);
+  EXPECT_EQ(limiter.Calculate(0.5 * mp::m), 0.5 * mp::m);
 }
 
 TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
-  frc::SlewRateLimiter<units::meters> limiter(1_mps, -0.5_mps);
+  frc::SlewRateLimiter<mp::m> limiter(1.0 * mp::m / mp::s,
+                                      -0.5 * mp::m / mp::s);
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
-  EXPECT_EQ(limiter.Calculate(2_m), 1_m);
+  EXPECT_EQ(limiter.Calculate(2.0 * mp::m), 1.0 * mp::m);
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
-  EXPECT_EQ(limiter.Calculate(0_m), 0.5_m);
+  EXPECT_EQ(limiter.Calculate(0.0 * mp::m), 0.5 * mp::m);
 }

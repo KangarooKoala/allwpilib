@@ -12,7 +12,7 @@ using namespace frc;
 namespace {
 
 const SwerveModuleState kExpectedData =
-    SwerveModuleState{22.9_mps, Rotation2d{3.3_rad}};
+    SwerveModuleState{22.9 * mp::m / mp::s, Rotation2d{3.3 * mp::rad}};
 }  // namespace
 
 TEST(SwerveModuleStateProtoTest, Roundtrip) {
@@ -23,6 +23,6 @@ TEST(SwerveModuleStateProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.speed.value(), unpacked_data->speed.value());
+  EXPECT_EQ(mp::value(kExpectedData.speed), mp::value(unpacked_data->speed));
   EXPECT_EQ(kExpectedData.angle, unpacked_data->angle);
 }

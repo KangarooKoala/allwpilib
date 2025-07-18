@@ -11,8 +11,8 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::MecanumDriveWheelPositions>;
-const MecanumDriveWheelPositions kExpectedData{
-    MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m}};
+const MecanumDriveWheelPositions kExpectedData{MecanumDriveWheelPositions{
+    17.4 * mp::m, 2.29 * mp::m, 22.9 * mp::m, 1.74 * mp::m}};
 }  // namespace
 
 TEST(MecanumDriveWheelPositionsStructTest, Roundtrip) {
@@ -22,8 +22,12 @@ TEST(MecanumDriveWheelPositionsStructTest, Roundtrip) {
 
   MecanumDriveWheelPositions unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.frontLeft.value(), unpacked_data.frontLeft.value());
-  EXPECT_EQ(kExpectedData.frontRight.value(), unpacked_data.frontRight.value());
-  EXPECT_EQ(kExpectedData.rearLeft.value(), unpacked_data.rearLeft.value());
-  EXPECT_EQ(kExpectedData.rearRight.value(), unpacked_data.rearRight.value());
+  EXPECT_EQ(mp::value(kExpectedData.frontLeft),
+            mp::value(unpacked_data.frontLeft));
+  EXPECT_EQ(mp::value(kExpectedData.frontRight),
+            mp::value(unpacked_data.frontRight));
+  EXPECT_EQ(mp::value(kExpectedData.rearLeft),
+            mp::value(unpacked_data.rearLeft));
+  EXPECT_EQ(mp::value(kExpectedData.rearRight),
+            mp::value(unpacked_data.rearRight));
 }

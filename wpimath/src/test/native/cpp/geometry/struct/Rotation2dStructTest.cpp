@@ -11,7 +11,7 @@ using namespace frc;
 namespace {
 
 using StructType = wpi::Struct<frc::Rotation2d>;
-const Rotation2d kExpectedData{Rotation2d{1.91_rad}};
+const Rotation2d kExpectedData{Rotation2d{1.91 * mp::rad}};
 }  // namespace
 
 TEST(Rotation2dStructTest, Roundtrip) {
