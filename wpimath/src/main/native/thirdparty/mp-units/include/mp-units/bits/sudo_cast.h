@@ -35,7 +35,7 @@ constexpr bool has_common_type_v = requires { typename std::common_type_t<Ts...>
 
 template<typename T, typename Other>
 using maybe_common_type =
-  std::conditional_t<has_common_type_v<T, Other>, std::common_type<T, Other>, std::type_identity<T>>::type;
+  typename std::conditional_t<has_common_type_v<T, Other>, std::common_type<T, Other>, std::type_identity<T>>::type;
 
 /**
  * @brief Type-related details about the conversion from one quantity to another
@@ -104,7 +104,7 @@ template<Quantity To, typename FwdFrom, Quantity From = std::remove_cvref_t<FwdF
   constexpr auto q_unit = From::unit;
   if constexpr (equivalent(q_unit, To::unit)) {
     // no scaling of the number needed
-    return {static_cast<To::rep>(std::forward<FwdFrom>(q).numerical_value_is_an_implementation_detail_),
+    return {static_cast<typename To::rep>(std::forward<FwdFrom>(q).numerical_value_is_an_implementation_detail_),
             To::reference};  // this is the only (and recommended) way to do a truncating conversion on a number, so we
                              // are using static_cast to suppress all the compiler warnings on conversions
   } else {
@@ -115,7 +115,7 @@ template<Quantity To, typename FwdFrom, Quantity From = std::remove_cvref_t<FwdF
     // auto scale = [&](std::invocable<typename type_traits::c_type> auto func) {
     auto scale = [&](auto func) {
       auto res =
-        static_cast<To::rep>(func(static_cast<type_traits::c_type>(q.numerical_value_is_an_implementation_detail_)));
+        static_cast<typename To::rep>(func(static_cast<typename type_traits::c_type>(q.numerical_value_is_an_implementation_detail_)));
       return To{res, To::reference};
     };
 

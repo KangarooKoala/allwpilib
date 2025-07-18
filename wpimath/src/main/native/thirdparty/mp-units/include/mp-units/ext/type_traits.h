@@ -57,7 +57,7 @@ struct conditional_impl<true> {
 MP_UNITS_EXPORT_BEGIN
 
 template<bool B, typename T, typename F>
-using conditional = detail::conditional_impl<B>::template type<T, F>;
+using conditional = typename detail::conditional_impl<B>::template type<T, F>;
 
 // is_same
 template<class T, class U>
@@ -104,7 +104,7 @@ constexpr bool is_derived_from_specialization_of_v = requires(T* t) { detail::to
 template<typename T>
   requires(!std::is_pointer_v<T> && !std::is_array_v<T>) &&
             requires { typename std::indirectly_readable_traits<T>::value_type; }
-using wrapped_type_t = std::indirectly_readable_traits<T>::value_type;
+using wrapped_type_t = typename std::indirectly_readable_traits<T>::value_type;
 
 namespace detail {
 
@@ -123,7 +123,7 @@ struct value_type_impl<T> {
 
 template<typename T>
   requires std::is_object_v<T>
-using value_type_t = detail::value_type_impl<T>::type;
+using value_type_t = typename detail::value_type_impl<T>::type;
 
 template<typename T, typename... Ts>
 concept one_of = (false || ... || std::same_as<T, Ts>);

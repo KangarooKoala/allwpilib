@@ -147,7 +147,7 @@ public:
     auto end = ctx.end();
 
     auto it = parse_fill_align_width(ctx, begin, end, specs_);
-    fill_align_width_format_str_ = {begin, it};
+    fill_align_width_format_str_ = {&*begin, it - begin};
     if (it == end) return it;
 
     return parse_dimension_specs(it, end);
@@ -238,7 +238,7 @@ public:
     auto end = ctx.end();
 
     auto it = parse_fill_align_width(ctx, begin, end, specs_);
-    fill_align_width_format_str_ = {begin, it};
+    fill_align_width_format_str_ = {&*begin, it - begin};
     if (it == end) return it;
 
     return parse_unit_specs(it, end);
@@ -298,9 +298,9 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
   format_specs specs_{};
 
   std::basic_string_view<Char> modifiers_format_str_;
-  std::basic_string<Char> rep_format_str_ = "{}";
-  std::basic_string<Char> unit_format_str_ = "{}";
-  std::basic_string<Char> dimension_format_str_ = "{}";
+  shim::constexpr_string<Char> rep_format_str_{"{}"};
+  shim::constexpr_string<Char> unit_format_str_{"{}"};
+  shim::constexpr_string<Char> dimension_format_str_{"{}"};
 
   MP_UNITS_STD_FMT::formatter<Rep> rep_formatter_;
   MP_UNITS_STD_FMT::formatter<unit_t> unit_formatter_;
@@ -326,7 +326,7 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
 
     void on_number()
     {
-      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.rep_format_str_,
+      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.rep_format_str_.sv(),
                                          MP_UNITS_STD_FMT::make_format_args(q.numerical_value_ref_in(q.unit)));
     }
     void on_maybe_space()
@@ -335,11 +335,11 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
     }
     void on_unit()
     {
-      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.unit_format_str_, MP_UNITS_STD_FMT::make_format_args(q.unit));
+      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.unit_format_str_.sv(), MP_UNITS_STD_FMT::make_format_args(q.unit));
     }
     void on_dimension()
     {
-      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.dimension_format_str_,
+      out = MP_UNITS_STD_FMT::vformat_to(out, locale, f.dimension_format_str_.sv(),
                                          MP_UNITS_STD_FMT::make_format_args(q.dimension));
     }
     template<std::forward_iterator It>
@@ -406,7 +406,7 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
   }
 
   template<std::forward_iterator It, typename Formatter>
-  constexpr It parse_default_spec(It begin, It end, Formatter& f, std::string& format_str)
+  constexpr It parse_default_spec(It begin, It end, Formatter& f, shim::constexpr_string<Char>& format_str)
   {
     if (begin == end || *begin != '[')
       throw MP_UNITS_STD_FMT::format_error("`default-spec` should contain a `[` character");
@@ -418,11 +418,13 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
         --nested_brackets;
       }
     }
-    format_str = "{:" + std::string(begin, it) + '}';
+    format_str = shim::constexpr_string<Char>{":{"}
+      .append(begin, it)
+      .append('}');
     if (it == end) throw MP_UNITS_STD_FMT::format_error("unmatched '[' in format string");
-    MP_UNITS_STD_FMT::basic_format_parse_context<Char> ctx(std::string_view(begin, it));
+    MP_UNITS_STD_FMT::basic_format_parse_context<Char> ctx(std::string_view(&*begin, it - begin));
     auto ptr = f.parse(ctx);
-    if (ptr != it) throw MP_UNITS_STD_FMT::format_error("invalid subentity format '" + std::string(begin, it) + "'");
+    if (ptr != it) throw MP_UNITS_STD_FMT::format_error("invalid subentity format '" + std::string(&*begin, it - begin) + "'");
     return ++it;  // skip `]`
   }
 
@@ -457,10 +459,10 @@ class MP_UNITS_STD_FMT::formatter<mp_units::quantity<Reference, Rep>, Char> {
     const std::locale locale = MP_UNITS_FMT_LOCALE(ctx.locale());
     if (modifiers_format_str_.empty()) {
       // default
-      out = MP_UNITS_STD_FMT::vformat_to(out, locale, rep_format_str_,
+      out = MP_UNITS_STD_FMT::vformat_to(out, locale, rep_format_str_.sv(),
                                          MP_UNITS_STD_FMT::make_format_args(q.numerical_value_ref_in(q.unit)));
       if constexpr (mp_units::space_before_unit_symbol<unit>) *out++ = ' ';
-      return MP_UNITS_STD_FMT::vformat_to(out, locale, unit_format_str_, MP_UNITS_STD_FMT::make_format_args(q.unit));
+      return MP_UNITS_STD_FMT::vformat_to(out, locale, unit_format_str_.sv(), MP_UNITS_STD_FMT::make_format_args(q.unit));
     }
     // user provided format
     quantity_formatter f{*this, out, q, locale};
@@ -478,7 +480,7 @@ public:
 
     const format_checker checker{};
     auto it = parse_quantity_specs(begin, end, checker);
-    modifiers_format_str_ = {begin, it};
+    modifiers_format_str_ = {&*begin, it - begin};
 
     return parse_defaults_specs(it, end);
   }

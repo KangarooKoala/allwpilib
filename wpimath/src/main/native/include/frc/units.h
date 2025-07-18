@@ -8,6 +8,7 @@
 
 #include <gcem.hpp>
 
+#include "mp-units-shims.h"
 #include "mp-units/format.h"
 #include "mp-units/framework.h"
 #include "mp-units/math.h"

@@ -118,11 +118,10 @@ template<typename T>
     if (n % 2 == 0) {
       return std::nullopt;
     } else {
-      const auto negative_result = root(-x, n);
-      if (!negative_result.has_value()) {
+      if (!root(-x, n).has_value()) {
         return std::nullopt;
       }
-      return static_cast<T>(-negative_result.value());
+      return static_cast<T>(-root(-x, n).value());
     }
   }
 
@@ -133,11 +132,10 @@ template<typename T>
 
   // Handle numbers bewtween 0 and 1.
   if (x < 1) {
-    const auto inverse_result = root(T{1} / x, n);
-    if (!inverse_result.has_value()) {
+    if (!root(T{1} / x, n).has_value()) {
       return std::nullopt;
     }
-    return static_cast<T>(T{1} / inverse_result.value());
+    return static_cast<T>(T{1} / root(T{1} / x, n).value());
   }
 
   //
@@ -158,14 +156,14 @@ template<typename T>
   while (lo < hi) {
     long double mid = lo + (hi - lo) / 2;
 
-    auto result = checked_int_pow(mid, n);
+    #define RESULT checked_int_pow(mid, n)
 
-    if (!result.has_value()) {
+    if (!RESULT.has_value()) {
       return std::nullopt;
     }
 
     // Early return if we get lucky with an exact answer.
-    if (result.value() == xld) {
+    if (RESULT.value() == xld) {
       return static_cast<T>(mid);
     }
 
@@ -175,17 +173,21 @@ template<typename T>
     }
 
     // Preserve the invariant that `checked_int_pow(lo, n) < x < checked_int_pow(hi, n)`.
-    if (result.value() < xld) {
+    if (RESULT.value() < xld) {
       lo = mid;
     } else {
       hi = mid;
     }
+
+    #undef RESULT
   }
 
   // Pick whichever one gets closer to the target.
-  const auto lo_diff = xld - checked_int_pow(lo, n).value();
-  const auto hi_diff = checked_int_pow(hi, n).value() - xld;
-  return static_cast<T>(lo_diff < hi_diff ? lo : hi);
+  #define LO_DIFF xld - checked_int_pow(lo, n).value()
+  #define HI_DIFF checked_int_pow(hi, n).value() - xld
+  return static_cast<T>(LO_DIFF < HI_DIFF ? lo : hi);
+  #undef HI_DIFF
+  #undef LO_DIFF
 }
 
 // A converter for the value member variable of magnitude (below).

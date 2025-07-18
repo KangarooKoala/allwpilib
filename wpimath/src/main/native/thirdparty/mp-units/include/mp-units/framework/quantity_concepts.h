@@ -56,7 +56,7 @@ concept Quantity = detail::is_derived_from_specialization_of_quantity<T>;
 namespace detail {
 
 template<typename T, template<typename> typename Traits>
-concept QuantityLikeImpl = requires(const T& qty, const Traits<T>::rep& num) {
+concept QuantityLikeImpl = requires(const T& qty, const typename Traits<T>::rep& num) {
   { Traits<T>::to_numerical_value(qty) } -> std::same_as<typename Traits<T>::rep>;
   { Traits<T>::from_numerical_value(num) } -> std::same_as<T>;
   requires std::same_as<decltype(Traits<T>::explicit_import), const bool>;

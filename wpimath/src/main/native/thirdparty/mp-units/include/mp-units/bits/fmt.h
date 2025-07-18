@@ -370,7 +370,7 @@ template<std::forward_iterator It, typename Specs>
         auto c = *begin;
         if (c == '}') return begin;
         if (c == '{') MP_UNITS_THROW(MP_UNITS_STD_FMT::format_error("invalid fill character '{'"));
-        specs.fill = {begin, p};
+        specs.fill = {&*begin, p - begin};
         begin = p + 1;
       } else {
         ++begin;

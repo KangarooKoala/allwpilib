@@ -168,9 +168,9 @@ template<typename T>
   //
   // Note that since this function should only be called at compile time, the point of these
   // terminations is to act as "static_assert substitutes", not to actually terminate at runtime.
-  const auto exp = get_exponent(el);
+  #define EXP get_exponent(el)
 
-  if (exp.num < 0) {
+  if (EXP.num < 0) {
     if constexpr (std::is_integral_v<T>) {
       std::abort();  // Cannot represent reciprocal as integer
     } else {
@@ -178,19 +178,20 @@ template<typename T>
     }
   }
 
-  const auto pow_result =
-    checked_int_pow(static_cast<widen_t<T>>(get_base_value(el)), static_cast<std::uintmax_t>(exp.num));
-  if (pow_result.has_value()) {
-    const auto final_result =
-      (exp.den > 1) ? root(pow_result.value(), static_cast<std::uintmax_t>(exp.den)) : pow_result;
-    if (final_result.has_value()) {
-      return final_result.value();
+  #define POW_RESULT checked_int_pow(static_cast<widen_t<T>>(get_base_value(el)), static_cast<std::uintmax_t>(EXP.num))
+  if (POW_RESULT.has_value()) {
+    #define FINAL_RESULT ((EXP.den > 1) ? root(POW_RESULT.value(), static_cast<std::uintmax_t>(EXP.den)) : POW_RESULT)
+    if (FINAL_RESULT.has_value()) {
+      return FINAL_RESULT.value();
     } else {
       std::abort();  // Root computation failed.
     }
+    #undef FINAL_RESULT
   } else {
     std::abort();  // Power computation failed.
   }
+  #undef POW_RESULT
+  #undef EXP
 }
 
 [[nodiscard]] consteval bool is_rational_impl(auto element)
@@ -643,23 +644,33 @@ namespace detail {
 // Helper to perform prime factorization at compile time.
 template<std::intmax_t N>
   requires gt_zero<N>
-struct prime_factorization {
-  [[nodiscard]] static consteval std::intmax_t get_or_compute_first_factor()
-  {
-    constexpr auto opt = known_first_factor<N>;
-    if constexpr (opt.has_value()) {
-      return opt.value();  // NOLINT(bugprone-unchecked-optional-access)
-    } else {
-      return static_cast<std::intmax_t>(factorizer::find_first_factor(N));
-    }
+[[nodiscard]] static consteval std::intmax_t get_or_compute_first_factor()
+{
+  constexpr auto opt = known_first_factor<N>;
+  if constexpr (opt.has_value()) {
+    return opt.value();  // NOLINT(bugprone-unchecked-optional-access)
+  } else {
+    return static_cast<std::intmax_t>(factorizer::find_first_factor(N));
   }
+}
 
-  static constexpr std::intmax_t first_base = get_or_compute_first_factor();
-  static constexpr std::intmax_t first_power = multiplicity(first_base, N);
-  static constexpr std::intmax_t remainder = remove_power(first_base, first_power, N);
+template<std::intmax_t N>
+  requires gt_zero<N>
+static constexpr std::intmax_t prime_factorization_first_base = get_or_compute_first_factor<N>();
 
+template<std::intmax_t N>
+  requires gt_zero<N>
+static constexpr std::intmax_t prime_factorization_first_power = multiplicity(prime_factorization_first_base<N>, N);
+
+template<std::intmax_t N>
+  requires gt_zero<N>
+static constexpr std::intmax_t prime_factorization_remainder = remove_power(prime_factorization_first_base<N>, prime_factorization_first_power<N>, N);
+
+template<std::intmax_t N>
+  requires gt_zero<N>
+struct prime_factorization {
   static constexpr auto value =
-    magnitude<power_v_or_T<first_base, ratio{first_power}>()>{} * prime_factorization<remainder>::value;
+    magnitude<power_v_or_T<prime_factorization_first_base<N>, ratio{prime_factorization_first_power<N>}>()>{} * prime_factorization<prime_factorization_remainder<N>>::value;
 };
 
 // Specialization for the prime factorization of 1 (base case).

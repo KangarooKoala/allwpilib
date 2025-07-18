@@ -431,7 +431,7 @@ public:
 
   template<detail::Mutable<quantity> Q1, QuantityOf<dimensionless> Q2>
     requires(Q2::unit == ::mp_units::one) && detail::ValuePreservingTo<typename Q2::rep, Rep> &&
-            requires(rep a, Q2::rep b) {
+            requires(rep a, typename Q2::rep b) {
               { a *= b } -> std::same_as<rep&>;
             }
   friend constexpr decltype(auto) operator*=(Q1&& lhs, const Q2& rhs)
@@ -454,7 +454,7 @@ public:
 
   template<detail::Mutable<quantity> Q1, QuantityOf<dimensionless> Q2>
     requires(Q2::unit == ::mp_units::one) && detail::ValuePreservingTo<typename Q2::rep, Rep> &&
-            requires(rep a, Q2::rep b) {
+            requires(rep a, typename Q2::rep b) {
               { a /= b } -> std::same_as<rep&>;
             }
   friend constexpr decltype(auto) operator/=(Q1&& lhs, const Q2& rhs)
