@@ -6,67 +6,69 @@
 #include <wpi/timestamp.h>
 
 #include "frc/filter/Debouncer.h"
-#include "units/time.h"
+#include "frc/units.h"
 
-static units::second_t now = 0_s;
+static mp::quantity<mp::s> now = 0.0 * mp::s;
 
 class DebouncerTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl(
+        [] { return static_cast<uint64_t>(mp::value(now.in(mp::µs))); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
 TEST_F(DebouncerTest, DebounceRising) {
-  frc::Debouncer debouncer{20_ms};
+  frc::Debouncer debouncer{20.0 * mp::ms};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
   EXPECT_TRUE(debouncer.Calculate(true));
 }
 
 TEST_F(DebouncerTest, DebounceFalling) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kFalling};
+  frc::Debouncer debouncer{20.0 * mp::ms,
+                           frc::Debouncer::DebounceType::kFalling};
 
   debouncer.Calculate(true);
   EXPECT_TRUE(debouncer.Calculate(false));
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
   EXPECT_FALSE(debouncer.Calculate(false));
 }
 
 TEST_F(DebouncerTest, DebounceBoth) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+  frc::Debouncer debouncer{20.0 * mp::ms, frc::Debouncer::DebounceType::kBoth};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
   EXPECT_TRUE(debouncer.Calculate(true));
   EXPECT_TRUE(debouncer.Calculate(false));
 
-  now += 1_s;
+  now += 1.0 * mp::s;
 
   EXPECT_FALSE(debouncer.Calculate(false));
 }
 
 TEST_F(DebouncerTest, DebounceParams) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+  frc::Debouncer debouncer{20.0 * mp::ms, frc::Debouncer::DebounceType::kBoth};
 
-  EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
+  EXPECT_TRUE(debouncer.GetDebounceTime() == 20.0 * mp::ms);
   EXPECT_TRUE(debouncer.GetDebounceType() ==
               frc::Debouncer::DebounceType::kBoth);
 
-  debouncer.SetDebounceTime(100_ms);
+  debouncer.SetDebounceTime(100.0 * mp::ms);
 
-  EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
+  EXPECT_TRUE(debouncer.GetDebounceTime() == 100.0 * mp::ms);
 
   debouncer.SetDebounceType(frc::Debouncer::DebounceType::kFalling);
 

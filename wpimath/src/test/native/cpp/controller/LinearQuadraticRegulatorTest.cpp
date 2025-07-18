@@ -11,7 +11,8 @@
 #include "frc/system/LinearSystem.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "units/time.h"
+#include "frc/units-usc.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -20,10 +21,10 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
     auto motors = DCMotor::Vex775Pro(2);
 
     // Carriage mass
-    constexpr auto m = 5_kg;
+    constexpr auto m = 5.0 * mp::kg;
 
     // Radius of pulley
-    constexpr auto r = 0.0181864_m;
+    constexpr auto r = 0.0181864 * mp::m;
 
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
@@ -31,7 +32,8 @@ TEST(LinearQuadraticRegulatorTest, ElevatorGains) {
     return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   Matrixd<1, 2> K =
-      LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5.05_ms}.K();
+      LinearQuadraticRegulator<2, 1>{plant, {0.02, 0.4}, {12.0}, 5.05 * mp::ms}
+          .K();
 
   EXPECT_NEAR(522.15314269, K(0, 0), 1e-6);
   EXPECT_NEAR(38.20138596, K(0, 1), 1e-6);
@@ -42,10 +44,10 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
     auto motors = DCMotor::Vex775Pro(2);
 
     // Carriage mass
-    constexpr auto m = 4_kg;
+    constexpr auto m = 4.0 * mp::kg;
 
     // Radius of pulley
-    constexpr auto r = 0.4_m;
+    constexpr auto r = 0.4 * mp::m;
 
     // Gear ratio
     constexpr double G = 100.0;
@@ -56,7 +58,8 @@ TEST(LinearQuadraticRegulatorTest, ArmGains) {
   }();
 
   Matrixd<1, 2> K =
-      LinearQuadraticRegulator<2, 1>{plant, {0.01745, 0.08726}, {12.0}, 5.05_ms}
+      LinearQuadraticRegulator<2, 1>{
+          plant, {0.01745, 0.08726}, {12.0}, 5.05 * mp::ms}
           .K();
 
   EXPECT_NEAR(19.16, K(0, 0), 1e-1);
@@ -68,10 +71,10 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
     auto motors = DCMotor::Vex775Pro(4);
 
     // Carriage mass
-    constexpr auto m = 8_kg;
+    constexpr auto m = 8.0 * mp::kg;
 
     // Radius of pulley
-    constexpr auto r = 0.75_in;
+    constexpr auto r = 0.75 * mp::in;
 
     // Gear ratio
     constexpr double G = 14.67;
@@ -79,7 +82,8 @@ TEST(LinearQuadraticRegulatorTest, FourMotorElevator) {
     return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
   Matrixd<1, 2> K =
-      LinearQuadraticRegulator<2, 1>{plant, {0.1, 0.2}, {12.0}, 20_ms}.K();
+      LinearQuadraticRegulator<2, 1>{plant, {0.1, 0.2}, {12.0}, 20.0 * mp::ms}
+          .K();
 
   EXPECT_NEAR(10.38, K(0, 0), 1e-1);
   EXPECT_NEAR(0.69, K(0, 1), 1e-1);
@@ -103,7 +107,7 @@ template <int States, int Inputs>
 Matrixd<Inputs, States> GetImplicitModelFollowingK(
     const Matrixd<States, States>& A, const Matrixd<States, Inputs>& B,
     const Matrixd<States, States>& Q, const Matrixd<Inputs, Inputs>& R,
-    const Matrixd<States, States>& Aref, units::second_t dt) {
+    const Matrixd<States, States>& Aref, mp::quantity<mp::s> dt) {
   // Discretize real dynamics
   Matrixd<States, States> discA;
   Matrixd<States, Inputs> discB;
@@ -129,7 +133,8 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithSingleIntegrator) {
   Matrixd<2, 2> R{Matrixd<2, 2>::Identity()};
 
   // QR overload
-  Matrixd<2, 2> K = LinearQuadraticRegulator<2, 2>{A, B, Q, R, 5_ms}.K();
+  Matrixd<2, 2> K =
+      LinearQuadraticRegulator<2, 2>{A, B, Q, R, 5.0 * mp::ms}.K();
   EXPECT_NEAR(0.99750312499512261, K(0, 0), 1e-10);
   EXPECT_NEAR(0.0, K(0, 1), 1e-10);
   EXPECT_NEAR(0.0, K(1, 0), 1e-10);
@@ -137,7 +142,8 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithSingleIntegrator) {
 
   // QRN overload
   Matrixd<2, 2> N{Matrixd<2, 2>::Identity()};
-  Matrixd<2, 2> Kimf = LinearQuadraticRegulator<2, 2>{A, B, Q, R, N, 5_ms}.K();
+  Matrixd<2, 2> Kimf =
+      LinearQuadraticRegulator<2, 2>{A, B, Q, R, N, 5.0 * mp::ms}.K();
   EXPECT_NEAR(1.0, Kimf(0, 0), 1e-10);
   EXPECT_NEAR(0.0, Kimf(0, 1), 1e-10);
   EXPECT_NEAR(0.0, Kimf(1, 0), 1e-10);
@@ -154,13 +160,15 @@ TEST(LinearQuadraticRegulatorTest, MatrixOverloadsWithDoubleIntegrator) {
   Matrixd<1, 1> R{0.25};
 
   // QR overload
-  Matrixd<1, 2> K = LinearQuadraticRegulator<2, 1>{A, B, Q, R, 5_ms}.K();
+  Matrixd<1, 2> K =
+      LinearQuadraticRegulator<2, 1>{A, B, Q, R, 5.0 * mp::ms}.K();
   EXPECT_NEAR(1.9960017786537287, K(0, 0), 1e-10);
   EXPECT_NEAR(0.51182128351092726, K(0, 1), 1e-10);
 
   // QRN overload
   Matrixd<2, 2> Aref{{0, 1}, {0, -Kv / (Ka * 5.0)}};
-  Matrixd<1, 2> Kimf = GetImplicitModelFollowingK<2, 1>(A, B, Q, R, Aref, 5_ms);
+  Matrixd<1, 2> Kimf =
+      GetImplicitModelFollowingK<2, 1>(A, B, Q, R, Aref, 5.0 * mp::ms);
   EXPECT_NEAR(0.0, Kimf(0, 0), 1e-10);
   EXPECT_NEAR(-6.9190500116751458e-05, Kimf(0, 1), 1e-10);
 }
@@ -170,19 +178,20 @@ TEST(LinearQuadraticRegulatorTest, LatencyCompensate) {
     auto motors = DCMotor::Vex775Pro(4);
 
     // Carriage mass
-    constexpr auto m = 8_kg;
+    constexpr auto m = 8.0 * mp::kg;
 
     // Radius of pulley
-    constexpr auto r = 0.75_in;
+    constexpr auto r = 0.75 * mp::in;
 
     // Gear ratio
     constexpr double G = 14.67;
 
     return frc::LinearSystemId::ElevatorSystem(motors, m, r, G).Slice(0);
   }();
-  LinearQuadraticRegulator<2, 1> controller{plant, {0.1, 0.2}, {12.0}, 20_ms};
+  LinearQuadraticRegulator<2, 1> controller{
+      plant, {0.1, 0.2}, {12.0}, 20.0 * mp::ms};
 
-  controller.LatencyCompensate(plant, 20_ms, 10_ms);
+  controller.LatencyCompensate(plant, 20.0 * mp::ms, 10.0 * mp::ms);
 
   EXPECT_NEAR(8.97115941, controller.K(0, 0), 1e-3);
   EXPECT_NEAR(0.07904881, controller.K(0, 1), 1e-3);

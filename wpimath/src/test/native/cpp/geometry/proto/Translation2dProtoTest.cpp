@@ -11,7 +11,7 @@ using namespace frc;
 
 namespace {
 
-const Translation2d kExpectedData = Translation2d{3.504_m, 22.9_m};
+const Translation2d kExpectedData = Translation2d{3.504 * mp::m, 22.9 * mp::m};
 }  // namespace
 
 TEST(Translation2dProtoTest, Roundtrip) {
@@ -21,6 +21,6 @@ TEST(Translation2dProtoTest, Roundtrip) {
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.X().value(), unpacked_data->X().value());
-  EXPECT_EQ(kExpectedData.Y().value(), unpacked_data->Y().value());
+  EXPECT_EQ(mp::value(kExpectedData.X()), mp::value(unpacked_data->X()));
+  EXPECT_EQ(mp::value(kExpectedData.Y()), mp::value(unpacked_data->Y()));
 }

@@ -14,6 +14,7 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/path/TravelingSalesman.h"
+#include "frc/units.h"
 
 /**
  * Returns true if the cycles represented by the two lists match.
@@ -57,9 +58,11 @@ TEST(TravelingSalesmanTest, FiveLengthStaticPathWithDistanceCost) {
   // ....3.....1........
   // ...................
   wpi::array<frc::Pose2d, 5> poses{
-      frc::Pose2d{3_m, 3_m, 0_rad}, frc::Pose2d{11_m, 5_m, 0_rad},
-      frc::Pose2d{9_m, 2_m, 0_rad}, frc::Pose2d{5_m, 5_m, 0_rad},
-      frc::Pose2d{14_m, 3_m, 0_rad}};
+      frc::Pose2d{3.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{11.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{9.0 * mp::m, 2.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{5.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{14.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad}};
 
   frc::TravelingSalesman traveler;
   wpi::array<frc::Pose2d, 5> solution = traveler.Solve(poses, 500);
@@ -78,9 +81,11 @@ TEST(TravelingSalesmanTest, FiveLengthDynamicPathWithDistanceCost) {
   // ....3.....1........
   // ...................
   wpi::array<frc::Pose2d, 5> poses{
-      frc::Pose2d{3_m, 3_m, 0_rad}, frc::Pose2d{11_m, 5_m, 0_rad},
-      frc::Pose2d{9_m, 2_m, 0_rad}, frc::Pose2d{5_m, 5_m, 0_rad},
-      frc::Pose2d{14_m, 3_m, 0_rad}};
+      frc::Pose2d{3.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{11.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{9.0 * mp::m, 2.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{5.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{14.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad}};
 
   frc::TravelingSalesman traveler;
   std::vector<frc::Pose2d> solution =
@@ -101,11 +106,16 @@ TEST(TravelingSalesmanTest, TenLengthStaticPathWithDistanceCost) {
   // .....7..5...8......
   // ...................
   wpi::array<frc::Pose2d, 10> poses{
-      frc::Pose2d{2_m, 4_m, 0_rad},  frc::Pose2d{10_m, 1_m, 0_rad},
-      frc::Pose2d{12_m, 1_m, 0_rad}, frc::Pose2d{7_m, 1_m, 0_rad},
-      frc::Pose2d{3_m, 2_m, 0_rad},  frc::Pose2d{9_m, 5_m, 0_rad},
-      frc::Pose2d{5_m, 1_m, 0_rad},  frc::Pose2d{6_m, 5_m, 0_rad},
-      frc::Pose2d{13_m, 5_m, 0_rad}, frc::Pose2d{14_m, 3_m, 0_rad}};
+      frc::Pose2d{2.0 * mp::m, 4.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{10.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{12.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{7.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{3.0 * mp::m, 2.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{9.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{5.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{6.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{13.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{14.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad}};
 
   frc::TravelingSalesman traveler;
   wpi::array<frc::Pose2d, 10> solution = traveler.Solve(poses, 500);
@@ -125,11 +135,16 @@ TEST(TravelingSalesmanTest, TenLengthDynamicPathWithDistanceCost) {
   // .....7..5...8......
   // ...................
   wpi::array<frc::Pose2d, 10> poses{
-      frc::Pose2d{2_m, 4_m, 0_rad},  frc::Pose2d{10_m, 1_m, 0_rad},
-      frc::Pose2d{12_m, 1_m, 0_rad}, frc::Pose2d{7_m, 1_m, 0_rad},
-      frc::Pose2d{3_m, 2_m, 0_rad},  frc::Pose2d{9_m, 5_m, 0_rad},
-      frc::Pose2d{5_m, 1_m, 0_rad},  frc::Pose2d{6_m, 5_m, 0_rad},
-      frc::Pose2d{13_m, 5_m, 0_rad}, frc::Pose2d{14_m, 3_m, 0_rad}};
+      frc::Pose2d{2.0 * mp::m, 4.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{10.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{12.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{7.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{3.0 * mp::m, 2.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{9.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{5.0 * mp::m, 1.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{6.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{13.0 * mp::m, 5.0 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{14.0 * mp::m, 3.0 * mp::m, 0.0 * mp::rad}};
 
   frc::TravelingSalesman traveler;
   std::vector<frc::Pose2d> solution =

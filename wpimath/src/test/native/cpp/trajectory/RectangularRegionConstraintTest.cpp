@@ -6,19 +6,18 @@
 
 #include "frc/trajectory/constraint/MaxVelocityConstraint.h"
 #include "frc/trajectory/constraint/RectangularRegionConstraint.h"
+#include "frc/units-usc.h"
+#include "frc/units.h"
 #include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/math.h"
-#include "units/velocity.h"
 
 using namespace frc;
 
 TEST(RectangularRegionConstraintTest, Constraint) {
-  constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Rectangle2d rectangle{{1_ft, 1_ft}, {5_ft, 27_ft}};
+  constexpr auto maxVelocity = 2.0 * mp::ft / mp::s;
+  constexpr frc::Rectangle2d rectangle{{1.0 * mp::ft, 1.0 * mp::ft},
+                                       {5.0 * mp::ft, 27.0 * mp::ft}};
 
-  auto config = TrajectoryConfig(13_fps, 13_fps_sq);
+  auto config = TrajectoryConfig(13.0 * mp::ft / mp::s, 13.0 * mp::ft / mp::s2);
   config.AddConstraint(RectangularRegionConstraint{
       rectangle, MaxVelocityConstraint{maxVelocity}});
   auto trajectory = TestTrajectory::GetTrajectory(config);
@@ -26,8 +25,8 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.States()) {
     if (rectangle.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
-    } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
+      EXPECT_TRUE(mp::abs(point.velocity) < maxVelocity + 0.05 * mp::m / mp::s);
+    } else if (mp::abs(point.velocity) >= maxVelocity + 0.05 * mp::m / mp::s) {
       exceededConstraintOutsideRegion = true;
     }
   }

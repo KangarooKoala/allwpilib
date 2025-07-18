@@ -8,6 +8,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/system/NumericalIntegration.h"
+#include "frc/units.h"
 
 // Test that integrating dx/dt = eˣ works
 TEST(NumericalIntegrationTest, Exponential) {
@@ -15,7 +16,7 @@ TEST(NumericalIntegrationTest, Exponential) {
 
   frc::Vectord<1> y1 = frc::RK4(
       [](const frc::Vectord<1>& x) { return frc::Vectord<1>{std::exp(x(0))}; },
-      y0, 0.1_s);
+      y0, 0.1 * mp::s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
@@ -27,7 +28,7 @@ TEST(NumericalIntegrationTest, ExponentialWithU) {
       [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
         return frc::Vectord<1>{std::exp(u(0) * x(0))};
       },
-      y0, frc::Vectord<1>{1.0}, 0.1_s);
+      y0, frc::Vectord<1>{1.0}, 0.1 * mp::s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
@@ -43,11 +44,11 @@ TEST(NumericalIntegrationTest, RK4TimeVarying) {
   frc::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   frc::Vectord<1> y1 = frc::RK4(
-      [](units::second_t t, const frc::Vectord<1>& x) {
+      [](mp::quantity<mp::s> t, const frc::Vectord<1>& x) {
         return frc::Vectord<1>{x(0) *
-                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                               (2.0 / (std::exp(mp::value(t)) + 1.0) - 1.0)};
       },
-      5_s, y0, 1_s);
+      5.0 * mp::s, y0, 1.0 * mp::s);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
               1e-3);
 }
@@ -58,7 +59,7 @@ TEST(NumericalIntegrationTest, ZeroRKDP) {
       [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
         return frc::Vectord<1>::Zero();
       },
-      frc::Vectord<1>{0.0}, frc::Vectord<1>{0.0}, 0.1_s);
+      frc::Vectord<1>{0.0}, frc::Vectord<1>{0.0}, 0.1 * mp::s);
   EXPECT_NEAR(y1(0), 0.0, 1e-3);
 }
 
@@ -70,7 +71,7 @@ TEST(NumericalIntegrationTest, ExponentialRKDP) {
       [](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
         return frc::Vectord<1>{std::exp(x(0))};
       },
-      y0, frc::Vectord<1>{0.0}, 0.1_s);
+      y0, frc::Vectord<1>{0.0}, 0.1 * mp::s);
   EXPECT_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
@@ -86,11 +87,11 @@ TEST(NumericalIntegrationTest, RKDPTimeVarying) {
   frc::Vectord<1> y0{12.0 * std::exp(5.0) / std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   frc::Vectord<1> y1 = frc::RKDP(
-      [](units::second_t t, const frc::Vectord<1>& x) {
+      [](mp::quantity<mp::s> t, const frc::Vectord<1>& x) {
         return frc::Vectord<1>{x(0) *
-                               (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
+                               (2.0 / (std::exp(mp::value(t)) + 1.0) - 1.0)};
       },
-      5_s, y0, 1_s, 1e-12);
+      5.0 * mp::s, y0, 1.0 * mp::s, 1e-12);
   EXPECT_NEAR(y1(0), 12.0 * std::exp(6.0) / std::pow(std::exp(6.0) + 1.0, 2.0),
               1e-3);
 }

@@ -9,6 +9,7 @@
 #include "frc/trajectory/Trajectory.h"
 #include "frc/trajectory/TrajectoryConfig.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
+#include "frc/units.h"
 
 void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
                               std::vector<frc::Trajectory::State> statesB) {
@@ -22,41 +23,45 @@ void TestSameShapedTrajectory(std::vector<frc::Trajectory::State> statesA,
     auto a = a2.RelativeTo(a1);
     auto b = b2.RelativeTo(b1);
 
-    EXPECT_NEAR(a.X().value(), b.X().value(), 1E-9);
-    EXPECT_NEAR(a.Y().value(), b.Y().value(), 1E-9);
-    EXPECT_NEAR(a.Rotation().Radians().value(), b.Rotation().Radians().value(),
-                1E-9);
+    EXPECT_NEAR(mp::value(a.X()), mp::value(b.X()), 1E-9);
+    EXPECT_NEAR(mp::value(a.Y()), mp::value(b.Y()), 1E-9);
+    EXPECT_NEAR(mp::value(a.Rotation().Radians()),
+                mp::value(b.Rotation().Radians()), 1E-9);
   }
 }
 
 TEST(TrajectoryTransformsTest, TransformBy) {
-  frc::TrajectoryConfig config{3_mps, 3_mps_sq};
+  frc::TrajectoryConfig config{3.0 * mp::m / mp::s, 3.0 * mp::m / mp::s2};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d{}, {}, frc::Pose2d{1_m, 1_m, 90_deg}, config);
+      frc::Pose2d{}, {}, frc::Pose2d{1.0 * mp::m, 1.0 * mp::m, 90.0 * mp::deg},
+      config);
 
-  auto transformedTrajectory = trajectory.TransformBy({{1_m, 2_m}, 30_deg});
+  auto transformedTrajectory =
+      trajectory.TransformBy({{1.0 * mp::m, 2.0 * mp::m}, 30.0 * mp::deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.Sample(0.0 * mp::s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 1.0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 2.0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 30.0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.X()), 1.0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.Y()), 2.0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.Rotation().Degrees()), 30.0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
-  frc::TrajectoryConfig config{3_mps, 3_mps_sq};
+  frc::TrajectoryConfig config{3.0 * mp::m / mp::s, 3.0 * mp::m / mp::s2};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      frc::Pose2d{1_m, 2_m, 30_deg}, {}, frc::Pose2d{5_m, 7_m, 90_deg}, config);
+      frc::Pose2d{1.0 * mp::m, 2.0 * mp::m, 30.0 * mp::deg}, {},
+      frc::Pose2d{5.0 * mp::m, 7.0 * mp::m, 90.0 * mp::deg}, config);
 
-  auto transformedTrajectory = trajectory.RelativeTo({1_m, 2_m, 30_deg});
+  auto transformedTrajectory =
+      trajectory.RelativeTo({1.0 * mp::m, 2.0 * mp::m, 30.0 * mp::deg});
 
-  auto firstPose = transformedTrajectory.Sample(0_s).pose;
+  auto firstPose = transformedTrajectory.Sample(0.0 * mp::s).pose;
 
-  EXPECT_NEAR(firstPose.X().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Y().value(), 0, 1E-9);
-  EXPECT_NEAR(firstPose.Rotation().Degrees().value(), 0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.X()), 0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.Y()), 0, 1E-9);
+  EXPECT_NEAR(mp::value(firstPose.Rotation().Degrees()), 0, 1E-9);
 
   TestSameShapedTrajectory(trajectory.States(), transformedTrajectory.States());
 }

@@ -11,7 +11,7 @@ using namespace frc;
 
 namespace {
 
-const Rotation2d kExpectedData = Rotation2d{1.91_rad};
+const Rotation2d kExpectedData = Rotation2d{1.91 * mp::rad};
 }  // namespace
 
 TEST(Rotation2dProtoTest, Roundtrip) {
@@ -21,5 +21,6 @@ TEST(Rotation2dProtoTest, Roundtrip) {
   ASSERT_TRUE(message.Pack(buf, kExpectedData));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.Radians().value(), unpacked_data->Radians().value());
+  EXPECT_EQ(mp::value(kExpectedData.Radians()),
+            mp::value(unpacked_data->Radians()));
 }

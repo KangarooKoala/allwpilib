@@ -9,53 +9,55 @@
 #include "frc/geometry/Pose2d.h"
 #include "frc/geometry/Rotation2d.h"
 #include "frc/interpolation/TimeInterpolatableBuffer.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 TEST(TimeInterpolatableBufferTest, AddSample) {
-  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
+  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10.0 * mp::s};
 
   // No entries
-  buffer.AddSample(1_s, 0_rad);
-  EXPECT_TRUE(buffer.Sample(1_s).value() == 0_rad);
+  buffer.AddSample(1.0 * mp::s, 0.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(1.0 * mp::s).value() == 0.0 * mp::rad);
 
   // New entry at start of container
-  buffer.AddSample(0_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0_s).value() == 1_rad);
+  buffer.AddSample(0.0 * mp::s, 1.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.0 * mp::s).value() == 1.0 * mp::rad);
 
   // New entry in middle of container
-  buffer.AddSample(0.5_s, 0.5_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
+  buffer.AddSample(0.5 * mp::s, 0.5 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.5 * mp::s).value() == 0.5 * mp::rad);
 
   // Override sample
-  buffer.AddSample(0.5_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 1_rad);
+  buffer.AddSample(0.5 * mp::s, 1.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.5 * mp::s).value() == 1.0 * mp::rad);
 }
 
 TEST(TimeInterpolatableBufferTest, Interpolation) {
-  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10_s};
+  frc::TimeInterpolatableBuffer<frc::Rotation2d> buffer{10.0 * mp::s};
 
-  buffer.AddSample(0_s, 0_rad);
-  EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);
-  buffer.AddSample(1_s, 1_rad);
-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
-  EXPECT_TRUE(buffer.Sample(1_s).value() == 1_rad);
-  buffer.AddSample(3_s, 2_rad);
-  EXPECT_TRUE(buffer.Sample(2_s).value() == 1.5_rad);
+  buffer.AddSample(0.0 * mp::s, 0.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.0 * mp::s).value() == 0.0 * mp::rad);
+  buffer.AddSample(1.0 * mp::s, 1.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.5 * mp::s).value() == 0.5 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(1.0 * mp::s).value() == 1.0 * mp::rad);
+  buffer.AddSample(3.0 * mp::s, 2.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(2.0 * mp::s).value() == 1.5 * mp::rad);
 
-  buffer.AddSample(10.5_s, 2_rad);
-  EXPECT_TRUE(buffer.Sample(0_s) == 1_rad);
+  buffer.AddSample(10.5 * mp::s, 2.0 * mp::rad);
+  EXPECT_TRUE(buffer.Sample(0.0 * mp::s) == 1.0 * mp::rad);
 }
 
 TEST(TimeInterpolatableBufferTest, Pose2d) {
-  frc::TimeInterpolatableBuffer<frc::Pose2d> buffer{10_s};
+  frc::TimeInterpolatableBuffer<frc::Pose2d> buffer{10.0 * mp::s};
 
   // We expect to be at (1 - 1/std::sqrt(2), 1/std::sqrt(2), 45deg) at t=0.5
-  buffer.AddSample(0_s, frc::Pose2d{0_m, 0_m, 90_deg});
-  buffer.AddSample(1_s, frc::Pose2d{1_m, 1_m, 0_deg});
-  frc::Pose2d sample = buffer.Sample(0.5_s).value();
+  buffer.AddSample(0.0 * mp::s,
+                   frc::Pose2d{0.0 * mp::m, 0.0 * mp::m, 90.0 * mp::deg});
+  buffer.AddSample(1.0 * mp::s,
+                   frc::Pose2d{1.0 * mp::m, 1.0 * mp::m, 0.0 * mp::deg});
+  frc::Pose2d sample = buffer.Sample(0.5 * mp::s).value();
 
-  EXPECT_TRUE(std::abs(sample.X().value() - (1.0 - 1.0 / std::sqrt(2.0))) <
+  EXPECT_TRUE(std::abs(mp::value(sample.X()) - (1.0 - 1.0 / std::sqrt(2.0))) <
               0.01);
-  EXPECT_TRUE(std::abs(sample.Y().value() - (1.0 / std::sqrt(2.0))) < 0.01);
-  EXPECT_TRUE(std::abs(sample.Rotation().Degrees().value() - 45.0) < 0.01);
+  EXPECT_TRUE(std::abs(mp::value(sample.Y()) - (1.0 / std::sqrt(2.0))) < 0.01);
+  EXPECT_TRUE(std::abs(mp::value(sample.Rotation().Degrees()) - 45.0) < 0.01);
 }

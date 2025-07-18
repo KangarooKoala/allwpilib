@@ -11,7 +11,8 @@ using namespace frc;
 
 namespace {
 
-const Translation3d kExpectedData = Translation3d{35.04_m, 22.9_m, 3.504_m};
+const Translation3d kExpectedData =
+    Translation3d{35.04 * mp::m, 22.9 * mp::m, 3.504 * mp::m};
 }  // namespace
 
 TEST(Translation3dProtoTest, Roundtrip) {

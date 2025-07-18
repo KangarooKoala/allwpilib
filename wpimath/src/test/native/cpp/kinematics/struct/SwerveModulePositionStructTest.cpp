@@ -12,7 +12,7 @@ namespace {
 
 using StructType = wpi::Struct<frc::SwerveModulePosition>;
 const SwerveModulePosition kExpectedData{
-    SwerveModulePosition{3.504_m, Rotation2d{17.4_rad}}};
+    SwerveModulePosition{3.504 * mp::m, Rotation2d{17.4 * mp::rad}}};
 }  // namespace
 
 TEST(SwerveModulePositionStructTest, Roundtrip) {
@@ -22,6 +22,7 @@ TEST(SwerveModulePositionStructTest, Roundtrip) {
 
   SwerveModulePosition unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.distance.value(), unpacked_data.distance.value());
+  EXPECT_EQ(mp::value(kExpectedData.distance),
+            mp::value(unpacked_data.distance));
   EXPECT_EQ(kExpectedData.angle, unpacked_data.angle);
 }

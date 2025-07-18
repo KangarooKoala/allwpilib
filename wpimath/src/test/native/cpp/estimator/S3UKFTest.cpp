@@ -20,7 +20,7 @@
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/moment_of_inertia.h"
+#include "frc/units.h"
 
 namespace {
 
@@ -30,31 +30,31 @@ frc::Vectord<5> DriveDynamics(const frc::Vectord<5>& x,
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;    // Low gear ratio
-  constexpr double Ghigh = 7.08;       // High gear ratio
-  constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
-  constexpr auto r = 0.0746125_m;      // Wheel radius
-  constexpr auto m = 63.503_kg;        // Robot mass
-  constexpr auto J = 5.6_kg_sq_m;      // Robot moment of inertia
+  constexpr double Ghigh = 7.08;             // High gear ratio
+  constexpr auto rb = 0.8382 * mp::m / 2.0;  // Robot radius
+  constexpr auto r = 0.0746125 * mp::m;      // Wheel radius
+  constexpr auto m = 63.503 * mp::kg;        // Robot mass
+  constexpr auto J = 5.6 * mp::kg * mp::m2;  // Robot moment of inertia
 
-  auto C1 = -std::pow(Ghigh, 2) * motors.Kt /
-            (motors.Kv * motors.R * units::math::pow<2>(r));
+  auto C1 =
+      -std::pow(Ghigh, 2) * motors.Kt / (motors.Kv * motors.R * mp::pow<2>(r));
   auto C2 = Ghigh * motors.Kt / (motors.R * r);
-  auto k1 = (1 / m + units::math::pow<2>(rb) / J);
-  auto k2 = (1 / m - units::math::pow<2>(rb) / J);
+  auto k1 = (1 / m + mp::pow<2>(rb) / J);
+  auto k2 = (1 / m - mp::pow<2>(rb) / J);
 
-  units::meters_per_second_t vl{x(3)};
-  units::meters_per_second_t vr{x(4)};
-  units::volt_t Vl{u(0)};
-  units::volt_t Vr{u(1)};
+  mp::quantity<mp::m / mp::s> vl = x(3) * mp::m / mp::s;
+  mp::quantity<mp::m / mp::s> vr = x(4) * mp::m / mp::s;
+  mp::quantity<mp::V> Vl = u(0) * mp::V;
+  mp::quantity<mp::V> Vr = u(1) * mp::V;
 
   auto v = 0.5 * (vl + vr);
   return frc::Vectord<5>{
-      v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
-      ((vr - vl) / (2.0 * rb)).value(),
-      k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
-          k2.value() * ((C1 * vr).value() + (C2 * Vr).value()),
-      k2.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
-          k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
+      mp::value(v) * std::cos(x(2)), mp::value(v) * std::sin(x(2)),
+      mp::value((vr - vl) / (2.0 * rb)),
+      mp::value(k1) * (mp::value(C1 * vl) + mp::value(C2 * Vl)) +
+          mp::value(k2) * (mp::value(C1 * vr) + mp::value(C2 * Vr)),
+      mp::value(k2) * (mp::value(C1 * vl) + mp::value(C2 * Vl)) +
+          mp::value(k1) * (mp::value(C1 * vr) + mp::value(C2 * Vr))};
 }
 
 frc::Vectord<3> DriveLocalMeasurementModel(
@@ -68,7 +68,7 @@ frc::Vectord<5> DriveGlobalMeasurementModel(
 }
 
 TEST(S3UKFTest, DriveInit) {
-  constexpr auto dt = 5_ms;
+  constexpr auto dt = 5.0 * mp::ms;
 
   frc::S3UKF<5, 2, 3> observer{DriveDynamics,
                                DriveLocalMeasurementModel,
@@ -94,8 +94,8 @@ TEST(S3UKFTest, DriveInit) {
 }
 
 TEST(S3UKFTest, DriveConvergence) {
-  constexpr auto dt = 5_ms;
-  constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
+  constexpr mp::quantity<mp::s> dt = 5.0 * mp::ms;
+  constexpr auto rb = 0.8382 * mp::m / 2.0;  // Robot radius
 
   frc::S3UKF<5, 2, 3> observer{DriveDynamics,
                                DriveLocalMeasurementModel,
@@ -108,11 +108,11 @@ TEST(S3UKFTest, DriveConvergence) {
                                frc::AngleAdd<5>(2),
                                dt};
 
-  auto waypoints =
-      std::vector<frc::Pose2d>{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto waypoints = std::vector<frc::Pose2d>{
+      frc::Pose2d{2.75 * mp::m, 22.521 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{24.73 * mp::m, 19.68 * mp::m, 5.846 * mp::rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8 * mp::m / mp::s, 0.1 * mp::m / mp::s2});
 
   frc::Vectord<5> r = frc::Vectord<5>::Zero();
   frc::Vectord<2> u = frc::Vectord<2>::Zero();
@@ -121,28 +121,29 @@ TEST(S3UKFTest, DriveConvergence) {
       DriveDynamics, frc::Vectord<5>::Zero(), frc::Vectord<2>::Zero());
 
   observer.SetXhat(frc::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+      mp::value(trajectory.InitialPose().Translation().X()),
+      mp::value(trajectory.InitialPose().Translation().Y()),
+      mp::value(trajectory.InitialPose().Rotation().Radians()), 0.0, 0.0});
 
   auto trueXhat = observer.Xhat();
 
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
+  for (size_t i = 0; i < double{totalTime / dt}; ++i) {
     auto ref = trajectory.Sample(dt * i);
-    units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
-    units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+    mp::quantity<mp::m / mp::s> vl =
+        ref.velocity * (1 - mp::value(ref.curvature * rb));
+    mp::quantity<mp::m / mp::s> vr =
+        ref.velocity * (1 + mp::value(ref.curvature * rb));
 
-    frc::Vectord<5> nextR{
-        ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
-        ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
+    frc::Vectord<5> nextR{mp::value(ref.pose.Translation().X()),
+                          mp::value(ref.pose.Translation().Y()),
+                          mp::value(ref.pose.Rotation().Radians()),
+                          mp::value(vl), mp::value(vr)};
 
     auto localY = DriveLocalMeasurementModel(trueXhat, frc::Vectord<2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    frc::Vectord<5> rdot = (nextR - r) / dt.value();
+    frc::Vectord<5> rdot = (nextR - r) / mp::value(dt);
     u = B.householderQr().solve(rdot -
                                 DriveDynamics(r, frc::Vectord<2>::Zero()));
 
@@ -164,20 +165,20 @@ TEST(S3UKFTest, DriveConvergence) {
   );
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  EXPECT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+  EXPECT_NEAR(mp::value(finalPosition.pose.Translation().X()), observer.Xhat(0),
               0.055);
-  EXPECT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+  EXPECT_NEAR(mp::value(finalPosition.pose.Translation().Y()), observer.Xhat(1),
               0.15);
-  EXPECT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              0.00015);
+  EXPECT_NEAR(mp::value(finalPosition.pose.Rotation().Radians()),
+              observer.Xhat(2), 0.00015);
   EXPECT_NEAR(0.0, observer.Xhat(3), 0.1);
   EXPECT_NEAR(0.0, observer.Xhat(4), 0.1);
 }
 
 TEST(S3UKFTest, LinearUKF) {
-  constexpr units::second_t dt = 20_ms;
-  auto plant = frc::LinearSystemId::IdentifyVelocitySystem<units::meters>(
-      0.02_V / 1_mps, 0.006_V / 1_mps_sq);
+  constexpr mp::quantity<mp::s> dt = 20.0 * mp::ms;
+  auto plant = frc::LinearSystemId::IdentifyVelocitySystem<mp::m>(
+      0.02 * mp::V / (mp::m / mp::s), 0.006 * mp::V / (mp::m / mp::s2));
   frc::S3UKF<1, 1, 1> observer{
       [&](const frc::Vectord<1>& x, const frc::Vectord<1>& u) {
         return plant.A() * x + plant.B() * u;
@@ -196,7 +197,7 @@ TEST(S3UKFTest, LinearUKF) {
   frc::Vectord<1> ref{100.0};
   frc::Vectord<1> u{0.0};
 
-  for (int i = 0; i < 2.0 / dt.value(); ++i) {
+  for (int i = 0; i < 2.0 / mp::value(dt); ++i) {
     observer.Predict(u, dt);
 
     u = discB.householderQr().solve(ref - discA * ref);
@@ -206,7 +207,7 @@ TEST(S3UKFTest, LinearUKF) {
 }
 
 TEST(S3UKFTest, RoundTripP) {
-  constexpr auto dt = 5_ms;
+  constexpr auto dt = 5.0 * mp::ms;
 
   frc::S3UKF<2, 2, 2> observer{
       [](const frc::Vectord<2>& x, const frc::Vectord<2>& u) { return x; },
@@ -256,7 +257,7 @@ frc::Vectord<1> MotorControlInput(double t) {
 }
 
 TEST(S3UKFTest, MotorConvergence) {
-  constexpr units::second_t dt = 10_ms;
+  constexpr mp::quantity<mp::s> dt = 10.0 * mp::ms;
   constexpr int steps = 500;
   constexpr double true_kV = 3;
   constexpr double true_kA = 0.2;
@@ -281,7 +282,7 @@ TEST(S3UKFTest, MotorConvergence) {
   frc::DiscretizeAB(A, B, dt, &discA, &discB);
 
   for (int i = 0; i < steps; ++i) {
-    inputs[i] = MotorControlInput(i * dt.value());
+    inputs[i] = MotorControlInput(i * mp::value(dt));
     states[i + 1] = discA * states[i] + discB * inputs[i];
     measurements[i] =
         MotorMeasurementModel(states[i + 1], inputs[i]) +

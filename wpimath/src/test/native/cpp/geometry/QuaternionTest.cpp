@@ -7,8 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "frc/geometry/Quaternion.h"
-#include "units/angle.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 using namespace frc;
 
@@ -94,8 +93,8 @@ TEST(QuaternionTest, ScalarDivision) {
 
 TEST(QuaternionTest, Multiply) {
   // 90° CCW rotations around each axis
-  double c = units::math::cos(90_deg / 2.0);
-  double s = units::math::sin(90_deg / 2.0);
+  double c = mp::cos(90.0 * mp::deg / 2.0);
+  double s = mp::sin(90.0 * mp::deg / 2.0);
   Quaternion xRot{c, s, 0.0, 0.0};
   Quaternion yRot{c, 0.0, s, 0.0};
   Quaternion zRot{c, 0.0, 0.0, s};

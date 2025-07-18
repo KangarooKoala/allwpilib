@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "frc/controller/PIDController.h"
+#include "frc/units.h"
 
 TEST(PIDInputOutputTest, ContinuousInput) {
   frc::PIDController controller{0.0, 0.0, 0.0};
@@ -36,7 +37,7 @@ TEST(PIDInputOutputTest, IntegralGainOutput) {
     out = controller.Calculate(0.025, 0);
   }
 
-  EXPECT_DOUBLE_EQ(-0.5 * controller.GetPeriod().value(), out);
+  EXPECT_DOUBLE_EQ(-0.5 * mp::value(controller.GetPeriod()), out);
 }
 
 TEST(PIDInputOutputTest, DerivativeGainOutput) {
@@ -46,7 +47,7 @@ TEST(PIDInputOutputTest, DerivativeGainOutput) {
 
   controller.Calculate(0, 0);
 
-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
+  EXPECT_DOUBLE_EQ(double{(-10.0 * mp::ms).in(mp::s) / controller.GetPeriod()},
                    controller.Calculate(0.0025, 0));
 }
 
@@ -69,5 +70,5 @@ TEST(PIDInputOutputTest, IZoneOutput) {
 
   double out = controller.Calculate(1, 0);
 
-  EXPECT_DOUBLE_EQ(-1 * controller.GetPeriod().value(), out);
+  EXPECT_DOUBLE_EQ(-1 * mp::value(controller.GetPeriod()), out);
 }

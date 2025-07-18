@@ -12,7 +12,7 @@ using namespace frc;
 namespace {
 
 const Transform3d kExpectedData =
-    Transform3d{Translation3d{0.3504_m, 22.9_m, 3.504_m},
+    Transform3d{Translation3d{0.3504 * mp::m, 22.9 * mp::m, 3.504 * mp::m},
                 Rotation3d{Quaternion{0.3504, 35.04, 2.29, 0.3504}}};
 }  // namespace
 

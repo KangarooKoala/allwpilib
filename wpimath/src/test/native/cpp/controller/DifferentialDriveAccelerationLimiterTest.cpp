@@ -6,20 +6,20 @@
 
 #include "frc/controller/DifferentialDriveAccelerationLimiter.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "units/math.h"
+#include "frc/units.h"
 
 namespace frc {
 
 TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
-  constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
-  constexpr auto maxA = 2_mps_sq;
-  constexpr auto maxAlpha = 2_rad_per_s_sq;
+  constexpr auto trackwidth = 0.9 * mp::m;
+  constexpr auto dt = 5.0 * mp::ms;
+  constexpr auto maxA = 2.0 * mp::m / mp::s2;
+  constexpr auto maxAlpha = 2.0 * mp::rad / mp::s2;
 
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, maxA,
                                                     maxAlpha};
@@ -31,106 +31,109 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    EXPECT_GT(units::math::abs(a), maxA);
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
+    EXPECT_GT(mp::abs(a), maxA);
   }
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{-12.0, 12.0};
-    units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
-                                              trackwidth.value()};
-    EXPECT_GT(units::math::abs(alpha), maxAlpha);
+    mp::quantity<mp::rad / mp::s2> alpha =
+        (accels(1) - accels(0)) / mp::value(trackwidth) * mp::rad / mp::s2;
+    EXPECT_GT(mp::abs(alpha), maxAlpha);
   }
 
   // Forward
   Vectord<2> u{12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     Vectord<2> accels =
-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
-                                              trackwidth.value()};
-    EXPECT_LE(units::math::abs(a), maxA);
-    EXPECT_LE(units::math::abs(alpha), maxAlpha);
+        plant.A() * xAccelLimiter +
+        plant.B() * Vectord<2>{mp::value(left), mp::value(right)};
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
+    mp::quantity<mp::rad / mp::s2> alpha =
+        (accels(1) - accels(0)) / mp::value(trackwidth) * mp::rad / mp::s2;
+    EXPECT_LE(mp::abs(a), maxA);
+    EXPECT_LE(mp::abs(alpha), maxAlpha);
   }
 
   // Backward
   u = Vectord<2>{-12.0, -12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     Vectord<2> accels =
-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
-                                              trackwidth.value()};
-    EXPECT_LE(units::math::abs(a), maxA);
-    EXPECT_LE(units::math::abs(alpha), maxAlpha);
+        plant.A() * xAccelLimiter +
+        plant.B() * Vectord<2>{mp::value(left), mp::value(right)};
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
+    mp::quantity<mp::rad / mp::s2> alpha =
+        (accels(1) - accels(0)) / mp::value(trackwidth) * mp::rad / mp::s2;
+    EXPECT_LE(mp::abs(a), maxA);
+    EXPECT_LE(mp::abs(alpha), maxAlpha);
   }
 
   // Rotate CCW
   u = Vectord<2>{-12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     Vectord<2> accels =
-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
-                                              trackwidth.value()};
-    EXPECT_LE(units::math::abs(a), maxA);
-    EXPECT_LE(units::math::abs(alpha), maxAlpha);
+        plant.A() * xAccelLimiter +
+        plant.B() * Vectord<2>{mp::value(left), mp::value(right)};
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
+    mp::quantity<mp::rad / mp::s2> alpha =
+        (accels(1) - accels(0)) / mp::value(trackwidth) * mp::rad / mp::s2;
+    EXPECT_LE(mp::abs(a), maxA);
+    EXPECT_LE(mp::abs(alpha), maxAlpha);
   }
 }
 
 TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
-  constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
+  constexpr auto trackwidth = 0.9 * mp::m;
+  constexpr auto dt = 5.0 * mp::ms;
 
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   // Limits are so high, they don't get hit, so states of constrained and
   // unconstrained systems should match
   DifferentialDriveAccelerationLimiter accelLimiter{
-      plant, trackwidth, 1e3_mps_sq, 1e3_rad_per_s_sq};
+      plant, trackwidth, 1'000.0 * mp::m / mp::s2, 1'000.0 * mp::rad / mp::s2};
 
   Vectord<2> x{0.0, 0.0};
   Vectord<2> xAccelLimiter{0.0, 0.0};
 
   // Forward
   Vectord<2> u{12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
@@ -140,14 +143,13 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   x.setZero();
   xAccelLimiter.setZero();
   u = Vectord<2>{-12.0, -12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
@@ -157,14 +159,13 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   x.setZero();
   xAccelLimiter.setZero();
   u = Vectord<2>{-12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
@@ -172,16 +173,16 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
 }
 
 TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
-  constexpr auto trackwidth = 0.9_m;
-  constexpr auto dt = 5_ms;
-  constexpr auto minA = -1_mps_sq;
-  constexpr auto maxA = 2_mps_sq;
-  constexpr auto maxAlpha = 2_rad_per_s_sq;
+  constexpr auto trackwidth = 0.9 * mp::m;
+  constexpr auto dt = 5.0 * mp::ms;
+  constexpr auto minA = -1.0 * mp::m / mp::s2;
+  constexpr auto maxA = 2.0 * mp::m / mp::s2;
+  constexpr auto maxAlpha = 2.0 * mp::rad / mp::s2;
 
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
 
   DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, minA,
                                                     maxA, maxAlpha};
@@ -193,63 +194,67 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    EXPECT_GT(units::math::abs(a), maxA);
-    EXPECT_GT(units::math::abs(a), -minA);
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
+    EXPECT_GT(mp::abs(a), maxA);
+    EXPECT_GT(mp::abs(a), -minA);
   }
 
   // a should always be within [minA, maxA]
   // Forward
   Vectord<2> u{12.0, 12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     Vectord<2> accels =
-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+        plant.A() * xAccelLimiter +
+        plant.B() * Vectord<2>{mp::value(left), mp::value(right)};
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
     EXPECT_GE(a, minA);
     EXPECT_LE(a, maxA);
   }
 
   // Backward
   u = Vectord<2>{-12.0, -12.0};
-  for (auto t = 0_s; t < 3_s; t += dt) {
+  for (auto t = 0.0 * mp::s; t < 3.0 * mp::s; t += dt) {
     x = plant.CalculateX(x, u, dt);
-    auto [left, right] =
-        accelLimiter.Calculate(units::meters_per_second_t{xAccelLimiter(0)},
-                               units::meters_per_second_t{xAccelLimiter(1)},
-                               units::volt_t{u(0)}, units::volt_t{u(1)});
-    xAccelLimiter =
-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+    auto [left, right] = accelLimiter.Calculate(
+        xAccelLimiter(0) * mp::m / mp::s, xAccelLimiter(1) * mp::m / mp::s,
+        u(0) * mp::V, u(1) * mp::V);
+    xAccelLimiter = plant.CalculateX(
+        xAccelLimiter, Vectord<2>{mp::value(left), mp::value(right)}, dt);
 
     Vectord<2> accels =
-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+        plant.A() * xAccelLimiter +
+        plant.B() * Vectord<2>{mp::value(left), mp::value(right)};
+    mp::quantity<mp::m / mp::s2> a =
+        (accels(0) + accels(1)) / 2.0 * mp::m / mp::s2;
     EXPECT_GE(a, minA);
     EXPECT_LE(a, maxA);
   }
 }
 
 TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
-  using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
+  constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
+  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
+      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
   EXPECT_NO_THROW({
-    DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps_sq,
-                                                      1_rad_per_s_sq);
+    DifferentialDriveAccelerationLimiter accelLimiter(
+        plant, 1.0 * mp::m, 1.0 * mp::m / mp::s2, 1.0 * mp::rad / mp::s2);
   });
 
   EXPECT_THROW(
       {
         DifferentialDriveAccelerationLimiter accelLimiter(
-            plant, 1_m, 1_mps_sq, -1_mps_sq, 1_rad_per_s_sq);
+            plant, 1.0 * mp::m, 1.0 * mp::m / mp::s2, -1.0 * mp::m / mp::s2,
+            1.0 * mp::rad / mp::s2);
       },
       std::invalid_argument);
 }

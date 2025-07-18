@@ -2,13 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <string_view>
 #include <vector>
 
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "frc/fmt/Eigen.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
 TEST(FormatterTest, Eigen) {
   Eigen::Matrix<double, 3, 2> A{{0.0, 1.0}, {2.0, 3.0}, {4.0, 5.0}};
@@ -44,5 +45,6 @@ TEST(FormatterTest, Eigen) {
 }
 
 TEST(FormatterTest, Units) {
-  EXPECT_EQ("4 mps", fmt::format("{}", 4_mps));
+  using namespace std::literals;
+  EXPECT_EQ("4\0 m/s\0"sv, fmt::format("{}", 4.0 * mp::m / mp::s));
 }

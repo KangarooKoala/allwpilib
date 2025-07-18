@@ -6,7 +6,7 @@
 
 #include "frc/EigenCore.h"
 #include "frc/controller/ControlAffinePlantInversionFeedforward.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
@@ -21,7 +21,7 @@ Vectord<2> StateDynamics(const Vectord<2>& x) {
 
 TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
   frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{&Dynamics,
-                                                                20_ms};
+                                                                20.0 * mp::ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};
@@ -31,7 +31,7 @@ TEST(ControlAffinePlantInversionFeedforwardTest, Calculate) {
 
 TEST(ControlAffinePlantInversionFeedforwardTest, CalculateState) {
   frc::ControlAffinePlantInversionFeedforward<2, 1> feedforward{
-      &StateDynamics, Matrixd<2, 1>{{0.0}, {1.0}}, 20_ms};
+      &StateDynamics, Matrixd<2, 1>{{0.0}, {1.0}}, 20.0 * mp::ms};
 
   Vectord<2> r{2, 2};
   Vectord<2> nextR{3, 3};

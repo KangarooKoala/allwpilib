@@ -10,11 +10,14 @@
 #include "frc/geometry/Rotation3d.h"
 #include "frc/geometry/Transform3d.h"
 #include "frc/geometry/Translation3d.h"
+#include "frc/units.h"
 
 using namespace frc;
 
 TEST(Transform3dTest, ToMatrix) {
-  Transform3d before{1_m, 2_m, 3_m, Rotation3d{10_deg, 20_deg, 30_deg}};
+  Transform3d before{
+      1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+      Rotation3d{10.0 * mp::deg, 20.0 * mp::deg, 30.0 * mp::deg}};
   Transform3d after{before.ToMatrix()};
 
   EXPECT_EQ(before, after);
@@ -23,8 +26,10 @@ TEST(Transform3dTest, ToMatrix) {
 TEST(Transform3dTest, Inverse) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Pose3d initial{1_m, 2_m, 3_m, Rotation3d{zAxis, 45_deg}};
-  const Transform3d transform{{5_m, 4_m, 3_m}, Rotation3d{zAxis, 5_deg}};
+  const Pose3d initial{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+                       Rotation3d{zAxis, 45.0 * mp::deg}};
+  const Transform3d transform{{5.0 * mp::m, 4.0 * mp::m, 3.0 * mp::m},
+                              Rotation3d{zAxis, 5.0 * mp::deg}};
 
   auto transformed = initial + transform;
   auto untransformed = transformed + transform.Inverse();
@@ -35,9 +40,12 @@ TEST(Transform3dTest, Inverse) {
 TEST(Transform3dTest, Composition) {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Pose3d initial{1_m, 2_m, 3_m, Rotation3d{zAxis, 45_deg}};
-  const Transform3d transform1{{5_m, 0_m, 0_m}, Rotation3d{zAxis, 5_deg}};
-  const Transform3d transform2{{0_m, 2_m, 0_m}, Rotation3d{zAxis, 5_deg}};
+  const Pose3d initial{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+                       Rotation3d{zAxis, 45.0 * mp::deg}};
+  const Transform3d transform1{{5.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m},
+                               Rotation3d{zAxis, 5.0 * mp::deg}};
+  const Transform3d transform2{{0.0 * mp::m, 2.0 * mp::m, 0.0 * mp::m},
+                               Rotation3d{zAxis, 5.0 * mp::deg}};
 
   auto transformedSeparate = initial + transform1 + transform2;
   auto transformedCombined = initial + (transform1 + transform2);

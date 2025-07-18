@@ -10,39 +10,42 @@
 #include "frc/controller/DifferentialDriveFeedforward.h"
 #include "frc/controller/LinearPlantInversionFeedforward.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "units/acceleration.h"
-#include "units/length.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
-  constexpr auto kVLinear = 1_V / 1_mps;
-  constexpr auto kALinear = 1_V / 1_mps_sq;
-  constexpr auto kVAngular = 1_V / 1_rad_per_s;
-  constexpr auto kAAngular = 1_V / 1_rad_per_s_sq;
-  constexpr auto trackwidth = 1_m;
-  constexpr auto dt = 20_ms;
+  constexpr auto kVLinear = 1.0 * mp::V / (mp::m / mp::s);
+  constexpr auto kALinear = 1.0 * mp::V / (mp::m / mp::s2);
+  constexpr auto kVAngular = 1.0 * mp::V / (mp::rad / mp::s);
+  constexpr auto kAAngular = 1.0 * mp::V / (mp::rad / mp::s2);
+  constexpr auto trackwidth = 1.0 * mp::m;
+  constexpr auto dt = 20.0 * mp::ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(
           kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
-  for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
-       currentLeftVelocity += 2_mps) {
-    for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
-         currentRightVelocity += 2_mps) {
-      for (auto nextLeftVelocity = -4_mps; nextLeftVelocity <= 4_mps;
-           nextLeftVelocity += 2_mps) {
-        for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
-             nextRightVelocity += 2_mps) {
+  for (auto currentLeftVelocity = -4.0 * mp::m / mp::s;
+       currentLeftVelocity <= 4.0 * mp::m / mp::s;
+       currentLeftVelocity += 2.0 * mp::m / mp::s) {
+    for (auto currentRightVelocity = -4.0 * mp::m / mp::s;
+         currentRightVelocity <= 4.0 * mp::m / mp::s;
+         currentRightVelocity += 2.0 * mp::m / mp::s) {
+      for (auto nextLeftVelocity = -4.0 * mp::m / mp::s;
+           nextLeftVelocity <= 4.0 * mp::m / mp::s;
+           nextLeftVelocity += 2.0 * mp::m / mp::s) {
+        for (auto nextRightVelocity = -4.0 * mp::m / mp::s;
+             nextRightVelocity <= 4.0 * mp::m / mp::s;
+             nextRightVelocity += 2.0 * mp::m / mp::s) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
               nextRightVelocity, dt);
           Eigen::Vector2d nextX = plant.CalculateX(
-              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
-              Eigen::Vector2d{left, right}, dt);
-          EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
-          EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+              Eigen::Vector2d{mp::value(currentLeftVelocity),
+                              mp::value(currentRightVelocity)},
+              Eigen::Vector2d{mp::value(left), mp::value(right)}, dt);
+          EXPECT_NEAR(nextX(0), mp::value(nextLeftVelocity), 1e-6);
+          EXPECT_NEAR(nextX(1), mp::value(nextRightVelocity), 1e-6);
         }
       }
     }
@@ -50,33 +53,38 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
 }
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
-  constexpr auto kVLinear = 1_V / 1_mps;
-  constexpr auto kALinear = 1_V / 1_mps_sq;
-  constexpr auto kVAngular = 1_V / 1_mps;
-  constexpr auto kAAngular = 1_V / 1_mps_sq;
-  constexpr auto dt = 20_ms;
+  constexpr auto kVLinear = 1.0 * mp::V / (mp::m / mp::s);
+  constexpr auto kALinear = 1.0 * mp::V / (mp::m / mp::s2);
+  constexpr auto kVAngular = 1.0 * mp::V / (mp::m / mp::s);
+  constexpr auto kAAngular = 1.0 * mp::V / (mp::m / mp::s2);
+  constexpr auto dt = 20.0 * mp::ms;
 
   frc::DifferentialDriveFeedforward differentialDriveFeedforward{
       kVLinear, kALinear, kVAngular, kAAngular};
   frc::LinearSystem<2, 2, 2> plant =
       frc::LinearSystemId::IdentifyDrivetrainSystem(kVLinear, kALinear,
                                                     kVAngular, kAAngular);
-  for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
-       currentLeftVelocity += 2_mps) {
-    for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
-         currentRightVelocity += 2_mps) {
-      for (auto nextLeftVelocity = -4_mps; nextLeftVelocity <= 4_mps;
-           nextLeftVelocity += 2_mps) {
-        for (auto nextRightVelocity = -4_mps; nextRightVelocity <= 4_mps;
-             nextRightVelocity += 2_mps) {
+  for (auto currentLeftVelocity = -4.0 * mp::m / mp::s;
+       currentLeftVelocity <= 4.0 * mp::m / mp::s;
+       currentLeftVelocity += 2.0 * mp::m / mp::s) {
+    for (auto currentRightVelocity = -4.0 * mp::m / mp::s;
+         currentRightVelocity <= 4.0 * mp::m / mp::s;
+         currentRightVelocity += 2.0 * mp::m / mp::s) {
+      for (auto nextLeftVelocity = -4.0 * mp::m / mp::s;
+           nextLeftVelocity <= 4.0 * mp::m / mp::s;
+           nextLeftVelocity += 2.0 * mp::m / mp::s) {
+        for (auto nextRightVelocity = -4.0 * mp::m / mp::s;
+             nextRightVelocity <= 4.0 * mp::m / mp::s;
+             nextRightVelocity += 2.0 * mp::m / mp::s) {
           auto [left, right] = differentialDriveFeedforward.Calculate(
               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
               nextRightVelocity, dt);
           Eigen::Vector2d nextX = plant.CalculateX(
-              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
-              Eigen::Vector2d{left, right}, dt);
-          EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
-          EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+              Eigen::Vector2d{mp::value(currentLeftVelocity),
+                              mp::value(currentRightVelocity)},
+              Eigen::Vector2d{mp::value(left), mp::value(right)}, dt);
+          EXPECT_NEAR(nextX(0), mp::value(nextLeftVelocity), 1e-6);
+          EXPECT_NEAR(nextX(1), mp::value(nextRightVelocity), 1e-6);
         }
       }
     }

@@ -12,7 +12,7 @@ using namespace frc;
 namespace {
 
 const DifferentialDriveKinematics kExpectedData =
-    DifferentialDriveKinematics{1.74_m};
+    DifferentialDriveKinematics{1.74 * mp::m};
 }  // namespace
 
 TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
@@ -23,6 +23,6 @@ TEST(DifferentialDriveKinematicsProtoTest, Roundtrip) {
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.trackwidth.value(),
-            unpacked_data->trackwidth.value());
+  EXPECT_EQ(mp::value(kExpectedData.trackwidth),
+            mp::value(unpacked_data->trackwidth));
 }

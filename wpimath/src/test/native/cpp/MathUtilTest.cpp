@@ -10,14 +10,11 @@
 #include "frc/MathUtil.h"
 #include "frc/geometry/Translation2d.h"
 #include "frc/geometry/Translation3d.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/time.h"
-#include "units/velocity.h"
+#include "frc/units.h"
 
-#define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
+#define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ(mp::value(a), mp::value(b))
 
-#define EXPECT_UNITS_NEAR(a, b, c) EXPECT_NEAR((a).value(), (b).value(), c)
+#define EXPECT_UNITS_NEAR(a, b, c) EXPECT_NEAR(mp::value(a), mp::value(b), c)
 
 TEST(MathUtilTest, ApplyDeadbandUnityScale) {
   // < 0
@@ -55,8 +52,8 @@ TEST(MathUtilTest, ApplyDeadbandArbitraryScale) {
 
 TEST(MathUtilTest, ApplyDeadbandUnits) {
   // < 0
-  EXPECT_DOUBLE_EQ(
-      -20, frc::ApplyDeadband<units::radian_t>(-20_rad, 1_rad, 20_rad).value());
+  EXPECT_DOUBLE_EQ(-20, mp::value(frc::ApplyDeadband<mp::quantity<mp::rad>>(
+                            -20.0 * mp::rad, 1.0 * mp::rad, 20.0 * mp::rad)));
 }
 
 TEST(MathUtilTest, ApplyDeadbandLargeMaxMagnitude) {
@@ -104,20 +101,19 @@ TEST(MathUtilTest, CopySignPowWithMaxMagnitude) {
 }
 
 TEST(MathUtilTest, CopySignPowWithUnits) {
-  EXPECT_DOUBLE_EQ(
-      0, frc::CopySignPow<units::meters_per_second_t>(0_mps, 2.0).value());
-  EXPECT_DOUBLE_EQ(
-      1, frc::CopySignPow<units::meters_per_second_t>(1_mps, 2.0).value());
-  EXPECT_DOUBLE_EQ(
-      -1, frc::CopySignPow<units::meters_per_second_t>(-1_mps, 2.0).value());
+  EXPECT_DOUBLE_EQ(0, mp::value(frc::CopySignPow<mp::quantity<mp::m / mp::s>>(
+                          0.0 * mp::m / mp::s, 2.0)));
+  EXPECT_DOUBLE_EQ(1, mp::value(frc::CopySignPow<mp::quantity<mp::m / mp::s>>(
+                          1.0 * mp::m / mp::s, 2.0)));
+  EXPECT_DOUBLE_EQ(-1, mp::value(frc::CopySignPow<mp::quantity<mp::m / mp::s>>(
+                           -1.0 * mp::m / mp::s, 2.0)));
 
-  EXPECT_DOUBLE_EQ(
-      0.5 * 0.5 * 10,
-      frc::CopySignPow<units::meters_per_second_t>(5_mps, 2.0, 10_mps).value());
-  EXPECT_DOUBLE_EQ(
-      -0.5 * 0.5 * 10,
-      frc::CopySignPow<units::meters_per_second_t>(-5_mps, 2.0, 10_mps)
-          .value());
+  EXPECT_DOUBLE_EQ(0.5 * 0.5 * 10,
+                   mp::value(frc::CopySignPow<mp::quantity<mp::m / mp::s>>(
+                       5.0 * mp::m / mp::s, 2.0, 10.0 * mp::m / mp::s)));
+  EXPECT_DOUBLE_EQ(-0.5 * 0.5 * 10,
+                   mp::value(frc::CopySignPow<mp::quantity<mp::m / mp::s>>(
+                       -5.0 * mp::m / mp::s, 2.0, 10.0 * mp::m / mp::s)));
 }
 
 TEST(MathUtilTest, InputModulus) {
@@ -156,28 +152,29 @@ TEST(MathUtilTest, InputModulus) {
   EXPECT_DOUBLE_EQ(-20.0,
                    frc::InputModulus<double>(170.0 - (-170.0), -170.0, 190.0));
   EXPECT_EQ(-20, frc::InputModulus<int>(170 - (-170), -170, 190));
-  EXPECT_EQ(-20_deg, frc::InputModulus<units::degree_t>(170_deg - (-170_deg),
-                                                        -170_deg, 190_deg));
+  EXPECT_EQ(-20.0 * mp::deg, frc::InputModulus<mp::quantity<mp::deg>>(
+                                 170.0 * mp::deg - (-170.0 * mp::deg),
+                                 -170.0 * mp::deg, 190.0 * mp::deg));
 }
 
 TEST(MathUtilTest, AngleModulus) {
   EXPECT_UNITS_NEAR(
-      frc::AngleModulus(units::radian_t{-2000 * std::numbers::pi / 180}),
-      units::radian_t{160 * std::numbers::pi / 180}, 1e-10);
+      frc::AngleModulus(-2000.0 * std::numbers::pi / 180.0 * mp::rad),
+      160.0 * std::numbers::pi / 180.0 * mp::rad, 1e-10);
   EXPECT_UNITS_NEAR(
-      frc::AngleModulus(units::radian_t{358 * std::numbers::pi / 180}),
-      units::radian_t{-2 * std::numbers::pi / 180}, 1e-10);
-  EXPECT_UNITS_NEAR(frc::AngleModulus(units::radian_t{2.0 * std::numbers::pi}),
-                    0_rad, 1e-10);
+      frc::AngleModulus(358.0 * std::numbers::pi / 180.0 * mp::rad),
+      -2.0 * std::numbers::pi / 180.0 * mp::rad, 1e-10);
+  EXPECT_UNITS_NEAR(frc::AngleModulus(2.0 * std::numbers::pi * mp::rad),
+                    0.0 * mp::rad, 1e-10);
 
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{5 * std::numbers::pi}),
-                  units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-5 * std::numbers::pi}),
-                  units::radian_t{std::numbers::pi});
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{std::numbers::pi / 2}),
-                  units::radian_t{std::numbers::pi / 2});
-  EXPECT_UNITS_EQ(frc::AngleModulus(units::radian_t{-std::numbers::pi / 2}),
-                  units::radian_t{-std::numbers::pi / 2});
+  EXPECT_UNITS_EQ(frc::AngleModulus(5 * std::numbers::pi * mp::rad),
+                  std::numbers::pi * mp::rad);
+  EXPECT_UNITS_EQ(frc::AngleModulus(-5 * std::numbers::pi * mp::rad),
+                  std::numbers::pi * mp::rad);
+  EXPECT_UNITS_EQ(frc::AngleModulus(std::numbers::pi / 2.0 * mp::rad),
+                  std::numbers::pi / 2.0 * mp::rad);
+  EXPECT_UNITS_EQ(frc::AngleModulus(-std::numbers::pi / 2.0 * mp::rad),
+                  -std::numbers::pi / 2.0 * mp::rad);
 }
 
 TEST(MathUtilTest, IsNear) {
@@ -209,7 +206,8 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_TRUE(frc::IsNear<double>(42, 42.5, 0.75));
 
   // Wraparound checks
-  EXPECT_TRUE(frc::IsNear(0_deg, 356_deg, 5_deg, 0_deg, 360_deg));
+  EXPECT_TRUE(frc::IsNear(0.0 * mp::deg, 356.0 * mp::deg, 5.0 * mp::deg,
+                          0.0 * mp::deg, 360.0 * mp::deg));
   EXPECT_TRUE(frc::IsNear(0, -356, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, 4, 5, 0, 360));
   EXPECT_TRUE(frc::IsNear(0, -4, 5, 0, 360));
@@ -223,58 +221,59 @@ TEST(MathUtilTest, IsNear) {
   EXPECT_FALSE(frc::IsNear(400, 35, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear(400, -315, 5, 0, 360));
   EXPECT_FALSE(frc::IsNear(400, 395, 5, 0, 360));
-  EXPECT_FALSE(frc::IsNear(0_deg, -4_deg, 2.5_deg, 0_deg, 360_deg));
+  EXPECT_FALSE(frc::IsNear(0.0 * mp::deg, -4.0 * mp::deg, 2.5 * mp::deg,
+                           0.0 * mp::deg, 360.0 * mp::deg));
 }
 
 TEST(MathUtilTest, Translation2dSlewRateLimitUnchanged) {
-  const frc::Translation2d translation1{0_m, 0_m};
-  const frc::Translation2d translation2{2_m, 2_m};
+  const frc::Translation2d translation1{0.0 * mp::m, 0.0 * mp::m};
+  const frc::Translation2d translation2{2.0 * mp::m, 2.0 * mp::m};
 
-  const frc::Translation2d result1 =
-      frc::SlewRateLimit(translation1, translation2, 1_s, 50_mps);
+  const frc::Translation2d result1 = frc::SlewRateLimit(
+      translation1, translation2, 1.0 * mp::s, 50.0 * mp::m / mp::s);
 
-  const frc::Translation2d expected1{2_m, 2_m};
+  const frc::Translation2d expected1{2.0 * mp::m, 2.0 * mp::m};
 
   EXPECT_EQ(result1, expected1);
 }
 
 TEST(MathUtilTest, Translation2dSlewRateLimitChanged) {
-  const frc::Translation2d translation3{1_m, 1_m};
-  const frc::Translation2d translation4{3_m, 3_m};
+  const frc::Translation2d translation3{1.0 * mp::m, 1.0 * mp::m};
+  const frc::Translation2d translation4{3.0 * mp::m, 3.0 * mp::m};
 
-  const frc::Translation2d result2 =
-      frc::SlewRateLimit(translation3, translation4, 0.25_s, 2_mps);
+  const frc::Translation2d result2 = frc::SlewRateLimit(
+      translation3, translation4, 0.25 * mp::s, 2.0 * mp::m / mp::s);
 
   const frc::Translation2d expected2{
-      units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)},
-      units::meter_t{1.0 + 0.5 * (std::numbers::sqrt2 / 2)}};
+      (1.0 + 0.5 * (std::numbers::sqrt2 / 2.0)) * mp::m,
+      (1.0 + 0.5 * (std::numbers::sqrt2 / 2.0)) * mp::m};
 
   EXPECT_EQ(result2, expected2);
 }
 
 TEST(MathUtilTest, Translation3dSlewRateLimitUnchanged) {
-  const frc::Translation3d translation1{0_m, 0_m, 0_m};
-  const frc::Translation3d translation2{2_m, 2_m, 2_m};
+  const frc::Translation3d translation1{0.0 * mp::m, 0.0 * mp::m, 0.0 * mp::m};
+  const frc::Translation3d translation2{2.0 * mp::m, 2.0 * mp::m, 2.0 * mp::m};
 
-  const frc::Translation3d result1 =
-      frc::SlewRateLimit(translation1, translation2, 1_s, 50.0_mps);
+  const frc::Translation3d result1 = frc::SlewRateLimit(
+      translation1, translation2, 1.0 * mp::s, 50.0 * mp::m / mp::s);
 
-  const frc::Translation3d expected1{2_m, 2_m, 2_m};
+  const frc::Translation3d expected1{2.0 * mp::m, 2.0 * mp::m, 2.0 * mp::m};
 
   EXPECT_EQ(result1, expected1);
 }
 
 TEST(MathUtilTest, Translation3dSlewRateLimitChanged) {
-  const frc::Translation3d translation3{1_m, 1_m, 1_m};
-  const frc::Translation3d translation4{3_m, 3_m, 3_m};
+  const frc::Translation3d translation3{1.0 * mp::m, 1.0 * mp::m, 1.0 * mp::m};
+  const frc::Translation3d translation4{3.0 * mp::m, 3.0 * mp::m, 3.0 * mp::m};
 
-  const frc::Translation3d result2 =
-      frc::SlewRateLimit(translation3, translation4, 0.25_s, 2.0_mps);
+  const frc::Translation3d result2 = frc::SlewRateLimit(
+      translation3, translation4, 0.25 * mp::s, 2.0 * mp::m / mp::s);
 
   const frc::Translation3d expected2{
-      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3},
-      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3},
-      units::meter_t{1.0 + 0.5 * std::numbers::inv_sqrt3}};
+      (1.0 + 0.5 * std::numbers::inv_sqrt3) * mp::m,
+      (1.0 + 0.5 * std::numbers::inv_sqrt3) * mp::m,
+      (1.0 + 0.5 * std::numbers::inv_sqrt3) * mp::m};
 
   EXPECT_EQ(result2, expected2);
 }

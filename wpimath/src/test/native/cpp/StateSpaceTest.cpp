@@ -15,12 +15,12 @@
 #include "frc/system/LinearSystemLoop.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/system/plant/LinearSystemId.h"
-#include "units/time.h"
+#include "frc/units.h"
 
 namespace frc {
 
 constexpr double kPositionStddev = 0.0001;
-constexpr auto kDt = 0.00505_s;
+constexpr auto kDt = 0.00505 * mp::s;
 
 class StateSpaceTest : public testing::Test {
  public:
@@ -28,10 +28,10 @@ class StateSpaceTest : public testing::Test {
     auto motors = DCMotor::Vex775Pro(2);
 
     // Carriage mass
-    constexpr auto m = 5_kg;
+    constexpr auto m = 5.0 * mp::kg;
 
     // Radius of pulley
-    constexpr auto r = 0.0181864_m;
+    constexpr auto r = 0.0181864 * mp::m;
 
     // Gear ratio
     constexpr double G = 40.0 / 40.0;
@@ -40,7 +40,8 @@ class StateSpaceTest : public testing::Test {
   }();
   LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
   KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
-  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12_V, kDt};
+  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12.0 * mp::V,
+                                 kDt};
 };
 
 void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,

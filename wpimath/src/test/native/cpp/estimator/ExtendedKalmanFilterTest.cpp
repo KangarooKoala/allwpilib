@@ -14,7 +14,7 @@
 #include "frc/system/NumericalJacobian.h"
 #include "frc/system/plant/DCMotor.h"
 #include "frc/trajectory/TrajectoryGenerator.h"
-#include "units/moment_of_inertia.h"
+#include "frc/units.h"
 
 namespace {
 
@@ -22,31 +22,31 @@ frc::Vectord<5> Dynamics(const frc::Vectord<5>& x, const frc::Vectord<2>& u) {
   auto motors = frc::DCMotor::CIM(2);
 
   // constexpr double Glow = 15.32;       // Low gear ratio
-  constexpr double Ghigh = 7.08;       // High gear ratio
-  constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
-  constexpr auto r = 0.0746125_m;      // Wheel radius
-  constexpr auto m = 63.503_kg;        // Robot mass
-  constexpr auto J = 5.6_kg_sq_m;      // Robot moment of inertia
+  constexpr double Ghigh = 7.08;             // High gear ratio
+  constexpr auto rb = 0.8382 * mp::m / 2.0;  // Robot radius
+  constexpr auto r = 0.0746125 * mp::m;      // Wheel radius
+  constexpr auto m = 63.503 * mp::kg;        // Robot mass
+  constexpr auto J = 5.6 * mp::kg * mp::m2;  // Robot moment of inertia
 
-  auto C1 = -std::pow(Ghigh, 2) * motors.Kt /
-            (motors.Kv * motors.R * units::math::pow<2>(r));
+  auto C1 =
+      -std::pow(Ghigh, 2) * motors.Kt / (motors.Kv * motors.R * mp::pow<2>(r));
   auto C2 = Ghigh * motors.Kt / (motors.R * r);
-  auto k1 = (1 / m + units::math::pow<2>(rb) / J);
-  auto k2 = (1 / m - units::math::pow<2>(rb) / J);
+  auto k1 = (1 / m + mp::pow<2>(rb) / J);
+  auto k2 = (1 / m - mp::pow<2>(rb) / J);
 
-  units::meters_per_second_t vl{x(3)};
-  units::meters_per_second_t vr{x(4)};
-  units::volt_t Vl{u(0)};
-  units::volt_t Vr{u(1)};
+  mp::quantity<mp::m / mp::s> vl = x(3) * mp::m / mp::s;
+  mp::quantity<mp::m / mp::s> vr = x(4) * mp::m / mp::s;
+  mp::quantity<mp::V> Vl = u(0) * mp::V;
+  mp::quantity<mp::V> Vr = u(1) * mp::V;
 
   auto v = 0.5 * (vl + vr);
   return frc::Vectord<5>{
-      v.value() * std::cos(x(2)), v.value() * std::sin(x(2)),
-      ((vr - vl) / (2.0 * rb)).value(),
-      k1.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
-          k2.value() * ((C1 * vr).value() + (C2 * Vr).value()),
-      k2.value() * ((C1 * vl).value() + (C2 * Vl).value()) +
-          k1.value() * ((C1 * vr).value() + (C2 * Vr).value())};
+      mp::value(v) * std::cos(x(2)), mp::value(v) * std::sin(x(2)),
+      mp::value((vr - vl) / (2.0 * rb)),
+      mp::value(k1) * (mp::value(C1 * vl) + mp::value(C2 * Vl)) +
+          mp::value(k2) * (mp::value(C1 * vr) + mp::value(C2 * Vr)),
+      mp::value(k2) * (mp::value(C1 * vl) + mp::value(C2 * Vl)) +
+          mp::value(k1) * (mp::value(C1 * vr) + mp::value(C2 * Vr))};
 }
 
 frc::Vectord<3> LocalMeasurementModel(
@@ -61,7 +61,7 @@ frc::Vectord<5> GlobalMeasurementModel(
 }  // namespace
 
 TEST(ExtendedKalmanFilterTest, Init) {
-  constexpr auto dt = 0.00505_s;
+  constexpr auto dt = 0.00505 * mp::s;
 
   frc::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                               LocalMeasurementModel,
@@ -80,8 +80,8 @@ TEST(ExtendedKalmanFilterTest, Init) {
 }
 
 TEST(ExtendedKalmanFilterTest, Convergence) {
-  constexpr auto dt = 0.00505_s;
-  constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
+  constexpr auto dt = 0.00505 * mp::s;
+  constexpr auto rb = 0.8382 * mp::m / 2.0;  // Robot radius
 
   frc::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                               LocalMeasurementModel,
@@ -89,11 +89,11 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
                                               {0.0001, 0.5, 0.5},
                                               dt};
 
-  auto waypoints =
-      std::vector<frc::Pose2d>{frc::Pose2d{2.75_m, 22.521_m, 0_rad},
-                               frc::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
+  auto waypoints = std::vector<frc::Pose2d>{
+      frc::Pose2d{2.75 * mp::m, 22.521 * mp::m, 0.0 * mp::rad},
+      frc::Pose2d{24.73 * mp::m, 19.68 * mp::m, 5.846 * mp::rad}};
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8 * mp::m / mp::s, 0.1 * mp::m / mp::s2});
 
   frc::Vectord<5> r = frc::Vectord<5>::Zero();
   frc::Vectord<2> u = frc::Vectord<2>::Zero();
@@ -102,26 +102,27 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
                                             frc::Vectord<2>::Zero());
 
   observer.SetXhat(frc::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+      mp::value(trajectory.InitialPose().Translation().X()),
+      mp::value(trajectory.InitialPose().Translation().Y()),
+      mp::value(trajectory.InitialPose().Rotation().Radians()), 0.0, 0.0});
 
   auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
+  for (size_t i = 0; i < mp::value(totalTime / dt); ++i) {
     auto ref = trajectory.Sample(dt * i);
-    units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
-    units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+    mp::quantity<mp::m / mp::s> vl =
+        ref.velocity * (1 - mp::value(ref.curvature * rb));
+    mp::quantity<mp::m / mp::s> vr =
+        ref.velocity * (1 + mp::value(ref.curvature * rb));
 
-    frc::Vectord<5> nextR{
-        ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
-        ref.pose.Rotation().Radians().value(), vl.value(), vr.value()};
+    frc::Vectord<5> nextR{mp::value(ref.pose.Translation().X()),
+                          mp::value(ref.pose.Translation().Y()),
+                          mp::value(ref.pose.Rotation().Radians()),
+                          mp::value(vl), mp::value(vr)};
 
     auto localY = LocalMeasurementModel(nextR, frc::Vectord<2>::Zero());
     observer.Correct(u, localY + frc::MakeWhiteNoiseVector(0.0001, 0.5, 0.5));
 
-    frc::Vectord<5> rdot = (nextR - r) / dt.value();
+    frc::Vectord<5> rdot = (nextR - r) / mp::value(dt);
     u = B.householderQr().solve(rdot - Dynamics(r, frc::Vectord<2>::Zero()));
 
     observer.Predict(u, dt);
@@ -137,12 +138,12 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
   auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+  ASSERT_NEAR(mp::value(finalPosition.pose.Translation().X()), observer.Xhat(0),
               1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+  ASSERT_NEAR(mp::value(finalPosition.pose.Translation().Y()), observer.Xhat(1),
               1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              1.0);
+  ASSERT_NEAR(mp::value(finalPosition.pose.Rotation().Radians()),
+              observer.Xhat(2), 1.0);
   ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
   ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
 }

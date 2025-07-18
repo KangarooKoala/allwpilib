@@ -7,6 +7,7 @@
 #include "frc/geometry/CoordinateSystem.h"
 #include "frc/geometry/Pose3d.h"
 #include "frc/geometry/Transform3d.h"
+#include "frc/units.h"
 
 using namespace frc;
 
@@ -52,105 +53,133 @@ void CheckTransform3dConvert(const Transform3d& transformFrom,
 TEST(CoordinateSystemTest, Pose3dEDNtoNWU) {
   // No rotation from EDN to NWU
   CheckPose3dConvert(
-      Pose3d{1_m, 2_m, 3_m, Rotation3d{}},
-      Pose3d{3_m, -1_m, -2_m, Rotation3d{-90_deg, 0_deg, -90_deg}},
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m, Rotation3d{}},
+      Pose3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m,
+             Rotation3d{-90.0 * mp::deg, 0.0 * mp::deg, -90.0 * mp::deg}},
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° roll from EDN to NWU
   CheckPose3dConvert(
-      Pose3d{1_m, 2_m, 3_m, Rotation3d{45_deg, 0_deg, 0_deg}},
-      Pose3d{3_m, -1_m, -2_m, Rotation3d{-45_deg, 0_deg, -90_deg}},
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m,
+             Rotation3d{-45.0 * mp::deg, 0.0 * mp::deg, -90.0 * mp::deg}},
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° pitch from EDN to NWU
   CheckPose3dConvert(
-      Pose3d{1_m, 2_m, 3_m, Rotation3d{0_deg, 45_deg, 0_deg}},
-      Pose3d{3_m, -1_m, -2_m, Rotation3d{-90_deg, 0_deg, -135_deg}},
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m,
+             Rotation3d{-90.0 * mp::deg, 0.0 * mp::deg, -135.0 * mp::deg}},
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° yaw from EDN to NWU
   CheckPose3dConvert(
-      Pose3d{1_m, 2_m, 3_m, Rotation3d{0_deg, 0_deg, 45_deg}},
-      Pose3d{3_m, -1_m, -2_m, Rotation3d{-90_deg, 45_deg, -90_deg}},
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 45.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m,
+             Rotation3d{-90.0 * mp::deg, 45.0 * mp::deg, -90.0 * mp::deg}},
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 }
 
 TEST(CoordinateSystemTest, Pose3dEDNtoNED) {
   // No rotation from EDN to NED
-  CheckPose3dConvert(Pose3d{1_m, 2_m, 3_m, Rotation3d{}},
-                     Pose3d{3_m, 1_m, 2_m, Rotation3d{90_deg, 0_deg, 90_deg}},
-                     CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckPose3dConvert(
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m, Rotation3d{}},
+      Pose3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m,
+             Rotation3d{90.0 * mp::deg, 0.0 * mp::deg, 90.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° roll from EDN to NED
-  CheckPose3dConvert(Pose3d{1_m, 2_m, 3_m, Rotation3d{45_deg, 0_deg, 0_deg}},
-                     Pose3d{3_m, 1_m, 2_m, Rotation3d{135_deg, 0_deg, 90_deg}},
-                     CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckPose3dConvert(
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m,
+             Rotation3d{135.0 * mp::deg, 0.0 * mp::deg, 90.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° pitch from EDN to NED
-  CheckPose3dConvert(Pose3d{1_m, 2_m, 3_m, Rotation3d{0_deg, 45_deg, 0_deg}},
-                     Pose3d{3_m, 1_m, 2_m, Rotation3d{90_deg, 0_deg, 135_deg}},
-                     CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckPose3dConvert(
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m,
+             Rotation3d{90.0 * mp::deg, 0.0 * mp::deg, 135.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° yaw from EDN to NED
-  CheckPose3dConvert(Pose3d{1_m, 2_m, 3_m, Rotation3d{0_deg, 0_deg, 45_deg}},
-                     Pose3d{3_m, 1_m, 2_m, Rotation3d{90_deg, -45_deg, 90_deg}},
-                     CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckPose3dConvert(
+      Pose3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m,
+             Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 45.0 * mp::deg}},
+      Pose3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m,
+             Rotation3d{90.0 * mp::deg, -45.0 * mp::deg, 90.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 }
 
 TEST(CoordinateSystemTest, Transform3dEDNtoNWU) {
   // No rotation from EDN to NWU
   CheckTransform3dConvert(
-      Transform3d{Translation3d{1_m, 2_m, 3_m}, Rotation3d{}},
-      Transform3d{Translation3d{3_m, -1_m, -2_m}, Rotation3d{}},
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{}},
+      Transform3d{Translation3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m},
+                  Rotation3d{}},
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° roll from EDN to NWU
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{45_deg, 0_deg, 0_deg}},
-                          Transform3d{Translation3d{3_m, -1_m, -2_m},
-                                      Rotation3d{0_deg, -45_deg, 0_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NWU());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, -45.0 * mp::deg, 0.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° pitch from EDN to NWU
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{0_deg, 45_deg, 0_deg}},
-                          Transform3d{Translation3d{3_m, -1_m, -2_m},
-                                      Rotation3d{0_deg, 0_deg, -45_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NWU());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, -45.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NWU());
 
   // 45° yaw from EDN to NWU
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{0_deg, 0_deg, 45_deg}},
-                          Transform3d{Translation3d{3_m, -1_m, -2_m},
-                                      Rotation3d{45_deg, 0_deg, 0_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NWU());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 45.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, -1.0 * mp::m, -2.0 * mp::m},
+                  Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NWU());
 }
 
 TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
   // No rotation from EDN to NED
   CheckTransform3dConvert(
-      Transform3d{Translation3d{1_m, 2_m, 3_m}, Rotation3d{}},
-      Transform3d{Translation3d{3_m, 1_m, 2_m}, Rotation3d{}},
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{}},
+      Transform3d{Translation3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m},
+                  Rotation3d{}},
       CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° roll from EDN to NED
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{45_deg, 0_deg, 0_deg}},
-                          Transform3d{Translation3d{3_m, 1_m, 2_m},
-                                      Rotation3d{0_deg, 45_deg, 0_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° pitch from EDN to NED
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{0_deg, 45_deg, 0_deg}},
-                          Transform3d{Translation3d{3_m, 1_m, 2_m},
-                                      Rotation3d{0_deg, 0_deg, 45_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 45.0 * mp::deg, 0.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 45.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 
   // 45° yaw from EDN to NED
-  CheckTransform3dConvert(Transform3d{Translation3d{1_m, 2_m, 3_m},
-                                      Rotation3d{0_deg, 0_deg, 45_deg}},
-                          Transform3d{Translation3d{3_m, 1_m, 2_m},
-                                      Rotation3d{45_deg, 0_deg, 0_deg}},
-                          CoordinateSystem::EDN(), CoordinateSystem::NED());
+  CheckTransform3dConvert(
+      Transform3d{Translation3d{1.0 * mp::m, 2.0 * mp::m, 3.0 * mp::m},
+                  Rotation3d{0.0 * mp::deg, 0.0 * mp::deg, 45.0 * mp::deg}},
+      Transform3d{Translation3d{3.0 * mp::m, 1.0 * mp::m, 2.0 * mp::m},
+                  Rotation3d{45.0 * mp::deg, 0.0 * mp::deg, 0.0 * mp::deg}},
+      CoordinateSystem::EDN(), CoordinateSystem::NED());
 }

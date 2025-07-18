@@ -11,7 +11,8 @@ using namespace frc;
 using StructType = wpi::Struct<frc::DCMotor>;
 
 inline constexpr DCMotor kExpectedData =
-    DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
+    DCMotor{1.91 * mp::V, 19.1 * mp::N* mp::m,   1.74 * mp::A,
+            2.29 * mp::A, 2.2 * mp::rad / mp::s, 2};
 
 TEST(DCMotorStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
@@ -20,16 +21,17 @@ TEST(DCMotorStructTest, Roundtrip) {
 
   DCMotor unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.nominalVoltage.value(),
-            unpacked_data.nominalVoltage.value());
-  EXPECT_EQ(kExpectedData.stallTorque.value(),
-            unpacked_data.stallTorque.value());
-  EXPECT_EQ(kExpectedData.stallCurrent.value(),
-            unpacked_data.stallCurrent.value());
-  EXPECT_EQ(kExpectedData.freeCurrent.value(),
-            unpacked_data.freeCurrent.value());
-  EXPECT_EQ(kExpectedData.freeSpeed.value(), unpacked_data.freeSpeed.value());
-  EXPECT_EQ(kExpectedData.R.value(), unpacked_data.R.value());
-  EXPECT_EQ(kExpectedData.Kv.value(), unpacked_data.Kv.value());
-  EXPECT_EQ(kExpectedData.Kt.value(), unpacked_data.Kt.value());
+  EXPECT_EQ(mp::value(kExpectedData.nominalVoltage),
+            mp::value(unpacked_data.nominalVoltage));
+  EXPECT_EQ(mp::value(kExpectedData.stallTorque),
+            mp::value(unpacked_data.stallTorque));
+  EXPECT_EQ(mp::value(kExpectedData.stallCurrent),
+            mp::value(unpacked_data.stallCurrent));
+  EXPECT_EQ(mp::value(kExpectedData.freeCurrent),
+            mp::value(unpacked_data.freeCurrent));
+  EXPECT_EQ(mp::value(kExpectedData.freeSpeed),
+            mp::value(unpacked_data.freeSpeed));
+  EXPECT_EQ(mp::value(kExpectedData.R), mp::value(unpacked_data.R));
+  EXPECT_EQ(mp::value(kExpectedData.Kv), mp::value(unpacked_data.Kv));
+  EXPECT_EQ(mp::value(kExpectedData.Kt), mp::value(unpacked_data.Kt));
 }
