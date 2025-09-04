@@ -4,10 +4,12 @@
 
 #include <gtest/gtest.h>
 #include <hal/HALBase.h>
+#include <wpi/print.h>
 
 int main(int argc, char** argv) {
   HAL_Initialize(500, 0);
   ::testing::InitGoogleTest(&argc, argv);
   int ret = RUN_ALL_TESTS();
+  wpi::print("Returning {}\n", ret);
   return ret;
 }
