@@ -303,7 +303,7 @@ public:
   // conversion operators
   template<typename V_, std::constructible_from<Rep> Value = std::remove_cvref_t<V_>>
     requires(unit == ::mp_units::one)
-  [[nodiscard]] explicit operator V_() const& noexcept
+  [[nodiscard]] explicit constexpr operator V_() const& noexcept
   {
     return numerical_value_is_an_implementation_detail_;
   }
