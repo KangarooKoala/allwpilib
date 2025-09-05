@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Fri, 5 Sep 2025 11:45:51 -0700
+Subject: [PATCH] Make quantity -> scalar conversion constexpr
+
+---
+ src/core/include/mp-units/framework/quantity.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/include/mp-units/framework/quantity.h b/src/core/include/mp-units/framework/quantity.h
+index 8c265516c519be5fb2b2185a86d09fee96bd9b31..8c1678d0d48c38678fb55ddb0856f1ff3eb7f2e3 100644
+--- a/src/core/include/mp-units/framework/quantity.h
++++ b/src/core/include/mp-units/framework/quantity.h
+@@ -303,7 +303,7 @@ public:
+   // conversion operators
+   template<typename V_, std::constructible_from<Rep> Value = std::remove_cvref_t<V_>>
+     requires(unit == ::mp_units::one)
+-  [[nodiscard]] explicit operator V_() const& noexcept
++  [[nodiscard]] explicit constexpr operator V_() const& noexcept
+   {
+     return numerical_value_is_an_implementation_detail_;
+   }
