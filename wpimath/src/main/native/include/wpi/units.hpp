@@ -655,11 +655,11 @@ consteval Unit auto get_base_unit(Unit auto u) {
 
 }  // namespace mp
 
-namespace wpi {
+namespace wpi::util {
 
 template <mp::Quantity T>
 constexpr int sgn(T val) {
   return (T::zero() < val) - (val < T::zero());
 }
 
-}  // namespace wpi
+}  // namespace wpi::util
