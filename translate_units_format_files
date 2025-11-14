@@ -84,6 +84,7 @@ wpimath/src/test/native/cpp/controller/LTVDifferentialDriveControllerTest.cpp
 wpimath/src/test/native/cpp/controller/LTVUnicycleControllerTest.cpp
 wpimath/src/test/native/cpp/controller/LinearPlantInversionFeedforwardTest.cpp
 wpimath/src/test/native/cpp/controller/LinearQuadraticRegulatorTest.cpp
+wpimath/src/test/native/cpp/controller/PIDInputOutputTest.cpp
 wpimath/src/test/native/cpp/controller/ProfiledPIDInputOutputTest.cpp
 wpimath/src/test/native/cpp/controller/SimpleMotorFeedforwardTest.cpp
 wpimath/src/test/native/cpp/controller/proto/ArmFeedforwardProtoTest.cpp

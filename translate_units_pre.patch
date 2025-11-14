@@ -212,7 +212,7 @@ index bcc088f804..b7f615137e 100644
    }
  }
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
-index 2f53b06cda..eccdfa7361 100644
+index 2f53b06cda..b8103daea0 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
 @@ -105,8 +105,9 @@ class LinearQuadraticRegulator {
@@ -237,6 +237,15 @@ index 2f53b06cda..eccdfa7361 100644
                  .solve(discB.transpose() * S.value() * discA + N.transpose());
      } else if (S.error() == DAREError::QNotSymmetric ||
                 S.error() == DAREError::QNotPositiveSemidefinite) {
+@@ -297,7 +299,7 @@ class LinearQuadraticRegulator {
+     Matrixd<States, Inputs> discB;
+     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);
+ 
+-    m_K = m_K * (discA - discB * m_K).pow(inputDelay / dt);
++    m_K = m_K * (discA - discB * m_K).pow(double{inputDelay / dt});
+   }
+ 
+  private:
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp b/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
 index c43e0300cc..851a66d138 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
@@ -329,6 +338,20 @@ index d692ac8dda..c8bb3b58f1 100644
      } else if (P.error() == DAREError::QNotSymmetric ||
                 P.error() == DAREError::QNotPositiveSemidefinite) {
        std::string msg =
+diff --git a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
+index abe1017fd5..267a50e59e 100644
+--- a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
++++ b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
+@@ -45,8 +45,7 @@ class SlewRateLimiter {
+       : m_positiveRateLimit{positiveRateLimit},
+         m_negativeRateLimit{negativeRateLimit},
+         m_prevVal{initialValue},
+-        m_prevTime{wpi::units::microsecond_t{
+-            wpi::math::MathSharedStore::GetTimestamp()}} {}
++        m_prevTime{wpi::math::MathSharedStore::GetTimestamp()} {}
+ 
+   /**
+    * Creates a new SlewRateLimiter with the given positive rate limit and
 diff --git a/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp b/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp
 index 6f9a5a4653..3606aab44c 100644
 --- a/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp
@@ -394,6 +417,21 @@ index d4897bc93d..84029a507b 100644
  
    /**
     * Constructs a Rotation2d with the given x and y (cosine and sine)
+diff --git a/wpimath/src/main/native/include/wpi/math/interpolation/TimeInterpolatableBuffer.hpp b/wpimath/src/main/native/include/wpi/math/interpolation/TimeInterpolatableBuffer.hpp
+index bb6f328b30..daf3f8f84e 100644
+--- a/wpimath/src/main/native/include/wpi/math/interpolation/TimeInterpolatableBuffer.hpp
++++ b/wpimath/src/main/native/include/wpi/math/interpolation/TimeInterpolatableBuffer.hpp
+@@ -128,8 +128,8 @@ class TimeInterpolatableBuffer {
+ 
+     auto lower_bound = upper_bound - 1;
+ 
+-    double t = ((time - lower_bound->first) /
+-                (upper_bound->first - lower_bound->first));
++    double t = double{((time - lower_bound->first) /
++                       (upper_bound->first - lower_bound->first))};
+ 
+     return m_interpolatingFunc(lower_bound->second, upper_bound->second, t);
+   }
 diff --git a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
 index b0d25b317e..03f7c90b92 100644
 --- a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
@@ -607,3 +645,782 @@ index 40aa51cdea..c398dffd9c 100644
    }
    return next;
  }
+diff --git a/wpimath/src/test/native/cpp/DARETest.cpp b/wpimath/src/test/native/cpp/DARETest.cpp
+index 9ed2af0de9..a53f3c8a9d 100644
+--- a/wpimath/src/test/native/cpp/DARETest.cpp
++++ b/wpimath/src/test/native/cpp/DARETest.cpp
+@@ -157,7 +157,7 @@ TEST(DARETest, NonInvertibleA_ABQR) {
+ 
+   auto ret = wpi::math::DARE<4, 1>(A, B, Q, R);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -183,7 +183,7 @@ TEST(DARETest, NonInvertibleA_ABQRN) {
+ 
+   auto ret = wpi::math::DARE<4, 1>(A, B, Q, R, N);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -198,7 +198,7 @@ TEST(DARETest, InvertibleA_ABQR) {
+ 
+   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -218,7 +218,7 @@ TEST(DARETest, InvertibleA_ABQRN) {
+ 
+   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -235,7 +235,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQR) {
+ 
+   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -257,7 +257,7 @@ TEST(DARETest, FirstGeneralizedEigenvalueOfSTIsStable_ABQRN) {
+ 
+   auto ret = wpi::math::DARE<2, 1>(A, B, Q, R, N);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -272,7 +272,7 @@ TEST(DARETest, IdentitySystem_ABQR) {
+ 
+   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -288,7 +288,7 @@ TEST(DARETest, IdentitySystem_ABQRN) {
+ 
+   auto ret = wpi::math::DARE<2, 2>(A, B, Q, R, N);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -303,7 +303,7 @@ TEST(DARETest, MoreInputsThanStates_ABQR) {
+ 
+   auto ret = wpi::math::DARE<2, 3>(A, B, Q, R);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+@@ -319,7 +319,7 @@ TEST(DARETest, MoreInputsThanStates_ABQRN) {
+ 
+   auto ret = wpi::math::DARE<2, 3>(A, B, Q, R, N);
+   EXPECT_TRUE(ret);
+-  auto X = ret.value();
++  auto X = ret.value();  // non-unit .value()
+ 
+   ExpectMatrixEqual(X, X.transpose(), 1e-10);
+   ExpectPositiveSemidefinite(X);
+diff --git a/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp b/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
+index f30ababa58..9df3feb752 100644
+--- a/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
+@@ -32,14 +32,16 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
+   {
+     Vectord<2> accels =
+         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
+     EXPECT_GT(wpi::units::math::abs(a), maxA);
+   }
+   {
+     Vectord<2> accels =
+         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{-12.0, 12.0};
+-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+-                                                   trackwidth.value()};
++    wpi::units::radians_per_second_squared_t alpha =
++        wpi::units::radians_per_second_squared_t{(accels(1) - accels(0)) /
++                                                 trackwidth.value()};
+     EXPECT_GT(wpi::units::math::abs(alpha), maxAlpha);
+   }
+ 
+@@ -51,14 +53,16 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+-
+-    Vectord<2> accels =
+-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+-                                                   trackwidth.value()};
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
++
++    Vectord<2> accels = plant.A() * xAccelLimiter +
++                        plant.B() * Vectord<2>{left.value(), right.value()};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
++    wpi::units::radians_per_second_squared_t alpha =
++        wpi::units::radians_per_second_squared_t{(accels(1) - accels(0)) /
++                                                 trackwidth.value()};
+     EXPECT_LE(wpi::units::math::abs(a), maxA);
+     EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+   }
+@@ -71,14 +75,16 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+-
+-    Vectord<2> accels =
+-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+-                                                   trackwidth.value()};
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
++
++    Vectord<2> accels = plant.A() * xAccelLimiter +
++                        plant.B() * Vectord<2>{left.value(), right.value()};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
++    wpi::units::radians_per_second_squared_t alpha =
++        wpi::units::radians_per_second_squared_t{(accels(1) - accels(0)) /
++                                                 trackwidth.value()};
+     EXPECT_LE(wpi::units::math::abs(a), maxA);
+     EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+   }
+@@ -91,14 +97,16 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
+-
+-    Vectord<2> accels =
+-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+-                                                   trackwidth.value()};
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
++
++    Vectord<2> accels = plant.A() * xAccelLimiter +
++                        plant.B() * Vectord<2>{left.value(), right.value()};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
++    wpi::units::radians_per_second_squared_t alpha =
++        wpi::units::radians_per_second_squared_t{(accels(1) - accels(0)) /
++                                                 trackwidth.value()};
+     EXPECT_LE(wpi::units::math::abs(a), maxA);
+     EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+   }
+@@ -130,8 +138,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
+ 
+     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
+     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
+@@ -147,8 +155,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
+ 
+     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
+     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
+@@ -164,8 +172,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
+ 
+     EXPECT_DOUBLE_EQ(x(0), xAccelLimiter(0));
+     EXPECT_DOUBLE_EQ(x(1), xAccelLimiter(1));
+@@ -194,7 +202,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
+   {
+     Vectord<2> accels =
+         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
+     EXPECT_GT(wpi::units::math::abs(a), maxA);
+     EXPECT_GT(wpi::units::math::abs(a), -minA);
+   }
+@@ -208,12 +217,13 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
+ 
+-    Vectord<2> accels =
+-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
++    Vectord<2> accels = plant.A() * xAccelLimiter +
++                        plant.B() * Vectord<2>{left.value(), right.value()};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
+     EXPECT_GE(a, minA);
+     EXPECT_LE(a, maxA);
+   }
+@@ -226,12 +236,13 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
+         wpi::units::meters_per_second_t{xAccelLimiter(0)},
+         wpi::units::meters_per_second_t{xAccelLimiter(1)},
+         wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+-    xAccelLimiter =
+-        plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
++    xAccelLimiter = plant.CalculateX(
++        xAccelLimiter, Vectord<2>{left.value(), right.value()}, dt);
+ 
+-    Vectord<2> accels =
+-        plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
+-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
++    Vectord<2> accels = plant.A() * xAccelLimiter +
++                        plant.B() * Vectord<2>{left.value(), right.value()};
++    wpi::units::meters_per_second_squared_t a =
++        wpi::units::meters_per_second_squared_t{(accels(0) + accels(1)) / 2.0};
+     EXPECT_GE(a, minA);
+     EXPECT_LE(a, maxA);
+   }
+diff --git a/wpimath/src/test/native/cpp/controller/DifferentialDriveFeedforwardTest.cpp b/wpimath/src/test/native/cpp/controller/DifferentialDriveFeedforwardTest.cpp
+index ef481e1f97..abe7aa3f56 100644
+--- a/wpimath/src/test/native/cpp/controller/DifferentialDriveFeedforwardTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/DifferentialDriveFeedforwardTest.cpp
+@@ -40,8 +40,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
+               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+               nextRightVelocity, dt);
+           Eigen::Vector2d nextX = plant.CalculateX(
+-              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
+-              Eigen::Vector2d{left, right}, dt);
++              Eigen::Vector2d{currentLeftVelocity.value(),
++                              currentRightVelocity.value()},
++              Eigen::Vector2d{left.value(), right.value()}, dt);
+           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
+           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+         }
+@@ -74,8 +75,9 @@ TEST(DifferentialDriveFeedforwardTest, CalculateWithoutTrackwidth) {
+               currentLeftVelocity, nextLeftVelocity, currentRightVelocity,
+               nextRightVelocity, dt);
+           Eigen::Vector2d nextX = plant.CalculateX(
+-              Eigen::Vector2d{currentLeftVelocity, currentRightVelocity},
+-              Eigen::Vector2d{left, right}, dt);
++              Eigen::Vector2d{currentLeftVelocity.value(),
++                              currentRightVelocity.value()},
++              Eigen::Vector2d{left.value(), right.value()}, dt);
+           EXPECT_NEAR(nextX(0), nextLeftVelocity.value(), 1e-6);
+           EXPECT_NEAR(nextX(1), nextRightVelocity.value(), 1e-6);
+         }
+diff --git a/wpimath/src/test/native/cpp/controller/LTVDifferentialDriveControllerTest.cpp b/wpimath/src/test/native/cpp/controller/LTVDifferentialDriveControllerTest.cpp
+index a9161790c1..7f76b14c84 100644
+--- a/wpimath/src/test/native/cpp/controller/LTVDifferentialDriveControllerTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/LTVDifferentialDriveControllerTest.cpp
+@@ -17,9 +17,9 @@
+ #define EXPECT_NEAR_UNITS(val1, val2, eps) \
+   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+ 
+-static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
+-static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
+-                                                        180.0};
++static constexpr wpi::units::meter_t kTolerance = wpi::units::meter_t{1 / 12.0};
++static constexpr wpi::units::radian_t kAngularTolerance =
++    wpi::units::radian_t{2.0 * std::numbers::pi / 180.0};
+ 
+ /**
+  * States of the drivetrain system.
+diff --git a/wpimath/src/test/native/cpp/controller/LTVUnicycleControllerTest.cpp b/wpimath/src/test/native/cpp/controller/LTVUnicycleControllerTest.cpp
+index 51f8a9a977..1431c43ec0 100644
+--- a/wpimath/src/test/native/cpp/controller/LTVUnicycleControllerTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/LTVUnicycleControllerTest.cpp
+@@ -13,9 +13,9 @@
+ #define EXPECT_NEAR_UNITS(val1, val2, eps) \
+   EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+ 
+-static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
+-static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
+-                                                        180.0};
++static constexpr wpi::units::meter_t kTolerance = wpi::units::meter_t{1 / 12.0};
++static constexpr wpi::units::radian_t kAngularTolerance =
++    wpi::units::radian_t{2.0 * std::numbers::pi / 180.0};
+ 
+ TEST(LTVUnicycleControllerTest, ReachesReference) {
+   constexpr wpi::units::second_t kDt = 20_ms;
+diff --git a/wpimath/src/test/native/cpp/controller/PIDInputOutputTest.cpp b/wpimath/src/test/native/cpp/controller/PIDInputOutputTest.cpp
+index aa0fb9a227..49f17f4123 100644
+--- a/wpimath/src/test/native/cpp/controller/PIDInputOutputTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/PIDInputOutputTest.cpp
+@@ -46,8 +46,9 @@ TEST(PIDInputOutputTest, DerivativeGainOutput) {
+ 
+   controller.Calculate(0, 0);
+ 
+-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
+-                   controller.Calculate(0.0025, 0));
++  EXPECT_DOUBLE_EQ(
++      double{wpi::units::second_t{-10_ms} / controller.GetPeriod()},
++      controller.Calculate(0.0025, 0));
+ }
+ 
+ TEST(PIDInputOutputTest, IZoneNoOutput) {
+diff --git a/wpimath/src/test/native/cpp/controller/ProfiledPIDInputOutputTest.cpp b/wpimath/src/test/native/cpp/controller/ProfiledPIDInputOutputTest.cpp
+index a1fdd7400b..8f6a1a8f02 100644
+--- a/wpimath/src/test/native/cpp/controller/ProfiledPIDInputOutputTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/ProfiledPIDInputOutputTest.cpp
+@@ -18,9 +18,11 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
+   controller.SetP(1);
+   controller.EnableContinuousInput(-180_deg, 180_deg);
+ 
+-  static constexpr wpi::units::degree_t kSetpoint{-179.0};
+-  static constexpr wpi::units::degree_t kMeasurement{-179.0};
+-  static constexpr wpi::units::degree_t kGoal{179.0};
++  static constexpr wpi::units::degree_t kSetpoint =
++      wpi::units::degree_t{-179.0};
++  static constexpr wpi::units::degree_t kMeasurement =
++      wpi::units::degree_t{-179.0};
++  static constexpr wpi::units::degree_t kGoal = wpi::units::degree_t{179.0};
+ 
+   controller.Reset(kSetpoint);
+   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+@@ -39,9 +41,12 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
+   controller.EnableContinuousInput(-wpi::units::radian_t{std::numbers::pi},
+                                    wpi::units::radian_t{std::numbers::pi});
+ 
+-  static constexpr wpi::units::radian_t kSetpoint{-3.4826633343199735};
+-  static constexpr wpi::units::radian_t kMeasurement{-3.1352207333939606};
+-  static constexpr wpi::units::radian_t kGoal{-3.534162788601621};
++  static constexpr wpi::units::radian_t kSetpoint =
++      wpi::units::degree_t{-3.4826633343199735};
++  static constexpr wpi::units::radian_t kMeasurement =
++      wpi::units::degree_t{-3.1352207333939606};
++  static constexpr wpi::units::radian_t kGoal =
++      wpi::units::degree_t{-3.534162788601621};
+ 
+   controller.Reset(kSetpoint);
+   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+@@ -60,9 +65,12 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
+   controller.EnableContinuousInput(-wpi::units::radian_t{std::numbers::pi},
+                                    wpi::units::radian_t{std::numbers::pi});
+ 
+-  static constexpr wpi::units::radian_t kSetpoint{-3.5176604690006377};
+-  static constexpr wpi::units::radian_t kMeasurement{3.1191729343822456};
+-  static constexpr wpi::units::radian_t kGoal{2.709680418117445};
++  static constexpr wpi::units::radian_t kSetpoint =
++      wpi::units::degree_t{-3.5176604690006377};
++  static constexpr wpi::units::radian_t kMeasurement =
++      wpi::units::degree_t{3.1191729343822456};
++  static constexpr wpi::units::radian_t kGoal =
++      wpi::units::degree_t{2.709680418117445};
+ 
+   controller.Reset(kSetpoint);
+   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+@@ -81,9 +89,10 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
+   controller.EnableContinuousInput(
+       0_rad, wpi::units::radian_t{2.0 * std::numbers::pi});
+ 
+-  static constexpr wpi::units::radian_t kSetpoint{2.78};
+-  static constexpr wpi::units::radian_t kMeasurement{3.12};
+-  static constexpr wpi::units::radian_t kGoal{2.71};
++  static constexpr wpi::units::radian_t kSetpoint = wpi::units::degree_t{2.78};
++  static constexpr wpi::units::radian_t kMeasurement =
++      wpi::units::degree_t{3.12};
++  static constexpr wpi::units::radian_t kGoal = wpi::units::degree_t{2.71};
+ 
+   controller.Reset(kSetpoint);
+   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
+@@ -126,6 +135,7 @@ TEST(ProfiledPIDInputOutputTest, DerivativeGainOutput) {
+ 
+   controller.Calculate(0_deg, 0_deg);
+ 
+-  EXPECT_DOUBLE_EQ(-10_ms / controller.GetPeriod(),
+-                   controller.Calculate(0.0025_deg, 0_deg));
++  EXPECT_DOUBLE_EQ(
++      double{wpi::units::second_t{-10_ms} / controller.GetPeriod()},
++      controller.Calculate(0.0025_deg, 0_deg));
+ }
+diff --git a/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp b/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
+index 86254c57f2..2776649d35 100644
+--- a/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
+@@ -35,7 +35,7 @@ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardProtoTestData<wpi::units::meters>);
+ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardFeet, ProtoTest,
+-    SimpleMotorFeedforwardProtoTestData<wpi::units::feet>);
++    SimpleMotorFeedforwardProtoTestData<wpi::units::centimeters>);
+ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardRadians, ProtoTest,
+     SimpleMotorFeedforwardProtoTestData<wpi::units::radians>);
+diff --git a/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp b/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
+index 41395d0c6e..bd4efac352 100644
+--- a/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
++++ b/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
+@@ -35,7 +35,7 @@ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardStructTestData<wpi::units::meters>);
+ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardFeet, StructTest,
+-    SimpleMotorFeedforwardStructTestData<wpi::units::feet>);
++    SimpleMotorFeedforwardStructTestData<wpi::units::centimeters>);
+ INSTANTIATE_TYPED_TEST_SUITE_P(
+     SimpleMotorFeedforwardRadians, StructTest,
+     SimpleMotorFeedforwardStructTestData<wpi::units::radians>);
+diff --git a/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp b/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
+index 85b2e20ccb..6254827797 100644
+--- a/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
++++ b/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
+@@ -36,10 +36,10 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
+   auto k1 = (1 / m + wpi::units::math::pow<2>(rb) / J);
+   auto k2 = (1 / m - wpi::units::math::pow<2>(rb) / J);
+ 
+-  wpi::units::meters_per_second_t vl{x(3)};
+-  wpi::units::meters_per_second_t vr{x(4)};
+-  wpi::units::volt_t Vl{u(0)};
+-  wpi::units::volt_t Vr{u(1)};
++  wpi::units::meters_per_second_t vl = wpi::units::meters_per_second_t{x(3)};
++  wpi::units::meters_per_second_t vr = wpi::units::meters_per_second_t{x(4)};
++  wpi::units::volt_t Vl = wpi::units::volt_t{u(0)};
++  wpi::units::volt_t Vr = wpi::units::volt_t{u(1)};
+ 
+   auto v = 0.5 * (vl + vr);
+   return wpi::math::Vectord<5>{
+diff --git a/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp b/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
+index b61c147aa2..0cd4b26c46 100644
+--- a/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
++++ b/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
+@@ -43,10 +43,10 @@ wpi::math::Vectord<5> DriveDynamics(const wpi::math::Vectord<5>& x,
+   auto k1 = (1 / m + wpi::units::math::pow<2>(rb) / J);
+   auto k2 = (1 / m - wpi::units::math::pow<2>(rb) / J);
+ 
+-  wpi::units::meters_per_second_t vl{x(3)};
+-  wpi::units::meters_per_second_t vr{x(4)};
+-  wpi::units::volt_t Vl{u(0)};
+-  wpi::units::volt_t Vr{u(1)};
++  wpi::units::meters_per_second_t vl = wpi::units::meters_per_second_t{x(3)};
++  wpi::units::meters_per_second_t vr = wpi::units::meters_per_second_t{x(4)};
++  wpi::units::volt_t Vl = wpi::units::volt_t{u(0)};
++  wpi::units::volt_t Vr = wpi::units::volt_t{u(1)};
+ 
+   auto v = 0.5 * (vl + vr);
+   return wpi::math::Vectord<5>{
+diff --git a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
+index c03fb1007f..6b11255967 100644
+--- a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
++++ b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
+@@ -43,10 +43,10 @@ wpi::math::Vectord<5> DriveDynamics(const wpi::math::Vectord<5>& x,
+   auto k1 = (1 / m + wpi::units::math::pow<2>(rb) / J);
+   auto k2 = (1 / m - wpi::units::math::pow<2>(rb) / J);
+ 
+-  wpi::units::meters_per_second_t vl{x(3)};
+-  wpi::units::meters_per_second_t vr{x(4)};
+-  wpi::units::volt_t Vl{u(0)};
+-  wpi::units::volt_t Vr{u(1)};
++  wpi::units::meters_per_second_t vl = wpi::units::meters_per_second_t{x(3)};
++  wpi::units::meters_per_second_t vr = wpi::units::meters_per_second_t{x(4)};
++  wpi::units::volt_t Vl = wpi::units::volt_t{u(0)};
++  wpi::units::volt_t Vr = wpi::units::volt_t{u(1)};
+ 
+   auto v = 0.5 * (vl + vr);
+   return wpi::math::Vectord<5>{
+diff --git a/wpimath/src/test/native/cpp/filter/DebouncerTest.cpp b/wpimath/src/test/native/cpp/filter/DebouncerTest.cpp
+index 5921f5bd71..25f273a75e 100644
+--- a/wpimath/src/test/native/cpp/filter/DebouncerTest.cpp
++++ b/wpimath/src/test/native/cpp/filter/DebouncerTest.cpp
+@@ -14,8 +14,9 @@ static wpi::units::second_t now = 0_s;
+ class DebouncerTest : public ::testing::Test {
+  protected:
+   void SetUp() override {
+-    WPI_SetNowImpl(
+-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
++    WPI_SetNowImpl([] {
++      return static_cast<uint64_t>(wpi::units::microsecond_t{now}.value());
++    });
+   }
+ 
+   void TearDown() override { WPI_SetNowImpl(nullptr); }
+diff --git a/wpimath/src/test/native/cpp/filter/SlewRateLimiterTest.cpp b/wpimath/src/test/native/cpp/filter/SlewRateLimiterTest.cpp
+index ee4254fb80..0dffe8de86 100644
+--- a/wpimath/src/test/native/cpp/filter/SlewRateLimiterTest.cpp
++++ b/wpimath/src/test/native/cpp/filter/SlewRateLimiterTest.cpp
+@@ -16,15 +16,18 @@ static wpi::units::second_t now = 0_s;
+ class SlewRateLimiterTest : public ::testing::Test {
+  protected:
+   void SetUp() override {
+-    WPI_SetNowImpl(
+-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
++    WPI_SetNowImpl([] {
++      return static_cast<uint64_t>(wpi::units::microsecond_t{now}.value());
++    });
+   }
+ 
+   void TearDown() override { WPI_SetNowImpl(nullptr); }
+ };
+ 
+ TEST_F(SlewRateLimiterTest, SlewRateLimit) {
+-  WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
++  WPI_SetNowImpl([] {
++    return static_cast<uint64_t>(wpi::units::microsecond_t{now}.value());
++  });
+ 
+   wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
+ 
+diff --git a/wpimath/src/test/native/cpp/interpolation/TimeInterpolatableBufferTest.cpp b/wpimath/src/test/native/cpp/interpolation/TimeInterpolatableBufferTest.cpp
+index 340379f1ba..fd4a2f67a9 100644
+--- a/wpimath/src/test/native/cpp/interpolation/TimeInterpolatableBufferTest.cpp
++++ b/wpimath/src/test/native/cpp/interpolation/TimeInterpolatableBufferTest.cpp
+@@ -17,31 +17,31 @@ TEST(TimeInterpolatableBufferTest, AddSample) {
+ 
+   // No entries
+   buffer.AddSample(1_s, 0_rad);
+-  EXPECT_TRUE(buffer.Sample(1_s).value() == 0_rad);
++  EXPECT_TRUE(buffer.Sample(1_s).value() == 0_rad);  // non-unit .value()
+ 
+   // New entry at start of container
+   buffer.AddSample(0_s, 1_rad);
+-  EXPECT_TRUE(buffer.Sample(0_s).value() == 1_rad);
++  EXPECT_TRUE(buffer.Sample(0_s).value() == 1_rad);  // non-unit .value()
+ 
+   // New entry in middle of container
+   buffer.AddSample(0.5_s, 0.5_rad);
+-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
++  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);  // non-unit .value()
+ 
+   // Override sample
+   buffer.AddSample(0.5_s, 1_rad);
+-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 1_rad);
++  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 1_rad);  // non-unit .value()
+ }
+ 
+ TEST(TimeInterpolatableBufferTest, Interpolation) {
+   wpi::math::TimeInterpolatableBuffer<wpi::math::Rotation2d> buffer{10_s};
+ 
+   buffer.AddSample(0_s, 0_rad);
+-  EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);
++  EXPECT_TRUE(buffer.Sample(0_s).value() == 0_rad);  // non-unit .value()
+   buffer.AddSample(1_s, 1_rad);
+-  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);
+-  EXPECT_TRUE(buffer.Sample(1_s).value() == 1_rad);
++  EXPECT_TRUE(buffer.Sample(0.5_s).value() == 0.5_rad);  // non-unit .value()
++  EXPECT_TRUE(buffer.Sample(1_s).value() == 1_rad);      // non-unit .value()
+   buffer.AddSample(3_s, 2_rad);
+-  EXPECT_TRUE(buffer.Sample(2_s).value() == 1.5_rad);
++  EXPECT_TRUE(buffer.Sample(2_s).value() == 1.5_rad);  // non-unit .value()
+ 
+   buffer.AddSample(10.5_s, 2_rad);
+   EXPECT_TRUE(buffer.Sample(0_s) == 1_rad);
+@@ -53,7 +53,7 @@ TEST(TimeInterpolatableBufferTest, Pose2d) {
+   // We expect to be at (1 - 1/std::sqrt(2), 1/std::sqrt(2), 45deg) at t=0.5
+   buffer.AddSample(0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg});
+   buffer.AddSample(1_s, wpi::math::Pose2d{1_m, 1_m, 0_deg});
+-  wpi::math::Pose2d sample = buffer.Sample(0.5_s).value();
++  wpi::math::Pose2d sample = buffer.Sample(0.5_s).value();  // non-unit .value()
+ 
+   EXPECT_TRUE(std::abs(sample.X().value() - (1.0 - 1.0 / std::sqrt(2.0))) <
+               0.01);
+diff --git a/wpimath/src/test/native/cpp/optimization/NonlinearProblemTest.cpp b/wpimath/src/test/native/cpp/optimization/NonlinearProblemTest.cpp
+index eb1f0c345b..78bb5e4faa 100644
+--- a/wpimath/src/test/native/cpp/optimization/NonlinearProblemTest.cpp
++++ b/wpimath/src/test/native/cpp/optimization/NonlinearProblemTest.cpp
+@@ -34,7 +34,7 @@ TEST(ProblemTest, Quartic) {
+ 
+   EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+ 
+-  EXPECT_NEAR(x.value(), 1.0, 1e-6);
++  EXPECT_NEAR(x.value(), 1.0, 1e-6);  // non-unit .value()
+ 
+   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+     fmt::println("{}", output);
+@@ -72,7 +72,9 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
+ 
+       // Local minimum at (0.0, 0.0)
+       // Global minimum at (1.0, 1.0)
++      // next line non-unit .value()
+       EXPECT_TRUE((near(0.0, x.value(), 1e-2) || near(1.0, x.value(), 1e-2)));
++      // next line non-unit .value()
+       EXPECT_TRUE((near(0.0, y.value(), 1e-2) || near(1.0, y.value(), 1e-2)));
+     }
+   }
+@@ -106,8 +108,8 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
+ 
+       EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+ 
+-      EXPECT_NEAR(x.value(), 1.0, 1e-3);
+-      EXPECT_NEAR(y.value(), 1.0, 1e-3);
++      EXPECT_NEAR(x.value(), 1.0, 1e-3);  // non-unit .value()
++      EXPECT_NEAR(y.value(), 1.0, 1e-3);  // non-unit .value()
+     }
+   }
+ 
+@@ -144,8 +146,8 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
+   EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+ #endif
+ 
+-  EXPECT_NEAR(x.value(), 2.5, 1e-2);
+-  EXPECT_NEAR(y.value(), 2.5, 1e-2);
++  EXPECT_NEAR(x.value(), 2.5, 1e-2);  // non-unit .value()
++  EXPECT_NEAR(y.value(), 2.5, 1e-2);  // non-unit .value()
+ 
+   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+     fmt::println("{}", output);
+@@ -212,9 +214,9 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
+   EXPECT_EQ(problem.solve({.diagnostics = true}),
+             slp::ExitStatus::LINE_SEARCH_FAILED);
+ 
+-  // EXPECT_EQ(x.value(), 1.0);
+-  // EXPECT_EQ(s1.value(), 0.0);
+-  // EXPECT_EQ(s2.value(), 0.5);
++  // EXPECT_EQ(x.value(), 1.0);  // non-unit .value()
++  // EXPECT_EQ(s1.value(), 0.0);  // non-unit .value()
++  // EXPECT_EQ(s2.value(), 0.5);  // non-unit .value()
+ 
+   if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
+     fmt::println("{}", output);
+diff --git a/wpimath/src/test/native/cpp/spline/CubicHermiteSplineTest.cpp b/wpimath/src/test/native/cpp/spline/CubicHermiteSplineTest.cpp
+index 6e44e1b724..4cedc8617e 100644
+--- a/wpimath/src/test/native/cpp/spline/CubicHermiteSplineTest.cpp
++++ b/wpimath/src/test/native/cpp/spline/CubicHermiteSplineTest.cpp
+@@ -30,7 +30,7 @@ class CubicHermiteSplineTest : public ::testing::Test {
+         SplineHelper::CubicSplinesFromControlVectors(startCV, waypoints, endCV);
+     std::vector<Spline<3>::PoseWithCurvature> poses;
+ 
+-    poses.push_back(splines[0].GetPoint(0.0).value());
++    poses.push_back(splines[0].GetPoint(0.0).value());  // non-unit .value()
+ 
+     for (auto&& spline : splines) {
+       auto x = SplineParameterizer::Parameterize(spline);
+diff --git a/wpimath/src/test/native/cpp/trajectory/ExponentialProfileTest.cpp b/wpimath/src/test/native/cpp/trajectory/ExponentialProfileTest.cpp
+index 101967f532..6a92305dc9 100644
+--- a/wpimath/src/test/native/cpp/trajectory/ExponentialProfileTest.cpp
++++ b/wpimath/src/test/native/cpp/trajectory/ExponentialProfileTest.cpp
+@@ -4,6 +4,7 @@
+ 
+ #include "wpi/math/trajectory/ExponentialProfile.hpp"
+ 
++#include <algorithm>
+ #include <chrono>
+ #include <cmath>
+ #include <tuple>
+@@ -189,7 +190,7 @@ TEST(ExponentialProfileTest, TopSpeed) {
+ 
+   for (int i = 0; i < 900; ++i) {
+     state = CheckDynamics(profile, constraints, feedforward, state, goal);
+-    maxSpeed = wpi::units::math::max(state.velocity, maxSpeed);
++    maxSpeed = std::max(state.velocity, maxSpeed);
+   }
+ 
+   EXPECT_NEAR_UNITS(constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+@@ -214,7 +215,7 @@ TEST(ExponentialProfileTest, TopSpeedBackward) {
+ 
+   for (int i = 0; i < 900; ++i) {
+     state = CheckDynamics(profile, constraints, feedforward, state, goal);
+-    maxSpeed = wpi::units::math::min(state.velocity, maxSpeed);
++    maxSpeed = std::min(state.velocity, maxSpeed);
+   }
+ 
+   EXPECT_NEAR_UNITS(-constraints.MaxVelocity(), maxSpeed, 1e-5_mps);
+diff --git a/wpimath/src/test/native/cpp/trajectory/TrapezoidProfileTest.cpp b/wpimath/src/test/native/cpp/trajectory/TrapezoidProfileTest.cpp
+index e040d0aa02..1d883f65ed 100644
+--- a/wpimath/src/test/native/cpp/trajectory/TrapezoidProfileTest.cpp
++++ b/wpimath/src/test/native/cpp/trajectory/TrapezoidProfileTest.cpp
+@@ -142,8 +142,6 @@ TEST(TrapezoidProfileTest, TimingToCurrent) {
+ }
+ 
+ TEST(TrapezoidProfileTest, TimingToGoal) {
+-  using wpi::units::unit_cast;
+-
+   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+       0.75_mps, 0.75_mps_sq};
+   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
+@@ -159,15 +157,13 @@ TEST(TrapezoidProfileTest, TimingToGoal) {
+     if (!reachedGoal && state == goal) {
+       // Expected value using for loop index is just an approximation since the
+       // time left in the profile doesn't increase linearly at the endpoints
+-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
++      EXPECT_NEAR(predictedTimeLeft.value(), i / 100.0, 0.25);
+       reachedGoal = true;
+     }
+   }
+ }
+ 
+ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
+-  using wpi::units::unit_cast;
+-
+   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+       0.75_mps, 0.75_mps_sq};
+   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{2_m, 0_mps};
+@@ -182,15 +178,13 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
+     state = profile.Calculate(kDt, state, goal);
+     if (!reachedGoal &&
+         (wpi::units::math::abs(state.velocity - 1_mps) < 10e-5_mps)) {
+-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
++      EXPECT_NEAR(predictedTimeLeft.value(), i / 100.0, 2e-2);
+       reachedGoal = true;
+     }
+   }
+ }
+ 
+ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
+-  using wpi::units::unit_cast;
+-
+   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+       0.75_mps, 0.75_mps_sq};
+   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
+@@ -206,15 +200,13 @@ TEST(TrapezoidProfileTest, TimingToNegativeGoal) {
+     if (!reachedGoal && state == goal) {
+       // Expected value using for loop index is just an approximation since the
+       // time left in the profile doesn't increase linearly at the endpoints
+-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 0.25);
++      EXPECT_NEAR(predictedTimeLeft.value(), i / 100.0, 0.25);
+       reachedGoal = true;
+     }
+   }
+ }
+ 
+ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
+-  using wpi::units::unit_cast;
+-
+   wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints constraints{
+       0.75_mps, 0.75_mps_sq};
+   wpi::math::TrapezoidProfile<wpi::units::meter>::State goal{-2_m, 0_mps};
+@@ -229,7 +221,7 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
+     state = profile.Calculate(kDt, state, goal);
+     if (!reachedGoal &&
+         (wpi::units::math::abs(state.velocity + 1_mps) < 10e-5_mps)) {
+-      EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
++      EXPECT_NEAR(predictedTimeLeft.value(), i / 100.0, 2e-2);
+       reachedGoal = true;
+     }
+   }
