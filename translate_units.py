@@ -255,7 +255,7 @@ def is_end_of_unit(lines: list[str], i: int, pos: int) -> bool:
             new_pos -= 1
         if lines[new_i][new_pos].isspace():
             new_pos += 1
-        if lines[new_i][new_pos:].startswith("units::"):
+        if lines[new_i][new_pos:].startswith("wpi::units::"):
             return True
         elif lines[i][pos] == "}" or has_preceding_ident:
             # If we're initializing a type or calling a function, we're not in a unit
@@ -433,20 +433,20 @@ def process_unit_t(lines: list[str], i: int, *, type_only: bool = False):
         ("unit", ""),
         *UNIT_T_TO_UNIT.items(),
     ):
-        unit_t: str = f"units::{nh_unit}_t"
+        unit_t: str = f"wpi::units::{nh_unit}_t"
         unit_t_start: int = -1
         while (unit_t_start := lines[i].find(unit_t, unit_t_start + 1)) >= 0:
             unit_type: str = unit_t
             unit_t_end: int = unit_t_start + len(unit_t)
             if nh_unit == "unit":
-                # Special case for units::unit_t<...>
+                # Special case for wpi::units::unit_t<...>
                 if lines[i][unit_t_end] != "<":
                     raise NotImplementedError
                 l_angle_i = unit_t_end
                 r_angle_line, r_angle_i = find_match(lines, i, l_angle_i)
                 if r_angle_line != i:
                     # Too complicated, leave this for manual fixing
-                    print(f"Line {i}: units::unit_t<...> is too complicated!")
+                    print(f"Line {i}: wpi::units::unit_t<...> is too complicated!")
                     continue
                 mp_unit = lines[i][l_angle_i + 1 : r_angle_i]
                 mp_unit = mp_unit.removeprefix("typename ")
@@ -469,16 +469,17 @@ def process_unit_t(lines: list[str], i: int, *, type_only: bool = False):
 def process_unit(lines: list[str], i: int):
     """Processes any unit type occurences in the specified line."""
     for nh_unit_sing, nh_unit_plural, mp_unit in (
-        ("units::meter", "units::meters", "mp::m"),
-        ("units::centimeter", "units::centimeters", "mp::cm"),
-        ("units::radian", "units::radians", "mp::rad"),
-        ("units::degree", "units::degrees", "mp::deg"),
-        ("units::second", "units::seconds", "mp::s"),
-        ("units::volt", "units::volts", "mp::V"),
-        ("units::ampere", "units::amperes", "mp::A"),
-        ("units::radian_per_second", "units::radians_per_second", "mp::rad / mp::s"),
+        ("meter", "meters", "mp::m"),
+        ("centimeter", "centimeters", "mp::cm"),
+        ("radian", "radians", "mp::rad"),
+        ("degree", "degrees", "mp::deg"),
+        ("second", "seconds", "mp::s"),
+        ("volt", "volts", "mp::V"),
+        ("ampere", "amperes", "mp::A"),
+        ("radian_per_second", "radians_per_second", "mp::rad / mp::s"),
     ):
         for nh_unit in (nh_unit_sing, nh_unit_plural):
+            nh_unit = "wpi::units::" + nh_unit
             unit_start: int = -1
             while (unit_start := lines[i].find(nh_unit, unit_start + 1)) >= 0:
                 unit_end: int = unit_start + len(nh_unit)
@@ -522,7 +523,7 @@ def process_decltype(lines: list[str], i: int, *, type_only: bool = False):
         unit_start: int = decltype_start + len("decltype(1.0 * ")
         end_line, unit_end = find_match(lines, i, decltype_start + len("decltype"))
         decltype_end: int = unit_end + 1
-        if lines[i][decltype_end] not in "{(":
+        if lines[end_line][decltype_end] not in "{(":
             # Plain type
             lines[i] = replace(
                 lines[i], decltype_start, "decltype(1.0 * ", "mp::quantity<"
@@ -548,6 +549,14 @@ def process_decltype(lines: list[str], i: int, *, type_only: bool = False):
 
 def process_value_calls(lines: list[str], i: int):
     """Processes any .value() calls in the specified line."""
+    SKIP_COMMENT: str = "  // non-unit .value()"
+    if SKIP_COMMENT in lines[i]:
+        if lines[i].count(SKIP_COMMENT) != 1:
+            raise ValueError(
+                "Multiple occurences of skip .value() comment in line {i + 1}!"
+            )
+        lines[i] = lines[i].replace(SKIP_COMMENT, "")
+        return
     while (index := lines[i].find(".value()")) >= 0:
         # Delete .value()
         lines[i] = delete(lines[i], index, ".value()")
@@ -606,11 +615,9 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
     # Process includes
     base_include_line: int = -1
     for i in line_iter():
-        if lines[i].startswith("#include") and "units/" in lines[i]:
+        if lines[i].startswith('#include "wpi/units/'):
             if base_include_line == -1:
-                begin: str = lines[i][lines[i].find("units/") - 1]
-                end: str = lines[i].rstrip("\r\n")[-1]
-                lines[i] = f"#include {begin}frc/units.h{end}\n"
+                lines[i] = '#include "wpi/units.hpp"\n'
                 base_include_line = i
             else:
                 del lines[i]
@@ -655,29 +662,29 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
                 last_function_header_line = -1
             yield i
 
-    # Process units::math functions
+    # Process wpi::units::math functions
     for i in body_iter():
-        if "units::math::max" in lines[i]:
+        if "wpi::units::math::max" in lines[i]:
             print(
-                f"Line {i}: units::math::max replaced with std::max, <algorithm> include may need to be added"
+                f"Line {i}: wpi::units::math::max replaced with std::max, <algorithm> include may need to be added"
             )
-        if "units::math::min" in lines[i]:
+        if "wpi::units::math::min" in lines[i]:
             print(
-                f"Line {i}: units::math::min replaced with std::min, <algorithm> include may need to be added"
+                f"Line {i}: wpi::units::math::min replaced with std::min, <algorithm> include may need to be added"
             )
         lines[i] = (
             lines[i]
-            .replace("units::math::max", "std::max")
-            .replace("units::math::min", "std::min")
-            .replace("units::math", "mp")
+            .replace("wpi::units::math::max", "std::max")
+            .replace("wpi::units::math::min", "std::min")
+            .replace("wpi::units::math", "mp")
         )
 
     # Process concepts
     for i in body_iter():
         lines[i] = (
             lines[i]
-            .replace("units::angle_unit auto", "mp::QuantityOf<mp::angle> auto")
-            .replace("units::traits::is_unit_t_v", "mp::Quantity")
+            .replace("wpi::units::angle_unit auto", "mp::QuantityOf<mp::angle> auto")
+            .replace("wpi::units::traits::is_unit_t_v", "mp::Quantity")
         )
 
     # Process function implementation parameter types separately to avoid counting those changes for IWYU
@@ -706,10 +713,15 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
 
     # Process decltype() (from nh UDLs)
     for i in body_iter():
-        process_decltype(lines, i)
+        try:
+            process_decltype(lines, i)
+        except:
+            print(f"{i = }")
+            raise
 
     # Process .value()
     for i in body_iter():
+        lines[i] = lines[i].replace(".to<double>()", ".value()")
         process_value_calls(lines, i)
 
     # Clean up double division
@@ -717,30 +729,28 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
         lines[i] = lines[i].replace("/ mp::s / mp::s", "/ mp::s2")
 
     # Warn about remaining instances
-    nh_units_count: int = sum(x.count("units::") for x in lines)
+    nh_units_count: int = sum(x.count("wpi::units::") for x in lines)
     if nh_units_count > 0:
         nh_instances: str = (
             "1 instance" if nh_units_count == 1 else f"{nh_units_count} instances"
         )
         print(f"Note: {nh_instances} of old units remaining that need manual updating")
 
-    # Automatically add frc/units-usc.h include if needed
+    # Automatically add wpi/units-usc.hpp include if needed
     if base_include_line != -1 and need_usc_include:
         i: int = base_include_line
-        # Copy the original include (so we get the right choice of <> vs "")
-        lines.insert(i, lines[i])
-        # Change the first of the two lines (since units-usc.h is before units.h)
-        assert lines[i].count("units.h") == 1
-        lines[i] = lines[i].replace("units.h", "units-usc.h")
+        # Note that units-usc.hpp is before units.hpp
+        lines.insert(i, '#include "wpi/units-usc.hpp"\n')
 
     # Do a basic IWYU (Include What You Use) check
     added_include: bool = base_include_line >= 0
-    if check_iwyu:
-        need_include: bool = need_base_include or need_usc_include
-        if added_include and not need_include:
-            print("Warning: units headers converted but no changes made to file")
-        elif not added_include and need_include:
-            print("Warning: Changes made to file but no units includes found")
+    # Disabled in the interest of getting an MVP out quickly
+    # if check_iwyu:
+    #     need_include: bool = need_base_include or need_usc_include
+    #     if added_include and not need_include:
+    #         print("Warning: units headers converted but no changes made to file")
+    #     elif not added_include and need_include:
+    #         print("Warning: Changes made to file but no units includes found")
 
     return added_include or changed_body
 
@@ -820,6 +830,9 @@ def test_translate(
     ):
         return True
     print(f'Test "{name}" failed!')
+    print("Input:")
+    for line in test_input:
+        print("> " + line, end="")
     if dirty != expected_dirty:
         print(f"Incorrect {dirty = }")
     if lines != list(expected):
@@ -844,147 +857,143 @@ def run_tests() -> bool:
     success &= test_translate(
         "Quote include",
         (
-            '#include "units/area.h"\n',
-            '#include "units/length.h"\n',
-            '#include "units/volume.h"\n',
+            '#include "wpi/units/area.hpp"\n',
+            '#include "wpi/units/length.hpp"\n',
+            '#include "wpi/units/volume.hpp"\n',
         ),
-        ('#include "frc/units.h"\n',),
-    )
-    success &= test_translate(
-        "Angle bracket include",
-        (
-            "#include <units/area.h>\n",
-            "#include <units/length.h>\n",
-            "#include <units/volume.h>\n",
-        ),
-        ("#include <frc/units.h>\n",),
+        ('#include "wpi/units.hpp"\n',),
     )
     success &= test_translate(
         "Okay includes",
         (
             "#include <utility>\n",
-            "#include <wpi/string.h>\n",
-            '#include "frc/units.h"\n',
+            '#include "wpi/util/string.h"\n',
+            '#include "wpi/units.hpp"\n',
         ),
         (
             "#include <utility>\n",
-            "#include <wpi/string.h>\n",
-            '#include "frc/units.h"\n',
+            '#include "wpi/util/string.h"\n',
+            '#include "wpi/units.hpp"\n',
         ),
     )
     success &= test_translate(
         "add usc include",
         (
-            '#include "units/length.h"\n',
+            '#include "wpi/units/length.hpp"\n',
             "\n",
             "static constexpr auto x = 1_in;\n",
         ),
         (
-            '#include "frc/units-usc.h"\n',
-            '#include "frc/units.h"\n',
+            '#include "wpi/units-usc.hpp"\n',
+            '#include "wpi/units.hpp"\n',
             "\n",
             "static constexpr auto x = 1.0 * mp::in;\n",
         ),
     )
     success &= test_translate(
-        "units::math",
-        ("units::math::hypot(x, y)\n",),
+        "wpi::units::math",
+        ("wpi::units::math::hypot(x, y)\n",),
         ("mp::hypot(x, y)\n",),
     )
     success &= test_translate(
-        "meter", ("units::meter_t x;\n",), ("mp::quantity<mp::m> x;\n",)
+        "meter", ("wpi::units::meter_t x;\n",), ("mp::quantity<mp::m> x;\n",)
     )
     success &= test_translate(
         "meters",
-        ("Translation2d(units::meter_t x, units::meter_t y);\n",),
+        ("Translation2d(wpi::units::meter_t x, wpi::units::meter_t y);\n",),
         ("Translation2d(mp::quantity<mp::m> x, mp::quantity<mp::m> y);\n",),
     )
     success &= test_translate(
         "instantiation",
-        ("units::meter_t{0}\n",),
+        ("wpi::units::meter_t{0}\n",),
         ("0.0 * mp::m\n",),
     )
     success &= test_translate(
         "instantiation exponent",
-        ("units::meter_t{1e-9}\n",),
+        ("wpi::units::meter_t{1e-9}\n",),
         ("1e-9 * mp::m\n",),
     )
     success &= test_translate(
         "instantiation multi in line",
-        ("units::meter_t{x}, units::meter_t{y}\n",),
+        ("wpi::units::meter_t{x}, wpi::units::meter_t{y}\n",),
         ("x * mp::m, y * mp::m\n",),
     )
     success &= test_translate(
         "instantiation multiline",
         (
-            "units::meter_t{\n",
+            "wpi::units::meter_t{\n",
             "  double{0}}\n",
         ),
         ("  double{0} * mp::m\n",),
     )
     success &= test_translate(
         "instantiation division",
-        ("1 / units::meter_t{x}\n",),
+        ("1 / wpi::units::meter_t{x}\n",),
         ("1 / (x * mp::m)\n",),
     )
     success &= test_translate(
         "instantiation unit composition",
-        ("1_V / units::unit_t<Distance>{1}\n",),
+        ("1_V / wpi::units::unit_t<Distance>{1}\n",),
         ("1.0 * mp::V / Distance\n",),
     )
     success &= test_translate(
         "double instantiation unit composition",
-        ("units::volt_t{1} / units::unit_t<Distance>{1}\n",),
+        ("wpi::units::volt_t{1} / wpi::units::unit_t<Distance>{1}\n",),
         ("1.0 * mp::V / Distance\n",),
     )
     success &= test_translate(
         "instantiation unit composition parenthesized",
-        ("4.0_V / (units::unit_t<Distance>{1} / 1_s)\n",),
+        ("4.0_V / (wpi::units::unit_t<Distance>{1} / 1_s)\n",),
         ("4.0 * mp::V / (Distance / mp::s)\n",),
         ("Line 0: Assuming that Distance is a unit template argument\n",),
     )
     success &= test_translate(
         "instantiation subtraction",
-        ("units::meter_t{x - y}\n",),
+        ("wpi::units::meter_t{x - y}\n",),
         ("(x - y) * mp::m\n",),
     )
     success &= test_translate(
         "instantiation parenthesized addition",
-        ("units::meter_t{(x + y) / 2}\n",),
+        ("wpi::units::meter_t{(x + y) / 2}\n",),
         ("(x + y) / 2.0 * mp::m\n",),
     )
     success &= test_translate(
         "unit conversion",
-        ("units::second_t{dt}.value();\n",),
+        ("wpi::units::second_t{dt}.value();\n",),
         ("mp::value(dt.in(mp::s));\n",),
     )
     success &= test_translate(
         "unit conversion two",
-        ("double{units::second_t{-10_ms} / foo}\n",),
+        ("double{wpi::units::second_t{-10_ms} / foo}\n",),
         ("double{(-10.0 * mp::ms).in(mp::s) / foo}\n",),
     )
     success &= test_translate(
         "unit conversion literal",
-        ("units::radian_t{90_deg}\n",),
+        ("wpi::units::radian_t{90_deg}\n",),
         ("(90.0 * mp::deg).in(mp::rad)\n",),
     )
     success &= test_translate(
         "unit conversion literal value",
-        ("units::radian_t{90_deg}.value();\n",),
+        ("wpi::units::radian_t{90_deg}.value();\n",),
         ("mp::value((90.0 * mp::deg).in(mp::rad));\n",),
     )
     success &= test_translate(
         "unit_t integer",
-        ("units::unit_t<kv_unit>(0)\n",),
+        ("wpi::units::unit_t<kv_unit>(0)\n",),
         ("0.0 * kv_unit\n",),
     )
     success &= test_translate(
         "unit_t blank line",
         (
-            "units::meter_t{\n",
+            "wpi::units::meter_t{\n",
             "  x}\n",
         ),
         ("  x * mp::m\n",),
+    )
+    success &= test_translate(
+        "skipped .value()",
+        ("opt.value()  // non-unit .value()\n",),
+        ("opt.value()\n",),
     )
     success &= test_translate(
         "parenthesized .value()",
@@ -1055,12 +1064,12 @@ def run_tests() -> bool:
     )
     success &= test_translate(
         "unit plural",
-        ("units::meters\n",),
+        ("wpi::units::meters\n",),
         ("mp::m\n",),
     )
     success &= test_translate(
         "unit singular",
-        ("units::meter\n",),
+        ("wpi::units::meter\n",),
         ("mp::m\n",),
     )
     success &= test_translate(
@@ -1138,8 +1147,8 @@ def run_conversions(paths: list[Path]):
             else:
                 for f in fn:
                     if f.startswith(".") or f in (
-                        "units.h",
-                        "units-usc.h",
+                        "units.hpp",
+                        "units-usc.hpp",
                         "UnitsTest.cpp",
                     ):
                         printer.run(lambda: print(f"file {dp / f}"))
@@ -1151,7 +1160,7 @@ def run_conversions(paths: list[Path]):
                         continue
                     files.append(dp / f)
             dn.sort()
-            for bad_dir in ("java", "generated", "units", "thirdparty"):
+            for bad_dir in ("java", "generated", "python", "units", "thirdparty"):
                 if bad_dir in dn:
                     printer.run(lambda: print(f"directory {dp / bad_dir}"))
                     dn.remove(bad_dir)

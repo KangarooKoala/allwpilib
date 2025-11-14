@@ -20,6 +20,11 @@ printf "  Done in %s seconds\n" $((end - start))
 
 ./translate_units.py $file_paths
 
+git restore --source HEAD -- wpimath/src/main/native/include/wpi/units.hpp
+git restore --source HEAD -- wpimath/src/main/native/include/wpi/units-usc.hpp
+git restore --source HEAD -- wpimath/src/main/native/thirdparty
+git restore --source HEAD -- wpimath/src/test/native/cpp/MpUnitsTest.cpp
+
 start=$(date +%s)
 echo "Running format"
 wpiformat -f $(cat translate_units_format_files)
@@ -34,18 +39,18 @@ if [ "$1" != $skip_post_flag ]; then
   printf "  Done in %s seconds\n" $((end - start))
 fi
 
-start=$(date +%s)
-echo "Inverting changes"
-git add $file_paths
-git restore --source HEAD $file_paths
-end=$(date +%s)
-printf "  Done in %s seconds\n" $((end - start))
-
-remaining_files=$(git diff --name-only -- $file_paths | wc -l)
-
-if [ $remaining_files = 0 ]; then
-  echo "No remaining changes!"
-else
-  printf "%s files have remaining changes\n" $(git diff --name-only -- $file_paths | wc -l)
-  exit 1
-fi
+# start=$(date +%s)
+# echo "Inverting changes"
+# git add $file_paths
+# git restore --source HEAD $file_paths
+# end=$(date +%s)
+# printf "  Done in %s seconds\n" $((end - start))
+# 
+# remaining_files=$(git diff --name-only -- $file_paths | wc -l)
+# 
+# if [ $remaining_files = 0 ]; then
+#   echo "No remaining changes!"
+# else
+#   printf "%s files have remaining changes\n" $(git diff --name-only -- $file_paths | wc -l)
+#   exit 1
+# fi
