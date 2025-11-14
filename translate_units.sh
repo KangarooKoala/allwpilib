@@ -1,9 +1,14 @@
 #!/bin/sh
 
+readonly only_pre_flag="--only-pre"
 readonly skip_post_flag="--skip-post"
 
 if [ "$1" ]; then
-  if [ "$1" != $skip_post_flag ]; then
+  if [ "$1" = $skip_post_flag ]; then
+    dummy=0
+  elif [ "$1" = $only_pre_flag ]; then
+    dummy=0
+  else
     echo Unknown argument "$1"!
     exit 11
   fi
@@ -13,17 +18,21 @@ file_paths=$(cat translate_units_paths)
 
 start=$(date +%s)
 echo "Restoring files and applying pre-patch"
-git restore --source 2027 -- $file_paths
+git restore --worktree --staged --source 2027 -- $file_paths
 git apply translate_units_pre.patch
 end=$(date +%s)
 printf "  Done in %s seconds\n" $((end - start))
 
-./translate_units.py $file_paths
+git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include/wpi/units.hpp
+git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include/wpi/units-usc.hpp
+git restore --worktree --staged --source HEAD -- wpimath/src/main/native/thirdparty
+git restore --worktree --staged --source HEAD -- wpimath/src/test/native/cpp/MpUnitsTest.cpp
 
-git restore --source HEAD -- wpimath/src/main/native/include/wpi/units.hpp
-git restore --source HEAD -- wpimath/src/main/native/include/wpi/units-usc.hpp
-git restore --source HEAD -- wpimath/src/main/native/thirdparty
-git restore --source HEAD -- wpimath/src/test/native/cpp/MpUnitsTest.cpp
+if [ "$1" = $only_pre_flag ]; then
+  exit 0
+fi
+
+./translate_units.py $file_paths
 
 start=$(date +%s)
 echo "Running format"
@@ -32,6 +41,8 @@ end=$(date +%s)
 printf "  Done formatting %s files in %s seconds\n" $(cat translate_units_format_files | wc -l) $((end - start))
 
 if [ "$1" != $skip_post_flag ]; then
+  git add .
+
   start=$(date +%s)
   echo "Applying post-patch"
   git apply translate_units_post.patch

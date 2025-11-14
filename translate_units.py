@@ -37,6 +37,7 @@ BASE_UDL_TO_UNIT: dict[str, str] = {
     "ms": "mp::ms",
     "rad": "mp::rad",
     "deg": "mp::deg",
+    "tr": "mp::rev",
     "kg": "mp::kg",
     "V": "mp::V",
     "A": "mp::A",
@@ -106,6 +107,21 @@ def prev_non_space(lines: list[str], line: int, pos: int) -> tuple[str, int, int
                 return s[pos], line, pos
             pos -= 1
         line -= 1
+    return "", -1, -1
+
+
+def first_non_space(lines: list[str], line: int, pos: int) -> tuple[str, int, int]:
+    """
+    Returns the first non-space character at or after the specified position. Empty string if there is no such character.
+    """
+    while line < len(lines):
+        s: str = lines[line]
+        while pos < len(s):
+            if not s[pos].isspace():
+                return s[pos], line, pos
+            pos += 1
+        pos = 0
+        line += 1
     return "", -1, -1
 
 
@@ -273,7 +289,7 @@ def is_end_of_unit(lines: list[str], i: int, pos: int) -> bool:
     if atom.startswith("mp::"):
         return True
     # Check for numeric UDL
-    if atom and atom[0].isdigit() or atom[0] in "-+":
+    if atom and (atom[0].isdigit() or atom[0] in "-+"):
         for nh_udl in ALL_UDL_TO_UNIT:
             udl_suffix: str = f"_{nh_udl}"
             if atom.endswith(udl_suffix):
@@ -392,9 +408,12 @@ def process_unit_type_initialization(
     # Delete "}"
     lines[r_line_i] = delete(lines[r_line_i], r_pos, init_pair[1])
     # Add " * unit" or ".in(unit)" at the end
+    first_ns, first_ns_line_i, first_ns_pos = first_non_space(lines, r_line_i, r_pos)
     replacement: str
-    if lines[r_line_i][r_pos:].startswith(".value()") or is_end_of_unit(
-        lines, r_line_i, r_pos - 1
+    if (
+        first_ns == "."
+        and lines[first_ns_line_i][first_ns_pos:].startswith(".value()")
+        or is_end_of_unit(lines, r_line_i, r_pos - 1)
     ):
         # Unit conversion
         replacement = f".in({unit})"
@@ -410,9 +429,9 @@ def check_variable_initializer(lines: list[str], i: int, end: int):
         # Variable declaration must be space between type and variable name
         return
     # Skip spaces
-    while pos < len(lines) and lines[i][pos].isspace():
+    while pos < len(lines[i]) and lines[i][pos].isspace():
         pos += 1
-    if pos >= len(lines):
+    if pos >= len(lines[i]):
         # Only check single-line variable declarations
         return
     if not lines[i][pos].isalpha() and lines[i][pos] != "_":
@@ -534,10 +553,22 @@ def process_decltype(lines: list[str], i: int, *, type_only: bool = False):
                 decltype_end += len("mp::quantity<") - len("decltype(1.0 * ")
             lines[end_line] = replace(lines[end_line], unit_end, ")", ">")
             # Check if this is a type for a variable that has an initializer
-            check_variable_initializer(lines, i, decltype_end)
+            check_variable_initializer(lines, end_line, decltype_end)
         elif not type_only:
             # Type initialization
             # Load data
+            if end_line == i + 1:
+                # Editing lines outside of lines[i + 1] is usually not allowed
+                # because we won't detect changes. However, we're also editing
+                # the current line, so the change will still show up. (Note
+                # though that we only only delete up to lines[i] without
+                # messing up the iteration)
+                old_line: str = lines[i + 1]
+                lines[i + 1] = lines[i].rstrip() + " " + lines[i + 1].lstrip()
+                unit_end += len(lines[i + 1]) - len(old_line)
+                decltype_end += len(lines[i + 1]) - len(old_line)
+                del lines[i]
+                end_line -= 1
             if end_line != i:
                 print(f"Line {i}: decltype(...) type conversion is too complicated!")
                 continue
@@ -549,13 +580,22 @@ def process_decltype(lines: list[str], i: int, *, type_only: bool = False):
 
 def process_value_calls(lines: list[str], i: int):
     """Processes any .value() calls in the specified line."""
-    SKIP_COMMENT: str = "  // non-unit .value()"
+    NEXT_LINE_SKIP_COMMENT: str = "// next line non-unit .value()"
+    SKIP_COMMENT: str = "// non-unit .value()"
+    if lines[i].strip() == NEXT_LINE_SKIP_COMMENT:
+        # Don't mangle the comment, but wait to delete until the next line
+        return
+    if i > 0 and NEXT_LINE_SKIP_COMMENT in lines[i - 1]:
+        del lines[i - 1]
+        return
     if SKIP_COMMENT in lines[i]:
         if lines[i].count(SKIP_COMMENT) != 1:
             raise ValueError(
                 "Multiple occurences of skip .value() comment in line {i + 1}!"
             )
-        lines[i] = lines[i].replace(SKIP_COMMENT, "")
+        index = lines[i].find(SKIP_COMMENT)
+        lines[i] = delete(lines[i], index, SKIP_COMMENT)
+        lines[i] = lines[i][:index].rstrip() + lines[i][index:]
         return
     while (index := lines[i].find(".value()")) >= 0:
         # Delete .value()
@@ -598,8 +638,12 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
             old_len: int = len(lines)
             old_line = lines[i]
             yield i
-            # Adjust for any added or deleted elements
-            i += len(lines) - old_len
+            # Handle added or deleted elements
+            if len(lines) != old_len:
+                i += len(lines) - old_len
+                dirty = True
+                i += 1
+                continue
             # Update dirty
             dirty |= lines[i] != old_line
             # Delete newly blank lines
@@ -820,6 +864,9 @@ def test_translate(
         dirty = print_capturer.run(lambda: translate_lines(lines, check_iwyu=False))
     except:
         print(f'Error running test "{name}"!')
+        print("Logged output:")
+        for line in print_capturer.output:
+            print("> " + line, end="")
         raise
     output: list[str] = print_capturer.output
     expected_dirty: bool = test_input != expected
@@ -978,6 +1025,17 @@ def run_tests() -> bool:
         ("mp::value((90.0 * mp::deg).in(mp::rad));\n",),
     )
     success &= test_translate(
+        "unit conversion multiline",
+        (
+            "wpi::units::second_t{dt}\n",
+            "    .value();\n",
+        ),
+        (
+            "mp::value(dt.in(mp::s)\n",
+            "    );\n",
+        ),
+    )
+    success &= test_translate(
         "unit_t integer",
         ("wpi::units::unit_t<kv_unit>(0)\n",),
         ("0.0 * kv_unit\n",),
@@ -992,8 +1050,24 @@ def run_tests() -> bool:
     )
     success &= test_translate(
         "skipped .value()",
+        ("// next line non-unit .value()\n", "opt.value()\n"),
+        ("opt.value()\n",),
+    )
+    success &= test_translate(
+        "skipped same line .value()",
         ("opt.value()  // non-unit .value()\n",),
         ("opt.value()\n",),
+    )
+    success &= test_translate(
+        "skipped same line .value() different space",
+        (
+            "  g = gradientF.value();  // non-unit .value()\n",
+            "  h = hessianF.value();   // non-unit .value()\n",
+        ),
+        (
+            "  g = gradientF.value();\n",
+            "  h = hessianF.value();\n",
+        ),
     )
     success &= test_translate(
         "parenthesized .value()",
@@ -1093,6 +1167,25 @@ def run_tests() -> bool:
         (
             "mp::quantity<mp::V / (mp::m / mp::s)> x, mp::quantity<mp::V / (mp::m / mp::s2)> y\n",
         ),
+    )
+    success &= test_translate(
+        "decltype multiline",
+        (
+            "decltype(1_V /\n",
+            "         1_mps)\n",
+        ),
+        (
+            "mp::quantity<mp::V /\n",
+            "         (mp::m / mp::s)>\n",
+        ),
+    )
+    success &= test_translate(
+        "decltype instantiation multiline",
+        (
+            "decltype(1_V /\n",
+            "         1_mps){x}\n",
+        ),
+        ("x * mp::V / (mp::m / mp::s)\n",),
     )
     if success:
         print("All tests succeeded!")
