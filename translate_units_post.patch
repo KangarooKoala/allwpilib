@@ -1,0 +1,375 @@
+diff --git a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
+index df17a3be9c..293b06ead2 100644
+--- a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
++++ b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
+@@ -18,14 +18,11 @@ namespace wpi::math {
+  */
+ class WPILIB_DLLEXPORT ArmFeedforward {
+  public:
+-  using Angle = mp::rad;
+-  using Velocity = mp::rad / mp::s;
+-  using Acceleration =
+-      wpi::units::compound_unit<mp::rad / mp::s, wpi::units::inverse<mp::s>>;
+-  using kv_unit =
+-      wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::rad / mp::s>>;
+-  using ka_unit =
+-      wpi::units::compound_unit<mp::V, wpi::units::inverse<Acceleration>>;
++  static constexpr auto Angle = mp::rad;
++  static constexpr auto Velocity = mp::rad / mp::s;
++  static constexpr auto Acceleration = mp::rad / mp::s / mp::s;
++  static constexpr auto kv_unit = mp::V / (mp::rad / mp::s);
++  static constexpr auto ka_unit = mp::V / Acceleration;
+ 
+   /**
+    * Creates a new ArmFeedforward with the specified gains.
+diff --git a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
+index 7f4e7994ab..3d46fd1e39 100644
+--- a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
++++ b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
+@@ -18,15 +18,11 @@ namespace wpi::math {
+  */
+ class ElevatorFeedforward {
+  public:
+-  using Distance = mp::m;
+-  using Velocity =
+-      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-  using Acceleration =
+-      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
+-  using kv_unit =
+-      wpi::units::compound_unit<mp::V, wpi::units::inverse<Velocity>>;
+-  using ka_unit =
+-      wpi::units::compound_unit<mp::V, wpi::units::inverse<Acceleration>>;
++  static constexpr auto Distance = mp::m;
++  static constexpr auto Velocity = Distance / mp::s;
++  static constexpr auto Acceleration = Velocity / mp::s;
++  static constexpr auto kv_unit = mp::V / Velocity;
++  static constexpr auto ka_unit = mp::V / Acceleration;
+ 
+   /**
+    * Creates a new ElevatorFeedforward with the specified gains.
+@@ -132,7 +128,7 @@ class ElevatorFeedforward {
+       mp::quantity<Velocity> currentVelocity,
+       mp::quantity<Velocity> nextVelocity) const {
+     // See wpimath/algorithms.md#Elevator_feedforward for derivation
+-    if (kA < decltype(kA)(1e-9)) {
++    if (kA < 1e-9 * decltype(kA)::unit) {
+       return kS * wpi::util::sgn(nextVelocity) + kG + kV * nextVelocity;
+     } else {
+       double A = -mp::value(kV) / mp::value(kA);
+diff --git a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
+index 42948aa079..f056925535 100644
+--- a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
++++ b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
+@@ -27,17 +27,15 @@ int IncrementAndGetProfiledPIDControllerInstances();
+  * Implements a PID control loop whose setpoint is constrained by a trapezoid
+  * profile.
+  */
+-template <class Distance>
++template <mp::Unit auto Distance>
+ class ProfiledPIDController
+     : public wpi::util::Sendable,
+       public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
+  public:
+   using Distance_t = mp::quantity<Distance>;
+-  using Velocity =
+-      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
++  static constexpr auto Velocity = Distance / mp::s;
+   using Velocity_t = mp::quantity<Velocity>;
+-  using Acceleration =
+-      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
++  static constexpr auto Acceleration = Velocity / mp::s;
+   using Acceleration_t = mp::quantity<Acceleration>;
+   using State = typename TrapezoidProfile<Distance>::State;
+   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
+diff --git a/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp b/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
+index aec4f48202..917075243a 100644
+--- a/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
++++ b/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
+@@ -14,11 +14,8 @@ namespace wpi::math {
+  */
+ class WPILIB_DLLEXPORT DCMotor {
+  public:
+-  using radians_per_second_per_volt_t = wpi::units::unit_t<
+-      wpi::units::compound_unit<mp::rad / mp::s, wpi::units::inverse<mp::V>>>;
+-  using newton_meters_per_ampere_t =
+-      wpi::units::unit_t<wpi::units::compound_unit<wpi::units::newton_meters,
+-                                                   wpi::units::inverse<mp::A>>>;
++  using radians_per_second_per_volt_t = mp::quantity<mp::rad / mp::s / mp::V>;
++  using newton_meters_per_ampere_t = mp::quantity<mp::N * mp::m / mp::A>;
+ 
+   /// Voltage at which the motor constants were measured.
+   mp::quantity<mp::V> nominalVoltage;
+diff --git a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
+index bd3c8088a3..d1bb4ebef6 100644
+--- a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
++++ b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
+@@ -20,14 +20,11 @@ namespace wpi::math {
+  */
+ class WPILIB_DLLEXPORT LinearSystemId {
+  public:
+-  template <typename Distance>
+-  using Velocity_t = wpi::units::unit_t<
+-      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>>;
++  template <mp::Unit auto Distance>
++  using Velocity_t = mp::quantity<Distance / mp::s>;
+ 
+-  template <typename Distance>
+-  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
+-      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>,
+-      wpi::units::inverse<mp::s>>>;
++  template <mp::Unit auto Distance>
++  using Acceleration_t = mp::quantity<Distance / mp::s2>;
+ 
+   /**
+    * Create a state-space model of the elevator system. The states of the system
+@@ -115,15 +112,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+    * @see <a
+    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
+    */
+-  template <typename Distance>
+-    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
++  template <mp::Unit auto Distance>
++    requires(mp::m == Distance) || (mp::rad == Distance)
+   static constexpr LinearSystem<1, 1, 1> IdentifyVelocitySystem(
+-      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
+-      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
+-    if (kV < decltype(kV){0}) {
++      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
++      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
++    if (kV < 0.0 * decltype(kV)::unit) {
+       throw std::domain_error("Kv must be greater than or equal to zero.");
+     }
+-    if (kA <= decltype(kA){0}) {
++    if (kA <= 0.0 * decltype(kA)::unit) {
+       throw std::domain_error("Ka must be greater than zero.");
+     }
+ 
+@@ -157,15 +154,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+    * @see <a
+    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
+    */
+-  template <typename Distance>
+-    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
++  template <mp::Unit auto Distance>
++    requires(mp::m == Distance) || (mp::rad == Distance)
+   static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
+-      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
+-      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
+-    if (kV < decltype(kV){0}) {
++      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
++      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
++    if (kV < 0.0 * decltype(kV)::unit) {
+       throw std::domain_error("Kv must be greater than or equal to zero.");
+     }
+-    if (kA <= decltype(kA){0}) {
++    if (kA <= 0.0 * decltype(kA)::unit) {
+       throw std::domain_error("Ka must be greater than zero.");
+     }
+ 
+@@ -204,16 +201,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
+       mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+       mp::quantity<mp::V / (mp::m / mp::s)> kVAngular,
+       mp::quantity<mp::V / (mp::m / mp::s2)> kAAngular) {
+-    if (kVLinear <= decltype(kVLinear){0}) {
++    if (kVLinear <= 0.0 * decltype(kVLinear)::unit) {
+       throw std::domain_error("Kv,linear must be greater than zero.");
+     }
+-    if (kALinear <= decltype(kALinear){0}) {
++    if (kALinear <= 0.0 * decltype(kALinear)::unit) {
+       throw std::domain_error("Ka,linear must be greater than zero.");
+     }
+-    if (kVAngular <= decltype(kVAngular){0}) {
++    if (kVAngular <= 0.0 * decltype(kVAngular)::unit) {
+       throw std::domain_error("Kv,angular must be greater than zero.");
+     }
+-    if (kAAngular <= decltype(kAAngular){0}) {
++    if (kAAngular <= 0.0 * decltype(kAAngular)::unit) {
+       throw std::domain_error("Ka,angular must be greater than zero.");
+     }
+ 
+@@ -268,16 +265,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
+       mp::quantity<mp::V / (mp::rad / mp::s)> kVAngular,
+       mp::quantity<mp::V / (mp::rad / mp::s2)> kAAngular,
+       mp::quantity<mp::m> trackwidth) {
+-    if (kVLinear <= decltype(kVLinear){0}) {
++    if (kVLinear <= 0.0 * decltype(kVLinear)::unit) {
+       throw std::domain_error("Kv,linear must be greater than zero.");
+     }
+-    if (kALinear <= decltype(kALinear){0}) {
++    if (kALinear <= 0.0 * decltype(kALinear)::unit) {
+       throw std::domain_error("Ka,linear must be greater than zero.");
+     }
+-    if (kVAngular <= decltype(kVAngular){0}) {
++    if (kVAngular <= 0.0 * decltype(kVAngular)::unit) {
+       throw std::domain_error("Kv,angular must be greater than zero.");
+     }
+-    if (kAAngular <= decltype(kAAngular){0}) {
++    if (kAAngular <= 0.0 * decltype(kAAngular)::unit) {
+       throw std::domain_error("Ka,angular must be greater than zero.");
+     }
+     if (trackwidth <= 0.0 * mp::m) {
+@@ -380,15 +377,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+    *
+    * @throws std::domain_error if kV < 0 or kA <= 0.
+    */
+-  template <typename Distance>
+-    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
++  template <mp::Unit auto Distance>
++    requires(mp::m == Distance) || (mp::rad == Distance)
+   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
+-      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
+-      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
+-    if (kV < decltype(kV){0}) {
++      mp::quantity<mp::V / Velocity_t<Distance>::unit> kV,
++      mp::quantity<mp::V / Acceleration_t<Distance>::unit> kA) {
++    if (kV < 0.0 * decltype(kV)::unit) {
+       throw std::domain_error("Kv must be greater than or equal to zero.");
+     }
+-    if (kA <= decltype(kA){0}) {
++    if (kA <= 0.0 * decltype(kA)::unit) {
+       throw std::domain_error("Ka must be greater than zero.");
+     }
+ 
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
+index 81e727192e..d057b47030 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
+@@ -42,15 +42,13 @@ namespace wpi::math {
+  * `Calculate()` and to determine when the profile has completed via
+  * `IsFinished()`.
+  */
+-template <class Distance>
++template <mp::Unit auto Distance>
+ class TrapezoidProfile {
+  public:
+   using Distance_t = mp::quantity<Distance>;
+-  using Velocity =
+-      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
++  static constexpr auto Velocity = Distance / mp::s;
+   using Velocity_t = mp::quantity<Velocity>;
+-  using Acceleration =
+-      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
++  static constexpr auto Acceleration = Velocity / mp::s;
+   using Acceleration_t = mp::quantity<Acceleration>;
+ 
+   /**
+diff --git a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
+index f89f2a0d90..ef86a7a3ca 100644
+--- a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
++++ b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
+@@ -17,6 +17,20 @@
+ 
+ namespace wpi::math {
+ 
++namespace detail {
++
++template <typename T>
++  requires std::is_arithmetic_v<T> || mp::Quantity<T>
++constexpr T MakeValue(double value) {
++  if constexpr (std::is_arithmetic_v<T>) {
++    return T{value};
++  } else {
++    return value * T::unit;
++  }
++}
++
++}  // namespace detail
++
+ /**
+  * Returns 0.0 if the given value is within the specified range around zero. The
+  * remaining range between the deadband and the maximum magnitude is scaled from
+@@ -30,7 +44,8 @@ namespace wpi::math {
+  */
+ template <typename T>
+   requires std::is_arithmetic_v<T> || mp::Quantity<T>
+-constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
++constexpr T ApplyDeadband(T value, T deadband,
++                          T maxMagnitude = detail::MakeValue<T>(1.0)) {
+   T magnitude;
+   if constexpr (std::is_arithmetic_v<T>) {
+     magnitude = gcem::abs(value);
+@@ -39,10 +54,10 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
+   }
+ 
+   if (magnitude < deadband) {
+-    return T{0.0};
++    return detail::MakeValue<T>(0.0);
+   }
+ 
+-  if (value > T{0.0}) {
++  if (value > detail::MakeValue<T>(0.0)) {
+     // Map deadband to 0 and map max to max with a linear relationship.
+     //
+     //   y - y₁ = m(x - x₁)
+@@ -103,7 +118,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
+ template <typename T, int N>
+   requires std::is_arithmetic_v<T> || mp::Quantity<T>
+ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
+-                                  T maxMagnitude = T{1.0}) {
++                                  T maxMagnitude = detail::MakeValue<T>(1.0)) {
+   if constexpr (std::is_arithmetic_v<T>) {
+     if (value.norm() < T{1e-9}) {
+       return Eigen::Vector<T, N>::Zero();
+@@ -111,10 +126,18 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
+     return value.normalized() *
+            ApplyDeadband(value.norm(), deadband, maxMagnitude);
+   } else {
+-    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
++    // Use explicit rows() to handle dynamic size vectors
++    Eigen::Vector<double, N> asDouble(value.rows());
++    for (int i = 0; i < value.rows(); ++i) {
++      asDouble(i) = mp::value(value(i));
++    }
+     const Eigen::Vector<double, N> processed =
+         ApplyDeadband(asDouble, mp::value(deadband), mp::value(maxMagnitude));
+-    return processed.template cast<T>();
++    Eigen::Vector<T, N> returnValue(processed.rows());
++    for (int i = 0; i < processed.rows(); ++i) {
++      returnValue(i) = processed(i) * T::unit;
++    }
++    return returnValue;
+   }
+ }
+ 
+@@ -139,7 +162,7 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
+ template <typename T>
+   requires std::is_arithmetic_v<T> || mp::Quantity<T>
+ constexpr T CopyDirectionPow(T value, double exponent,
+-                             T maxMagnitude = T{1.0}) {
++                             T maxMagnitude = detail::MakeValue<T>(1.0)) {
+   if constexpr (std::is_arithmetic_v<T>) {
+     return gcem::copysign(
+         gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
+@@ -172,8 +195,9 @@ constexpr T CopyDirectionPow(T value, double exponent,
+  */
+ template <typename T, int N>
+   requires std::is_arithmetic_v<T> || mp::Quantity<T>
+-Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
+-                                     double exponent, T maxMagnitude = T{1.0}) {
++Eigen::Vector<T, N> CopyDirectionPow(
++    const Eigen::Vector<T, N>& value, double exponent,
++    T maxMagnitude = detail::MakeValue<T>(1.0)) {
+   if constexpr (std::is_arithmetic_v<T>) {
+     if (value.norm() < T{1e-9}) {
+       return Eigen::Vector<T, N>::Zero();
+@@ -181,10 +205,18 @@ Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
+     return value.normalized() *
+            CopyDirectionPow(value.norm(), exponent, maxMagnitude);
+   } else {
+-    const Eigen::Vector<double, N> asDouble = value.template cast<double>();
++    // Use explicit rows() to handle dynamic size vectors
++    Eigen::Vector<double, N> asDouble(value.rows());
++    for (int i = 0; i < value.rows(); ++i) {
++      asDouble(i) = mp::value(value(i));
++    }
+     const Eigen::Vector<double, N> processed =
+         CopyDirectionPow(asDouble, exponent, mp::value(maxMagnitude));
+-    return processed.template cast<T>();
++    Eigen::Vector<T, N> returnValue(processed.rows());
++    for (int i = 0; i < processed.rows(); ++i) {
++      returnValue(i) = processed(i) * T::unit;
++    }
++    return returnValue;
+   }
+ }
+ 

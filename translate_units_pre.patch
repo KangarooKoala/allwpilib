@@ -1,0 +1,609 @@
+diff --git a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp b/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
+index 8525923727..869ace9848 100644
+--- a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
++++ b/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
+@@ -58,13 +58,13 @@ wpi::units::volt_t ArmFeedforward::Calculate(
+   // Refine solution via Newton's method
+   {
+     auto xAD = u_k;
+-    double x = xAD.value();
++    double x = xAD.value();  // non-unit .value()
+ 
+     slp::Gradient gradientF{cost, xAD};
+-    Eigen::SparseVector<double> g = gradientF.value();
++    Eigen::SparseVector<double> g = gradientF.value();  // non-unit .value()
+ 
+     slp::Hessian hessianF{cost, xAD};
+-    Eigen::SparseMatrix<double> H = hessianF.value();
++    Eigen::SparseMatrix<double> H = hessianF.value();  // non-unit .value()
+ 
+     double error_k = std::numeric_limits<double>::infinity();
+     double error_k1 = std::abs(g.coeff(0));
+@@ -83,14 +83,14 @@ wpi::units::volt_t ArmFeedforward::Calculate(
+ 
+       // Shrink step until cost goes down
+       {
+-        double oldCost = cost.value();
++        double oldCost = cost.value();  // non-unit .value()
+ 
+         double α = 1.0;
+         double trial_x = x + α * p_x;
+ 
+         xAD.set_value(trial_x);
+ 
+-        while (cost.value() > oldCost) {
++        while (cost.value() > oldCost) {  // non-unit .value()
+           α *= 0.5;
+           trial_x = x + α * p_x;
+ 
+@@ -102,12 +102,12 @@ wpi::units::volt_t ArmFeedforward::Calculate(
+ 
+       xAD.set_value(x);
+ 
+-      g = gradientF.value();
+-      H = hessianF.value();
++      g = gradientF.value();  // non-unit .value()
++      H = hessianF.value();   // non-unit .value()
+ 
+       error_k1 = std::abs(g.coeff(0));
+     }
+   }
+ 
+-  return wpi::units::volt_t{u_k.value()};
++  return wpi::units::volt_t{u_k.value()};  // non-unit .value()
+ }
+diff --git a/wpimath/src/main/native/cpp/controller/DifferentialDriveFeedforward.cpp b/wpimath/src/main/native/cpp/controller/DifferentialDriveFeedforward.cpp
+index 6225530edd..5a176aacaf 100644
+--- a/wpimath/src/main/native/cpp/controller/DifferentialDriveFeedforward.cpp
++++ b/wpimath/src/main/native/cpp/controller/DifferentialDriveFeedforward.cpp
+@@ -18,8 +18,8 @@ DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
+     wpi::units::second_t dt) {
+   wpi::math::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
+ 
+-  Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};
+-  Eigen::Vector2d nextR{nextLeftVelocity, nextRightVelocity};
++  Eigen::Vector2d r{currentLeftVelocity.value(), currentRightVelocity.value()};
++  Eigen::Vector2d nextR{nextLeftVelocity.value(), nextRightVelocity.value()};
+   auto u = feedforward.Calculate(r, nextR);
+   return {wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)}};
+ }
+diff --git a/wpimath/src/main/native/cpp/controller/LTVDifferentialDriveController.cpp b/wpimath/src/main/native/cpp/controller/LTVDifferentialDriveController.cpp
+index 1cae86bbdf..f041f55c24 100644
+--- a/wpimath/src/main/native/cpp/controller/LTVDifferentialDriveController.cpp
++++ b/wpimath/src/main/native/cpp/controller/LTVDifferentialDriveController.cpp
+@@ -26,8 +26,8 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
+   //     [vₗ]
+   //     [vᵣ]
+ 
+-  wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) /
+-                                           2.0};
++  wpi::units::meters_per_second_t velocity =
++      (leftVelocity + rightVelocity) / 2.0;
+ 
+   // The DARE is ill-conditioned if the velocity is close to zero, so don't
+   // let the system stop.
+@@ -62,6 +62,7 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
+   Eigen::Matrix<double, 5, 2> discB;
+   DiscretizeAB(A, B, m_dt, &discA, &discB);
+ 
++  // next line non-unit .value()
+   auto S = DARE<5, 2>(discA, discB, m_Q, m_R, false).value();
+ 
+   // K = (BᵀSB + R)⁻¹BᵀSA
+diff --git a/wpimath/src/main/native/cpp/controller/LTVUnicycleController.cpp b/wpimath/src/main/native/cpp/controller/LTVUnicycleController.cpp
+index 1820c9c23a..0c5a68b27a 100644
+--- a/wpimath/src/main/native/cpp/controller/LTVUnicycleController.cpp
++++ b/wpimath/src/main/native/cpp/controller/LTVUnicycleController.cpp
+@@ -67,6 +67,7 @@ ChassisSpeeds LTVUnicycleController::Calculate(
+   Eigen::Matrix<double, 3, 2> discB;
+   DiscretizeAB(A, B, m_dt, &discA, &discB);
+ 
++  // next line non-unit .value()
+   auto S = DARE<3, 2>(discA, discB, m_Q, m_R, false).value();
+ 
+   // K = (BᵀSB + R)⁻¹BᵀSA
+diff --git a/wpimath/src/main/native/cpp/geometry/Ellipse2d.cpp b/wpimath/src/main/native/cpp/geometry/Ellipse2d.cpp
+index fc35f501c3..fe77767a39 100644
+--- a/wpimath/src/main/native/cpp/geometry/Ellipse2d.cpp
++++ b/wpimath/src/main/native/cpp/geometry/Ellipse2d.cpp
+@@ -41,7 +41,9 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
+ 
+     problem.solve();
+ 
++    // next line non-unit .value()
+     rotPoint = wpi::math::Translation2d{wpi::units::meter_t{x.value()},
++                                        // next line non-unit .value()
+                                         wpi::units::meter_t{y.value()}};
+   }
+ 
+diff --git a/wpimath/src/main/native/cpp/jni/DAREJNI.cpp b/wpimath/src/main/native/cpp/jni/DAREJNI.cpp
+index 36ef6e6597..154d736f36 100644
+--- a/wpimath/src/main/native/cpp/jni/DAREJNI.cpp
++++ b/wpimath/src/main/native/cpp/jni/DAREJNI.cpp
+@@ -47,7 +47,7 @@ Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQR
+ 
+   auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                     Amat, Bmat, Qmat, Rmat, false)
+-                    .value();
++                    .value();  // non-unit .value()
+ 
+   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+ }
+@@ -86,7 +86,7 @@ Java_org_wpilib_math_jni_DAREJNI_dareNoPrecondABQRN
+ 
+   auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+                     Amat, Bmat, Qmat, Rmat, Nmat, false)
+-                    .value();
++                    .value();  // non-unit .value()
+ 
+   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+ }
+@@ -121,6 +121,7 @@ Java_org_wpilib_math_jni_DAREJNI_dareABQR
+ 
+   if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+           Amat, Bmat, Qmat, Rmat)) {
++    // next line non-unit .value()
+     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
+     // K = (BᵀSB + R)⁻¹BᵀSA
+   } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
+@@ -174,6 +175,7 @@ Java_org_wpilib_math_jni_DAREJNI_dareABQRN
+ 
+   if (auto result = wpi::math::DARE<Eigen::Dynamic, Eigen::Dynamic>(
+           Amat, Bmat, Qmat, Rmat, Nmat)) {
++    // next line non-unit .value()
+     env->SetDoubleArrayRegion(S, 0, states * states, result.value().data());
+   } else if (result.error() == wpi::math::DAREError::QNotSymmetric ||
+              result.error() == wpi::math::DAREError::QNotPositiveSemidefinite) {
+diff --git a/wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp b/wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
+index bcc088f804..b7f615137e 100644
+--- a/wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
++++ b/wpimath/src/main/native/cpp/trajectory/TrajectoryParameterizer.cpp
+@@ -28,6 +28,7 @@
+ 
+ #include "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+ 
++#include <algorithm>
+ #include <vector>
+ 
+ #include <fmt/format.h>
+@@ -66,7 +67,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+       // Enforce global max velocity and max reachable velocity by global
+       // acceleration limit. v_f = √(v_i² + 2ad).
+ 
+-      constrainedState.maxVelocity = wpi::units::math::min(
++      constrainedState.maxVelocity = std::min(
+           maxVelocity, wpi::units::math::sqrt(
+                            predecessor.maxVelocity * predecessor.maxVelocity +
+                            predecessor.maxAcceleration * ds * 2.0));
+@@ -77,11 +78,11 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
+       // At this point, the constrained state is fully constructed apart from
+       // all the custom-defined user constraints.
+       for (const auto& constraint : constraints) {
+-        constrainedState.maxVelocity = wpi::units::math::min(
+-            constrainedState.maxVelocity,
+-            constraint->MaxVelocity(constrainedState.pose.first,
+-                                    constrainedState.pose.second,
+-                                    constrainedState.maxVelocity));
++        constrainedState.maxVelocity =
++            std::min(constrainedState.maxVelocity,
++                     constraint->MaxVelocity(constrainedState.pose.first,
++                                             constrainedState.pose.second,
++                                             constrainedState.maxVelocity));
+       }
+ 
+       // Now enforce all acceleration limits.
+@@ -230,12 +231,12 @@ void TrajectoryParameterizer::EnforceAccelerationLimits(
+           "back one-by-one.");
+     }
+ 
+-    state->minAcceleration = wpi::units::math::max(
+-        state->minAcceleration,
+-        reverse ? -minMaxAccel.maxAcceleration : minMaxAccel.minAcceleration);
++    state->minAcceleration =
++        std::max(state->minAcceleration, reverse ? -minMaxAccel.maxAcceleration
++                                                 : minMaxAccel.minAcceleration);
+ 
+-    state->maxAcceleration = wpi::units::math::min(
+-        state->maxAcceleration,
+-        reverse ? -minMaxAccel.minAcceleration : minMaxAccel.maxAcceleration);
++    state->maxAcceleration =
++        std::min(state->maxAcceleration, reverse ? -minMaxAccel.minAcceleration
++                                                 : minMaxAccel.maxAcceleration);
+   }
+ }
+diff --git a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
+index 2f53b06cda..eccdfa7361 100644
+--- a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
++++ b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
+@@ -105,8 +105,9 @@ class LinearQuadraticRegulator {
+ 
+     if (auto S = DARE<States, Inputs>(discA, discB, Q, R)) {
+       // K = (BᵀSB + R)⁻¹BᵀSA
+-      m_K = (discB.transpose() * S.value() * discB + R)
++      m_K = (discB.transpose() * S.value() * discB + R)  // non-unit .value()
+                 .llt()
++                // next line non-unit .value()
+                 .solve(discB.transpose() * S.value() * discA);
+     } else if (S.error() == DAREError::QNotSymmetric ||
+                S.error() == DAREError::QNotPositiveSemidefinite) {
+@@ -160,8 +161,9 @@ class LinearQuadraticRegulator {
+ 
+     if (auto S = DARE<States, Inputs>(discA, discB, Q, R, N)) {
+       // K = (BᵀSB + R)⁻¹(BᵀSA + Nᵀ)
+-      m_K = (discB.transpose() * S.value() * discB + R)
++      m_K = (discB.transpose() * S.value() * discB + R)  // non-unit .value()
+                 .llt()
++                // next line non-unit .value()
+                 .solve(discB.transpose() * S.value() * discA + N.transpose());
+     } else if (S.error() == DAREError::QNotSymmetric ||
+                S.error() == DAREError::QNotPositiveSemidefinite) {
+diff --git a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp b/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
+index c43e0300cc..851a66d138 100644
+--- a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
++++ b/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
+@@ -69,6 +69,6 @@ struct wpi::util::Struct<wpi::math::SimpleMotorFeedforward<Distance>> {
+ static_assert(wpi::util::StructSerializable<
+               wpi::math::SimpleMotorFeedforward<wpi::units::meters>>);
+ static_assert(wpi::util::StructSerializable<
+-              wpi::math::SimpleMotorFeedforward<wpi::units::feet>>);
++              wpi::math::SimpleMotorFeedforward<wpi::units::centimeters>>);
+ static_assert(wpi::util::StructSerializable<
+               wpi::math::SimpleMotorFeedforward<wpi::units::radians>>);
+diff --git a/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
+index 15a69198e1..3aecf216ff 100644
+--- a/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
++++ b/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
+@@ -104,7 +104,7 @@ class ExtendedKalmanFilter {
+     if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
+       if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
+                                          discQ, discR)) {
+-        m_initP = P.value();
++        m_initP = P.value();  // non-unit .value()
+       } else if (P.error() == DAREError::QNotSymmetric ||
+                  P.error() == DAREError::QNotPositiveSemidefinite) {
+         std::string msg =
+@@ -188,7 +188,7 @@ class ExtendedKalmanFilter {
+     if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
+       if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
+                                          discQ, discR)) {
+-        m_initP = P.value();
++        m_initP = P.value();  // non-unit .value()
+       } else if (P.error() == DAREError::QNotSymmetric ||
+                  P.error() == DAREError::QNotPositiveSemidefinite) {
+         std::string msg =
+diff --git a/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
+index 94a1dbf70d..c63e4bdff4 100644
+--- a/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
++++ b/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
+@@ -87,7 +87,7 @@ class KalmanFilter {
+ 
+     if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ,
+                                        discR)) {
+-      m_initP = P.value();
++      m_initP = P.value();  // non-unit .value()
+     } else if (P.error() == DAREError::QNotSymmetric ||
+                P.error() == DAREError::QNotPositiveSemidefinite) {
+       std::string msg =
+diff --git a/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator.hpp b/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator.hpp
+index 3e7e98367a..24e991d3c7 100644
+--- a/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator.hpp
++++ b/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator.hpp
+@@ -264,6 +264,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
+ 
+     // Step 4: Measure the transform between the old pose estimate and the
+     // vision transform.
++    // next line non-unit .value()
+     auto transform = visionRobotPose - visionSample.value();
+ 
+     // Step 5: We should not trust the transform entirely, so instead we scale
+diff --git a/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator3d.hpp b/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator3d.hpp
+index 29bd3f3be7..089718adbc 100644
+--- a/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator3d.hpp
++++ b/wpimath/src/main/native/include/wpi/math/estimator/PoseEstimator3d.hpp
+@@ -273,6 +273,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
+ 
+     // Step 4: Measure the transform between the old pose estimate and the
+     // vision pose.
++    // next line non-unit .value()
+     auto transform = visionRobotPose - visionSample.value();
+ 
+     // Step 5: We should not trust the transform entirely, so instead we scale
+diff --git a/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
+index d692ac8dda..c8bb3b58f1 100644
+--- a/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
++++ b/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
+@@ -100,6 +100,7 @@ class SteadyStateKalmanFilter {
+     if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(), discQ,
+                                        discR)) {
+       // S = CPCᵀ + R
++      // next line non-unit .value()
+       Matrixd<Outputs, Outputs> S = C * P.value() * C.transpose() + discR;
+ 
+       // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
+@@ -118,7 +119,7 @@ class SteadyStateKalmanFilter {
+       // Drop the transposes on symmetric matrices S and P.
+       //
+       // K = (S.solve(CP))ᵀ
+-      m_K = S.ldlt().solve(C * P.value()).transpose();
++      m_K = S.ldlt().solve(C * P.value()).transpose();  // non-unit .value()
+     } else if (P.error() == DAREError::QNotSymmetric ||
+                P.error() == DAREError::QNotPositiveSemidefinite) {
+       std::string msg =
+diff --git a/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp b/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp
+index 6f9a5a4653..3606aab44c 100644
+--- a/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp
++++ b/wpimath/src/main/native/include/wpi/math/geometry/Ellipse2d.hpp
+@@ -4,6 +4,7 @@
+ 
+ #pragma once
+ 
++#include <algorithm>
+ #include <stdexcept>
+ 
+ #include <gcem.hpp>
+@@ -49,8 +50,8 @@ class WPILIB_DLLEXPORT Ellipse2d {
+    */
+   constexpr Ellipse2d(const Translation2d& center, double radius)
+       : m_center{center, Rotation2d{}},
+-        m_xSemiAxis{radius},
+-        m_ySemiAxis{radius} {}
++        m_xSemiAxis{wpi::units::meter_t{radius}},
++        m_ySemiAxis{wpi::units::meter_t{radius}} {}
+ 
+   /**
+    * Returns the center of the ellipse.
+@@ -88,10 +89,10 @@ class WPILIB_DLLEXPORT Ellipse2d {
+    */
+   constexpr wpi::util::array<Translation2d, 2> FocalPoints() const {
+     // Major semi-axis
+-    auto a = wpi::units::math::max(m_xSemiAxis, m_ySemiAxis);
++    auto a = std::max(m_xSemiAxis, m_ySemiAxis);
+ 
+     // Minor semi-axis
+-    auto b = wpi::units::math::min(m_xSemiAxis, m_ySemiAxis);
++    auto b = std::min(m_xSemiAxis, m_ySemiAxis);
+ 
+     auto c = wpi::units::math::sqrt(a * a - b * b);
+ 
+@@ -204,9 +205,9 @@ class WPILIB_DLLEXPORT Ellipse2d {
+     auto y = rotPoint.Y() - m_center.Y();
+ 
+     // NOLINTNEXTLINE (bugprone-integer-division)
+-    return (x * x) / (m_xSemiAxis * m_xSemiAxis) +
+-           // NOLINTNEXTLINE (bugprone-integer-division)
+-           (y * y) / (m_ySemiAxis * m_ySemiAxis);
++    return double{(x * x) / (m_xSemiAxis * m_xSemiAxis) +
++                  // NOLINTNEXTLINE (bugprone-integer-division)
++                  (y * y) / (m_ySemiAxis * m_ySemiAxis)};
+   }
+ };
+ 
+diff --git a/wpimath/src/main/native/include/wpi/math/geometry/Rotation2d.hpp b/wpimath/src/main/native/include/wpi/math/geometry/Rotation2d.hpp
+index d4897bc93d..84029a507b 100644
+--- a/wpimath/src/main/native/include/wpi/math/geometry/Rotation2d.hpp
++++ b/wpimath/src/main/native/include/wpi/math/geometry/Rotation2d.hpp
+@@ -36,9 +36,8 @@ class WPILIB_DLLEXPORT Rotation2d {
+    * @param value The value of the angle.
+    */
+   constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
+-      : m_cos{gcem::cos(value.template convert<wpi::units::radian>().value())},
+-        m_sin{gcem::sin(value.template convert<wpi::units::radian>().value())} {
+-  }
++      : m_cos{gcem::cos(wpi::units::radian_t{value}.value())},
++        m_sin{gcem::sin(wpi::units::radian_t{value}.value())} {}
+ 
+   /**
+    * Constructs a Rotation2d with the given x and y (cosine and sine)
+diff --git a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+index b0d25b317e..03f7c90b92 100644
+--- a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
++++ b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp
+@@ -4,6 +4,8 @@
+ 
+ #pragma once
+ 
++#include <algorithm>
++
+ #include "wpi/units/math.hpp"
+ #include "wpi/units/velocity.hpp"
+ #include "wpi/util/SymbolExports.hpp"
+@@ -37,8 +39,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
+    */
+   constexpr void Desaturate(
+       wpi::units::meters_per_second_t attainableMaxSpeed) {
+-    auto realMaxSpeed = wpi::units::math::max(wpi::units::math::abs(left),
+-                                              wpi::units::math::abs(right));
++    auto realMaxSpeed =
++        std::max(wpi::units::math::abs(left), wpi::units::math::abs(right));
+ 
+     if (realMaxSpeed > attainableMaxSpeed) {
+       left = left / realMaxSpeed * attainableMaxSpeed;
+diff --git a/wpimath/src/main/native/include/wpi/math/kinematics/SwerveDriveKinematics.hpp b/wpimath/src/main/native/include/wpi/math/kinematics/SwerveDriveKinematics.hpp
+index 0d347b2509..4da1afb467 100644
+--- a/wpimath/src/main/native/include/wpi/math/kinematics/SwerveDriveKinematics.hpp
++++ b/wpimath/src/main/native/include/wpi/math/kinematics/SwerveDriveKinematics.hpp
+@@ -190,8 +190,10 @@ class SwerveDriveKinematics
+         m_inverseKinematics * chassisSpeedsVector;
+ 
+     for (size_t i = 0; i < NumModules; i++) {
+-      wpi::units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
+-      wpi::units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
++      wpi::units::meters_per_second_t x =
++          wpi::units::meters_per_second_t{moduleStateMatrix(i * 2, 0)};
++      wpi::units::meters_per_second_t y =
++          wpi::units::meters_per_second_t{moduleStateMatrix(i * 2 + 1, 0)};
+ 
+       auto speed = wpi::units::math::hypot(x, y);
+       auto rotation = speed > 1e-6_mps ? Rotation2d{x.value(), y.value()}
+@@ -420,10 +422,10 @@ class SwerveDriveKinematics
+     auto rotationalK = wpi::units::math::abs(desiredChassisSpeed.omega) /
+                        attainableMaxRobotRotationSpeed;
+ 
+-    auto k = wpi::units::math::max(translationalK, rotationalK);
++    auto k = std::max(translationalK, rotationalK);
+ 
+-    auto scale = wpi::units::math::min(
+-        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::scalar_t{1});
++    auto scale = std::min(k * attainableMaxModuleSpeed / realMaxSpeed,
++                          wpi::units::scalar_t{1});
+     for (auto& module : states) {
+       module.speed = module.speed * scale;
+     }
+diff --git a/wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp b/wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp
+index 7adab5952b..782fc04dd0 100644
+--- a/wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp
++++ b/wpimath/src/main/native/include/wpi/math/spline/SplineParameterizer.hpp
+@@ -79,7 +79,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
+ 
+     // The parameterization does not add the initial point. Let's add that.
+     if (auto point = spline.GetPoint(t0)) {
+-      splinePoints.push_back(point.value());
++      splinePoints.push_back(point.value());  // non-unit .value()
+     } else {
+       throw MalformedSplineException(kMalformedSplineExceptionMsg);
+     }
+@@ -105,6 +105,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
+         throw MalformedSplineException(kMalformedSplineExceptionMsg);
+       }
+ 
++      // next line non-unit .value()
+       const auto twist = (end.value().first - start.value().first).Log();
+ 
+       if (wpi::units::math::abs(twist.dy) > kMaxDy ||
+@@ -113,7 +114,7 @@ class WPILIB_DLLEXPORT SplineParameterizer {
+         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
+         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
+       } else {
+-        splinePoints.push_back(end.value());
++        splinePoints.push_back(end.value());  // non-unit .value()
+       }
+ 
+       if (iterations++ >= kMaxIterations) {
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/Trajectory.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/Trajectory.hpp
+index 37145cd062..e6dfafa21e 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/Trajectory.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/Trajectory.hpp
+@@ -44,7 +44,7 @@ class WPILIB_DLLEXPORT Trajectory {
+     Pose2d pose;
+ 
+     /// The curvature at that point of the trajectory.
+-    wpi::units::curvature_t curvature{0.0};
++    wpi::units::curvature_t curvature = wpi::units::curvature_t{0.0};
+ 
+     /**
+      * Checks equality between this State and another object.
+@@ -94,7 +94,8 @@ class WPILIB_DLLEXPORT Trajectory {
+       // distance between the two endpoints.
+       const double interpolationFrac =
+           // NOLINTNEXTLINE (bugprone-integer-division)
+-          newS / endValue.pose.Translation().Distance(pose.Translation());
++          double{newS /
++                 endValue.pose.Translation().Distance(pose.Translation())};
+ 
+       return {
+           newT, newV, acceleration,
+@@ -172,7 +173,7 @@ class WPILIB_DLLEXPORT Trajectory {
+     }
+     // Interpolate between the two states for the state that we want.
+     return prevSample->Interpolate(
+-        *sample, (t - prevSample->t) / (sample->t - prevSample->t));
++        *sample, double{(t - prevSample->t) / (sample->t - prevSample->t)});
+   }
+ 
+   /**
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryGenerator.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryGenerator.hpp
+index 5e7ea6ead3..05d37feea4 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryGenerator.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/TrajectoryGenerator.hpp
+@@ -98,6 +98,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
+     std::vector<PoseWithCurvature> splinePoints;
+ 
+     // Add the first point to the vector.
++    // next line non-unit .value()
+     splinePoints.push_back(splines.front().GetPoint(0.0).value());
+ 
+     // Iterate through the vector and parameterize each spline, adding the
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
+index 27eb091564..788f85de47 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
+@@ -4,6 +4,7 @@
+ 
+ #pragma once
+ 
++#include <algorithm>
+ #include <type_traits>
+ 
+ #include "wpi/math/util/MathShared.hpp"
+@@ -222,8 +223,8 @@ class TrapezoidProfile {
+       velocity *= -1.0;
+     }
+ 
+-    endAccel = wpi::units::math::max(endAccel, 0_s);
+-    endFullSpeed = wpi::units::math::max(endFullSpeed, 0_s);
++    endAccel = std::max(endAccel, 0_s);
++    endFullSpeed = std::max(endFullSpeed, 0_s);
+ 
+     const Acceleration_t acceleration = m_constraints.maxAcceleration;
+     const Acceleration_t deceleration = -m_constraints.maxAcceleration;
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/constraint/TrajectoryConstraint.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/constraint/TrajectoryConstraint.hpp
+index d39cf3650f..92c0ce5174 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/constraint/TrajectoryConstraint.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/constraint/TrajectoryConstraint.hpp
+@@ -37,14 +37,16 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
+     /**
+      * The minimum acceleration.
+      */
+-    wpi::units::meters_per_second_squared_t minAcceleration{
+-        -std::numeric_limits<double>::max()};
++    wpi::units::meters_per_second_squared_t minAcceleration =
++        wpi::units::meters_per_second_squared_t{
++            -std::numeric_limits<double>::max()};
+ 
+     /**
+      * The maximum acceleration.
+      */
+-    wpi::units::meters_per_second_squared_t maxAcceleration{
+-        std::numeric_limits<double>::max()};
++    wpi::units::meters_per_second_squared_t maxAcceleration =
++        wpi::units::meters_per_second_squared_t{
++            std::numeric_limits<double>::max()};
+   };
+ 
+   /**
+diff --git a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
+index 40aa51cdea..c398dffd9c 100644
+--- a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
++++ b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
+@@ -206,11 +206,11 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
+   T modulus = maximumInput - minimumInput;
+ 
+   // Wrap input if it's above the maximum input
+-  int numMax = (input - minimumInput) / modulus;
++  int numMax = static_cast<int>((input - minimumInput) / modulus);
+   input -= numMax * modulus;
+ 
+   // Wrap input if it's below the minimum input
+-  int numMin = (input - maximumInput) / modulus;
++  int numMin = static_cast<int>((input - maximumInput) / modulus);
+   input -= numMin * modulus;
+ 
+   return input;
+@@ -344,7 +344,7 @@ constexpr Translation2d SlewRateLimit(
+   if (dist > maxVelocity * dt) {
+     // Move maximum allowed amount in direction of the difference
+     // NOLINTNEXTLINE(bugprone-integer-division)
+-    return current + diff * (maxVelocity * dt / dist);
++    return current + diff * double{maxVelocity * dt / dist};
+   }
+   return next;
+ }
+@@ -374,7 +374,7 @@ constexpr Translation3d SlewRateLimit(
+   if (dist > maxVelocity * dt) {
+     // Move maximum allowed amount in direction of the difference
+     // NOLINTNEXTLINE(bugprone-integer-division)
+-    return current + diff * (maxVelocity * dt / dist);
++    return current + diff * double{maxVelocity * dt / dist};
+   }
+   return next;
+ }
