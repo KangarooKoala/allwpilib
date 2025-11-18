@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "mp-units/systems/usc.h"
+#include <mp-units/systems/usc.h>
+
 #include "wpi/units.hpp"
 
 namespace mp {
