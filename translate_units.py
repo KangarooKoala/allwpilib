@@ -9,41 +9,59 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-UNIT_T_TO_UNIT: dict[str, str] = {
-    "scalar": "mp::one",
-    "meter": "mp::m",
-    "degree": "mp::deg",
-    "radian": "mp::rad",
-    "second": "mp::s",
-    "microsecond": "mp::µs",
-    "kilogram": "mp::kg",
-    "volt": "mp::V",
-    "ampere": "mp::A",
-    "ohm": "mp::ohm",
-    "square_meter": "mp::m2",
-    "meters_per_second": "mp::m / mp::s",
-    "meters_per_second_squared": "mp::m / mp::s2",
-    "radians_per_second": "mp::rad / mp::s",
-    "radians_per_second_squared": "mp::rad / mp::s2",
-    "curvature": "mp::rad / mp::m",
-    "newton_meter": "mp::N * mp::m",
-    "kilogram_square_meter": "mp::kg * mp::m2",
+
+UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
+    "base": {
+        "scalar": "mp::one",
+        "meter": "mp::m",
+        "degree": "mp::deg",
+        "radian": "mp::rad",
+        "turn": "mp::rev",
+        "second": "mp::s",
+        "millisecond": "mp::ms",
+        "microsecond": "mp::µs",
+        "nanosecond": "mp::ns",
+        "kilogram": "mp::kg",
+        "volt": "mp::V",
+        "ampere": "mp::A",
+        "ohm": "mp::ohm",
+        "hertz": "mp::Hz",
+        "square_meter": "mp::m2",
+        "meters_per_second": "mp::m / mp::s",
+        "meters_per_second_squared": "mp::m / mp::s2",
+        "radians_per_second": "mp::rad / mp::s",
+        "turns_per_second": "mp::rev / mp::s",
+        "revolutions_per_minute": "mp::rev / mp::min",
+        "radians_per_second_squared": "mp::rad / mp::s2",
+        "turns_per_second_squared": "mp::rev / mp::s2",
+        "curvature": "mp::rad / mp::m",
+        "newton_meter": "mp::N * mp::m",
+        "kilogram_square_meter": "mp::kg * mp::m2",
+    },
+    "usc": {
+        "pounds_per_square_inch": "mp::lb / mp::in / mp::in",
+    },
 }
 
 
 BASE_UDL_TO_UNIT: dict[str, str] = {
     "m": "mp::m",
+    "cm": "mp::cm",
     "s": "mp::s",
     "ms": "mp::ms",
+    "us": "mp::µs",
     "rad": "mp::rad",
     "deg": "mp::deg",
     "tr": "mp::rev",
     "kg": "mp::kg",
     "V": "mp::V",
     "A": "mp::A",
+    "Hz": "mp::Hz",
+    "Ohm": "mp::ohm",
     "mps": "mp::m / mp::s",
     "mps_sq": "mp::m / mp::s2",
     "rad_per_s": "mp::rad / mp::s",
+    "tps": "mp::rev / mp::s",
     "rad_per_s_sq": "mp::rad / mp::s2",
     "deg_per_s": "mp::deg / mp::s",
     "deg_per_s_sq": "mp::deg / mp::s2",
@@ -56,6 +74,7 @@ BASE_UDL_TO_UNIT: dict[str, str] = {
 USC_UDL_TO_UNIT: dict[str, str] = {
     "ft": "mp::ft",
     "in": "mp::in",
+    "lb": "mp::lb",
     "fps": "mp::ft / mp::s",
     "fps_sq": "mp::ft / mp::s2",
 }
@@ -446,11 +465,13 @@ def check_variable_initializer(lines: list[str], i: int, end: int):
         print(f"Line {i}: Quantity variable could be initialized from a scalar")
 
 
-def process_unit_t(lines: list[str], i: int, *, type_only: bool = False):
+def process_unit_t(
+    lines: list[str], i: int, *, unit_t_to_unit: dict[str, str], type_only: bool = False
+):
     """Processes any unit_t type occurrences in the specified line."""
     for nh_unit, mp_unit in (
         ("unit", ""),
-        *UNIT_T_TO_UNIT.items(),
+        *unit_t_to_unit.items(),
     ):
         unit_t: str = f"wpi::units::{nh_unit}_t"
         unit_t_start: int = -1
@@ -580,6 +601,7 @@ def process_decltype(lines: list[str], i: int, *, type_only: bool = False):
 
 def process_value_calls(lines: list[str], i: int):
     """Processes any .value() calls in the specified line."""
+    # Check for skips
     NEXT_LINE_SKIP_COMMENT: str = "// next line non-unit .value()"
     SKIP_COMMENT: str = "// non-unit .value()"
     if lines[i].strip() == NEXT_LINE_SKIP_COMMENT:
@@ -597,6 +619,22 @@ def process_value_calls(lines: list[str], i: int):
         lines[i] = delete(lines[i], index, SKIP_COMMENT)
         lines[i] = lines[i][:index].rstrip() + lines[i][index:]
         return
+    # Preprocess .to<>()
+    lines[i] = lines[i].replace(".to<double>()", ".value()")
+    while (index := lines[i].find(".to<")) >= 0:
+        lbrac_pos: int = index + len(".to")
+        rbrac_line_i, rbrac_pos = find_match(lines, i, lbrac_pos)
+        if not lines[rbrac_line_i][rbrac_pos + 1 :].startswith("()"):
+            raise ValueError(f"Line {i}: Unexpected non-call .to<>!")
+        if rbrac_line_i != i:
+            raise ValueError(f"Line {i}: .to<>() call too complicated!")
+        scalar_type: str = lines[i][lbrac_pos + 1 : rbrac_pos]
+        lines[i] = replace(lines[i], index, f".to<{scalar_type}>()", ".value())")
+        start_line_i, start_pos = find_expr_start(lines, i, index - 1)
+        lines[start_line_i] = insert(
+            lines[start_line_i], start_pos, f"static_cast<{scalar_type}>("
+        )
+    # Process .value()
     while (index := lines[i].find(".value()")) >= 0:
         # Delete .value()
         lines[i] = delete(lines[i], index, ".value()")
@@ -732,12 +770,14 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
         )
 
     # Process function implementation parameter types separately to avoid counting those changes for IWYU
-    for i in function_impl_header_iter():
-        process_unit_t(lines, i, type_only=True)
+    for _, unit_t_to_unit in UNIT_T_TO_UNIT.items():
+        for i in function_impl_header_iter():
+            process_unit_t(lines, i, unit_t_to_unit=unit_t_to_unit, type_only=True)
 
     # Process unit_t types
-    for i in body_iter():
-        process_unit_t(lines, i)
+    for include_kind, unit_t_to_unit in UNIT_T_TO_UNIT.items():
+        for i in body_iter(include_kind=include_kind):
+            process_unit_t(lines, i, unit_t_to_unit=unit_t_to_unit)
 
     # Process unit types
     for i in body_iter():
@@ -765,7 +805,6 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
 
     # Process .value()
     for i in body_iter():
-        lines[i] = lines[i].replace(".to<double>()", ".value()")
         process_value_calls(lines, i)
 
     # Clean up double division
@@ -858,6 +897,12 @@ def test_translate(
     expected: tuple[str],
     expected_output: tuple[str] = (),
 ) -> bool:
+    if isinstance(test_input, str):
+        print("test_input is a str!")
+    if isinstance(expected, str):
+        print("expected is a str!")
+    if isinstance(expected_output, str):
+        print("expected_output is a str!")
     lines: list[str] = list(test_input)
     print_capturer = PrintCapturer()
     try:
@@ -1102,6 +1147,16 @@ def run_tests() -> bool:
         ),
     )
     success &= test_translate(
+        ".to<double>()",
+        ("a + x.to<double>()\n",),
+        ("a + mp::value(x)\n",),
+    )
+    success &= test_translate(
+        ".to<uint64_t>()",
+        ("count + x.to<uint64_t>()\n",),
+        ("count + static_cast<uint64_t>(mp::value(x))\n",),
+    )
+    success &= test_translate(
         "UDL m",
         ("0_m\n",),
         ("0.0 * mp::m\n",),
@@ -1253,7 +1308,7 @@ def run_conversions(paths: list[Path]):
                         continue
                     files.append(dp / f)
             dn.sort()
-            for bad_dir in ("java", "generated", "python", "units", "thirdparty"):
+            for bad_dir in ("java", "python", "units", "thirdparty"):
                 if bad_dir in dn:
                     printer.run(lambda: print(f"directory {dp / bad_dir}"))
                     dn.remove(bad_dir)
