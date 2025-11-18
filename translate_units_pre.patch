@@ -1,3 +1,94 @@
+diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
+index 614f0abd36..d3aaa9247c 100644
+--- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
+@@ -91,7 +91,8 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
+   using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
+       wpi::units::volt, wpi::units::inverse<wpi::units::meters_per_second>>>;
+   Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+-  wpi::units::meters_per_second_t velocity{m_x(1)};
++  wpi::units::meters_per_second_t velocity =
++      wpi::units::meters_per_second_t{m_x(1)};
+   wpi::units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
+ 
+   // Perform calculation and return.
+diff --git a/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp b/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
+index d22ba2dacf..f8daa19989 100644
+--- a/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
+@@ -78,7 +78,8 @@ wpi::units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
+ wpi::units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
+   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
+   // is spinning 10x faster than the output
+-  wpi::units::radians_per_second_t motorVelocity{m_x(1) * m_gearing};
++  wpi::units::radians_per_second_t motorVelocity =
++      wpi::units::radians_per_second_t{m_x(1) * m_gearing};
+   return m_gearbox.Current(motorVelocity, wpi::units::volt_t{m_u(0)}) *
+          wpi::util::sgn(m_u(0));
+ }
+diff --git a/wpilibc/src/main/native/cpp/system/Watchdog.cpp b/wpilibc/src/main/native/cpp/system/Watchdog.cpp
+index 73a6fc5352..70b2f3cfd9 100644
+--- a/wpilibc/src/main/native/cpp/system/Watchdog.cpp
++++ b/wpilibc/src/main/native/cpp/system/Watchdog.cpp
+@@ -110,7 +110,7 @@ void Watchdog::Impl::Main() {
+     // has occurred, so call its timeout function.
+     auto watchdog = m_watchdogs.pop();
+ 
+-    wpi::units::second_t now{curTime * 1e-6};
++    wpi::units::second_t now = wpi::units::second_t{curTime * 1e-6};
+     if (now - watchdog->m_lastTimeoutPrintTime > kMinPrintPeriod) {
+       watchdog->m_lastTimeoutPrintTime = now;
+       if (!watchdog->m_suppressTimeoutMessage) {
+diff --git a/wpilibc/src/main/native/include/wpi/hardware/imu/OnboardIMU.hpp b/wpilibc/src/main/native/include/wpi/hardware/imu/OnboardIMU.hpp
+index 74e08a0d02..43e38487e7 100644
+--- a/wpilibc/src/main/native/include/wpi/hardware/imu/OnboardIMU.hpp
++++ b/wpilibc/src/main/native/include/wpi/hardware/imu/OnboardIMU.hpp
+@@ -125,6 +125,6 @@ class OnboardIMU {
+  private:
+   wpi::units::radian_t GetYawNoOffset();
+   MountOrientation m_mountOrientation;
+-  wpi::units::radian_t m_yawOffset{0};
++  wpi::units::radian_t m_yawOffset = wpi::units::radian_t{0};
+ };
+ }  // namespace wpi
+diff --git a/wpilibc/src/main/native/include/wpi/hardware/motor/PWMMotorController.hpp b/wpilibc/src/main/native/include/wpi/hardware/motor/PWMMotorController.hpp
+index a8961125d5..74df52f737 100644
+--- a/wpilibc/src/main/native/include/wpi/hardware/motor/PWMMotorController.hpp
++++ b/wpilibc/src/main/native/include/wpi/hardware/motor/PWMMotorController.hpp
+@@ -152,11 +152,11 @@ class PWMMotorController
+   wpi::hal::SimDouble m_simSpeed;
+ 
+   bool m_eliminateDeadband{0};
+-  wpi::units::microsecond_t m_minPwm{0};
+-  wpi::units::microsecond_t m_deadbandMinPwm{0};
+-  wpi::units::microsecond_t m_centerPwm{0};
+-  wpi::units::microsecond_t m_deadbandMaxPwm{0};
+-  wpi::units::microsecond_t m_maxPwm{0};
++  wpi::units::microsecond_t m_minPwm = wpi::units::microsecond_t{0};
++  wpi::units::microsecond_t m_deadbandMinPwm = wpi::units::microsecond_t{0};
++  wpi::units::microsecond_t m_centerPwm = wpi::units::microsecond_t{0};
++  wpi::units::microsecond_t m_deadbandMaxPwm = wpi::units::microsecond_t{0};
++  wpi::units::microsecond_t m_maxPwm = wpi::units::microsecond_t{0};
+ 
+   wpi::units::microsecond_t GetMinPositivePwm() const;
+   wpi::units::microsecond_t GetMaxNegativePwm() const;
+diff --git a/wpilibc/src/main/native/include/wpi/hardware/rotation/DutyCycleEncoder.hpp b/wpilibc/src/main/native/include/wpi/hardware/rotation/DutyCycleEncoder.hpp
+index 2a23f86411..27e7b05ce5 100644
+--- a/wpilibc/src/main/native/include/wpi/hardware/rotation/DutyCycleEncoder.hpp
++++ b/wpilibc/src/main/native/include/wpi/hardware/rotation/DutyCycleEncoder.hpp
+@@ -184,10 +184,10 @@ class DutyCycleEncoder : public wpi::util::Sendable,
+   double MapSensorRange(double pos) const;
+ 
+   std::shared_ptr<DutyCycle> m_dutyCycle;
+-  wpi::units::hertz_t m_frequencyThreshold = {100_Hz};
++  wpi::units::hertz_t m_frequencyThreshold = 100_Hz;
+   double m_fullRange;
+   double m_expectedZero;
+-  wpi::units::second_t m_period{0_s};
++  wpi::units::second_t m_period = 0_s;
+   double m_sensorMin{0.0};
+   double m_sensorMax{1.0};
+   bool m_isInverted{false};
 diff --git a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp b/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
 index 8525923727..869ace9848 100644
 --- a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
