@@ -1,5 +1,5 @@
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 611660fe21..4f1fdd72d5 100644
+index 00cada6e16..821e2e09e2 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 @@ -38,9 +38,8 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
@@ -14,7 +14,7 @@ index 611660fe21..4f1fdd72d5 100644
  ElevatorSim::ElevatorSim(mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
                           mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA,
                           const wpi::math::DCMotor& gearbox,
-@@ -88,9 +87,8 @@ mp::quantity<mp::A> ElevatorSim::GetCurrentDraw() const {
+@@ -89,9 +88,8 @@ mp::quantity<mp::A> ElevatorSim::GetCurrentDraw() const {
    // is spinning 10x faster than the output.
  
    double kA = 1.0 / m_plant.B(1, 0);
@@ -26,6 +26,45 @@ index 611660fe21..4f1fdd72d5 100644
    mp::quantity<mp::m / mp::s> velocity =
        m_x(1) * mp::m / mp::s;
    mp::quantity<mp::rad / mp::s> motorVelocity = velocity * Kv * m_gearbox.Kv;
+diff --git a/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp b/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
+index 1a711d4806..83bf466abf 100644
+--- a/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
+@@ -123,12 +123,12 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterCPUTempCallback(
+   return store;
+ }
+ 
+-wpi::units::celsius_t RoboRioSim::GetCPUTemp() {
+-  return wpi::units::celsius_t{HALSIM_GetRoboRioCPUTemp()};
++mp::quantity_point<mp::deg_C> RoboRioSim::GetCPUTemp() {
++  return mp::absolute<mp::deg_C>(HALSIM_GetRoboRioCPUTemp());
+ }
+ 
+-void RoboRioSim::SetCPUTemp(wpi::units::celsius_t cpuTemp) {
+-  HALSIM_SetRoboRioCPUTemp(mp::value(cpuTemp));
++void RoboRioSim::SetCPUTemp(mp::quantity_point<mp::deg_C> cpuTemp) {
++  HALSIM_SetRoboRioCPUTemp(mp::value(cpuTemp.quantity_from_zero()));
+ }
+ 
+ std::unique_ptr<CallbackStore> RoboRioSim::RegisterTeamNumberCallback(
+diff --git a/wpilibc/src/main/native/cpp/system/RobotController.cpp b/wpilibc/src/main/native/cpp/system/RobotController.cpp
+index e514a1c063..e0f984a341 100644
+--- a/wpilibc/src/main/native/cpp/system/RobotController.cpp
++++ b/wpilibc/src/main/native/cpp/system/RobotController.cpp
+@@ -155,11 +155,11 @@ void RobotController::SetBrownoutVoltage(mp::quantity<mp::V> brownoutVoltage) {
+   WPILIB_CheckErrorStatus(status, "SetBrownoutVoltage");
+ }
+ 
+-wpi::units::celsius_t RobotController::GetCPUTemp() {
++mp::quantity_point<mp::deg_C> RobotController::GetCPUTemp() {
+   int32_t status = 0;
+   double retVal = HAL_GetCPUTemp(&status);
+   WPILIB_CheckErrorStatus(status, "GetCPUTemp");
+-  return wpi::units::celsius_t{retVal};
++  return mp::absolute<mp::deg_C>(retVal);
+ }
+ 
+ CANStatus RobotController::GetCANStatus(int busId) {
 diff --git a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
 index a6ee90868e..afdbd23266 100644
 --- a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
@@ -62,6 +101,27 @@ index a6ee90868e..afdbd23266 100644
    ElevatorSim(mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
                mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA,
                const wpi::math::DCMotor& gearbox, mp::quantity<mp::m> minHeight,
+diff --git a/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
+index f023eb4468..1165060ae7 100644
+--- a/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
++++ b/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
+@@ -189,14 +189,14 @@ class RoboRioSim {
+    *
+    * @return the cpu temp.
+    */
+-  static wpi::units::celsius_t GetCPUTemp();
++  static mp::quantity_point<mp::deg_C> GetCPUTemp();
+ 
+   /**
+    * Define the cpu temp.
+    *
+    * @param cpuTemp the new cpu temp.
+    */
+-  static void SetCPUTemp(wpi::units::celsius_t cpuTemp);
++  static void SetCPUTemp(mp::quantity_point<mp::deg_C> cpuTemp);
+ 
+   /**
+    * Register a callback to be run whenever the team number changes.
 diff --git a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp b/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
 index 2e82c135e2..69faab69a0 100644
 --- a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
@@ -140,6 +200,38 @@ index 2e82c135e2..69faab69a0 100644
      }
  
     private:
+diff --git a/wpilibc/src/main/native/include/wpi/system/RobotController.hpp b/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
+index 134eca8885..379d8495a0 100644
+--- a/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
++++ b/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
+@@ -191,7 +191,7 @@ class RobotController {
+    *
+    * @return current CPU temperature
+    */
+-  static wpi::units::celsius_t GetCPUTemp();
++  static mp::quantity_point<mp::deg_C> GetCPUTemp();
+ 
+   /**
+    * Get the current status of the CAN bus.
+diff --git a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
+index 30c63bc3df..0aa515a878 100644
+--- a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
++++ b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
+@@ -97,11 +97,11 @@ TEST(RoboRioSimTest, SetCPUTemp) {
+       RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
+   constexpr double kCPUTemp = 100.0;
+ 
+-  RoboRioSim::SetCPUTemp(wpi::units::celsius_t{kCPUTemp});
++  RoboRioSim::SetCPUTemp(mp::absolute<mp::deg_C>(kCPUTemp));
+   EXPECT_TRUE(callback.WasTriggered());
+   EXPECT_EQ(kCPUTemp, callback.GetLastValue());
+-  EXPECT_EQ(kCPUTemp, mp::value(RoboRioSim::GetCPUTemp()));
+-  EXPECT_EQ(kCPUTemp, mp::value(RobotController::GetCPUTemp()));
++  EXPECT_EQ(kCPUTemp, mp::value(RoboRioSim::GetCPUTemp().quantity_from_zero()));
++  EXPECT_EQ(kCPUTemp, mp::value(RobotController::GetCPUTemp().quantity_from_zero()));
+ }
+ 
+ TEST(RoboRioSimTest, SetTeamNumber) {
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
 index df17a3be9..293b06ead 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
