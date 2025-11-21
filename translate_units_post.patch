@@ -1,3 +1,145 @@
+diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
+index 611660fe21..4f1fdd72d5 100644
+--- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
+@@ -38,9 +38,8 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
+                   gearbox, minHeight, maxHeight, simulateGravity,
+                   startingHeight, measurementStdDevs) {}
+ 
+-template <typename Distance>
+-  requires std::same_as<mp::m, Distance> ||
+-           std::same_as<mp::rad, Distance>
++template <mp::Unit auto Distance>
++  requires(mp::m == Distance) || (mp::rad == Distance)
+ ElevatorSim::ElevatorSim(mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
+                          mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA,
+                          const wpi::math::DCMotor& gearbox,
+@@ -88,9 +87,8 @@ mp::quantity<mp::A> ElevatorSim::GetCurrentDraw() const {
+   // is spinning 10x faster than the output.
+ 
+   double kA = 1.0 / m_plant.B(1, 0);
+-  using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
+-      mp::V, wpi::units::inverse<wpi::units::meters_per_second>>>;
+-  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
++  using Kv_t = mp::quantity<mp::V / (mp::m / mp::s)>;
++  Kv_t Kv = kA * m_plant.A(1, 1) * Kv_t::unit;
+   mp::quantity<mp::m / mp::s> velocity =
+       m_x(1) * mp::m / mp::s;
+   mp::quantity<mp::rad / mp::s> motorVelocity = velocity * Kv * m_gearbox.Kv;
+diff --git a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
+index a6ee90868e..afdbd23266 100644
+--- a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
++++ b/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
+@@ -16,15 +16,11 @@ namespace wpi::sim {
+  */
+ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
+  public:
+-  template <typename Distance>
+-  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
+-      Distance, wpi::units::inverse<mp::s>>>;
++  template <mp::Unit auto Distance>
++  using Velocity_t = mp::quantity<Distance / mp::s>;
+ 
+-  template <typename Distance>
+-  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>,
+-      wpi::units::inverse<mp::s>>>;
++  template <mp::Unit auto Distance>
++  using Acceleration_t = mp::quantity<Distance / mp::s / mp::s>;
+ 
+   /**
+    * Constructs a simulated elevator mechanism.
+@@ -82,9 +78,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
+    * @param startingHeight     The starting height of the elevator.
+    * @param measurementStdDevs The standard deviation of the measurements.
+    */
+-  template <typename Distance>
+-    requires std::same_as<mp::m, Distance> ||
+-             std::same_as<mp::rad, Distance>
++  template <mp::Unit auto Distance>
++    requires(mp::m == Distance) || (mp::rad == Distance)
+   ElevatorSim(mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
+               mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA,
+               const wpi::math::DCMotor& gearbox, mp::quantity<mp::m> minHeight,
+diff --git a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp b/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
+index 2e82c135e2..69faab69a0 100644
+--- a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
++++ b/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
+@@ -58,7 +58,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& voltage(mp::quantity<mp::V> voltage) {
+-      return value("voltage", mp::value(voltage), voltage.name());
++      return value("voltage", mp::value(voltage), mp::unit_name(voltage));
+     }
+ 
+     /**
+@@ -68,7 +68,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& position(mp::quantity<mp::m> position) {
+-      return value("position", mp::value(position), position.name());
++      return value("position", mp::value(position), mp::unit_name(position));
+     }
+ 
+     /**
+@@ -78,7 +78,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& position(mp::quantity<mp::rev> position) {
+-      return value("position", mp::value(position), position.name());
++      return value("position", mp::value(position), mp::unit_name(position));
+     }
+ 
+     /**
+@@ -88,7 +88,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& velocity(mp::quantity<mp::m / mp::s> velocity) {
+-      return value("velocity", mp::value(velocity), velocity.name());
++      return value("velocity", mp::value(velocity), mp::unit_name(velocity));
+     }
+ 
+     /**
+@@ -98,7 +98,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& velocity(mp::quantity<mp::rev / mp::s> velocity) {
+-      return value("velocity", mp::value(velocity), velocity.name());
++      return value("velocity", mp::value(velocity), mp::unit_name(velocity));
+     }
+ 
+     /**
+@@ -111,7 +111,8 @@ class SysIdRoutineLog {
+      */
+     MotorLog& acceleration(
+         mp::quantity<mp::m / mp::s2> acceleration) {
+-      return value("acceleration", mp::value(acceleration), acceleration.name());
++      return value("acceleration", mp::value(acceleration),
++                   mp::unit_name(acceleration));
+     }
+ 
+     /**
+@@ -124,7 +125,8 @@ class SysIdRoutineLog {
+      */
+     MotorLog& acceleration(
+         mp::quantity<mp::rev / mp::s2> acceleration) {
+-      return value("acceleration", mp::value(acceleration), acceleration.name());
++      return value("acceleration", mp::value(acceleration),
++                   mp::unit_name(acceleration));
+     }
+ 
+     /**
+@@ -136,7 +138,7 @@ class SysIdRoutineLog {
+      * @return The motor log (for call chaining).
+      */
+     MotorLog& current(mp::quantity<mp::A> current) {
+-      return value("current", mp::value(current), current.name());
++      return value("current", mp::value(current), mp::unit_name(current));
+     }
+ 
+    private:
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
 index df17a3be9..293b06ead 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp

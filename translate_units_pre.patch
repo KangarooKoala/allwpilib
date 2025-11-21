@@ -1,8 +1,105 @@
+diff --git a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp b/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
+index 2e9fbc46d5..d816f2e66a 100644
+--- a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
++++ b/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
+@@ -72,7 +72,7 @@ void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
+   angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
+ 
+   // NOLINTNEXTLINE(bugprone-integer-division)
+-  Set((angle - m_minServoAngle) / GetServoAngleRange());
++  Set(double{(angle - m_minServoAngle) / GetServoAngleRange()});
+ }
+ 
+ void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
+diff --git a/wpilibc/src/main/native/cpp/counter/Tachometer.cpp b/wpilibc/src/main/native/cpp/counter/Tachometer.cpp
+index f41c2d1abe..a5d81703b4 100644
+--- a/wpilibc/src/main/native/cpp/counter/Tachometer.cpp
++++ b/wpilibc/src/main/native/cpp/counter/Tachometer.cpp
+@@ -71,7 +71,7 @@ wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
+ 
+ wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute()
+     const {
+-  return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
++  return GetRevolutionsPerSecond();
+ }
+ 
+ bool Tachometer::GetStopped() const {
+diff --git a/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp b/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp
+index 1dacd45b22..6aab8b61d6 100644
+--- a/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp
++++ b/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp
+@@ -87,7 +87,7 @@ double DutyCycleEncoder::Get() const {
+     pos = m_dutyCycle->GetOutput();
+   } else {
+     auto highTime = m_dutyCycle->GetHighTime();
+-    pos = highTime / m_period;
++    pos = double{highTime / m_period};
+   }
+ 
+   // Map sensor range if range isn't full
+diff --git a/wpilibc/src/main/native/cpp/motorcontrol/MotorController.cpp b/wpilibc/src/main/native/cpp/motorcontrol/MotorController.cpp
+index d01d1d78e7..25daf9413e 100644
+--- a/wpilibc/src/main/native/cpp/motorcontrol/MotorController.cpp
++++ b/wpilibc/src/main/native/cpp/motorcontrol/MotorController.cpp
+@@ -10,5 +10,5 @@ using namespace wpi;
+ 
+ void MotorController::SetVoltage(wpi::units::volt_t output) {
+   // NOLINTNEXTLINE(bugprone-integer-division)
+-  Set(output / RobotController::GetBatteryVoltage());
++  Set(double{output / RobotController::GetBatteryVoltage()});
+ }
+diff --git a/wpilibc/src/main/native/cpp/motorcontrol/PWMMotorController.cpp b/wpilibc/src/main/native/cpp/motorcontrol/PWMMotorController.cpp
+index 198ed0d358..077e91b27e 100644
+--- a/wpilibc/src/main/native/cpp/motorcontrol/PWMMotorController.cpp
++++ b/wpilibc/src/main/native/cpp/motorcontrol/PWMMotorController.cpp
+@@ -32,7 +32,7 @@ void PWMMotorController::Set(double speed) {
+ 
+ void PWMMotorController::SetVoltage(wpi::units::volt_t output) {
+   // NOLINTNEXTLINE(bugprone-integer-division)
+-  Set(output / RobotController::GetBatteryVoltage());
++  Set(double{output / RobotController::GetBatteryVoltage()});
+ }
+ 
+ double PWMMotorController::Get() const {
+diff --git a/wpilibc/src/main/native/cpp/simulation/DCMotorSim.cpp b/wpilibc/src/main/native/cpp/simulation/DCMotorSim.cpp
+index 3485487e6b..7e520d3228 100644
+--- a/wpilibc/src/main/native/cpp/simulation/DCMotorSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/DCMotorSim.cpp
+@@ -33,12 +33,14 @@ DCMotorSim::DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
+       //   B = GKₜ/(RJ)
+       //   J = GKₜ/(RB)
+       m_gearing(-gearbox.Kv.value() * m_plant.A(1, 1) / m_plant.B(1, 0)),
+-      m_j(m_gearing * gearbox.Kt.value() /
+-          (gearbox.R.value() * m_plant.B(1, 0))) {}
++      m_j(wpi::units::kilogram_square_meter_t{
++          m_gearing * gearbox.Kt.value() /
++          (gearbox.R.value() * m_plant.B(1, 0))}) {}
+ 
+ void DCMotorSim::SetState(wpi::units::radian_t angularPosition,
+                           wpi::units::radians_per_second_t angularVelocity) {
+-  SetState(wpi::math::Vectord<2>{angularPosition, angularVelocity});
++  SetState(
++      wpi::math::Vectord<2>{angularPosition.value(), angularVelocity.value()});
+ }
+ 
+ void DCMotorSim::SetAngle(wpi::units::radian_t angularPosition) {
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 614f0abd36..d3aaa9247c 100644
+index 614f0abd36..02b8433c45 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-@@ -91,7 +91,8 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
+@@ -54,8 +54,9 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
+ 
+ void ElevatorSim::SetState(wpi::units::meter_t position,
+                            wpi::units::meters_per_second_t velocity) {
+-  SetState(wpi::math::Vectord<2>{std::clamp(position, m_minHeight, m_maxHeight),
+-                                 velocity});
++  SetState(wpi::math::Vectord<2>{
++      std::clamp(position, m_minHeight, m_maxHeight).value(),
++      velocity.value()});
+ }
+ 
+ bool ElevatorSim::WouldHitLowerLimit(wpi::units::meter_t elevatorHeight) const {
+@@ -91,7 +92,8 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
    using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
        wpi::units::volt, wpi::units::inverse<wpi::units::meters_per_second>>>;
    Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
@@ -12,10 +109,37 @@ index 614f0abd36..d3aaa9247c 100644
    wpi::units::radians_per_second_t motorVelocity = velocity * Kv * m_gearbox.Kv;
  
    // Perform calculation and return.
+diff --git a/wpilibc/src/main/native/cpp/simulation/FlywheelSim.cpp b/wpilibc/src/main/native/cpp/simulation/FlywheelSim.cpp
+index 25f893a5c5..0a5d0add3a 100644
+--- a/wpilibc/src/main/native/cpp/simulation/FlywheelSim.cpp
++++ b/wpilibc/src/main/native/cpp/simulation/FlywheelSim.cpp
+@@ -33,8 +33,9 @@ FlywheelSim::FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant,
+       //   B = GKₜ/(RJ)
+       //   J = GKₜ/(RB)
+       m_gearing(-gearbox.Kv.value() * m_plant.A(0, 0) / m_plant.B(0, 0)),
+-      m_j(m_gearing * gearbox.Kt.value() /
+-          (gearbox.R.value() * m_plant.B(0, 0))) {}
++      m_j(wpi::units::kilogram_square_meter_t{
++          m_gearing * gearbox.Kt.value() /
++          (gearbox.R.value() * m_plant.B(0, 0))}) {}
+ 
+ void FlywheelSim::SetVelocity(wpi::units::radians_per_second_t velocity) {
+   LinearSystemSim::SetState(wpi::math::Vectord<1>{velocity.value()});
 diff --git a/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp b/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
-index d22ba2dacf..f8daa19989 100644
+index d22ba2dacf..3a45dadb0e 100644
 --- a/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/SingleJointedArmSim.cpp
+@@ -45,8 +45,8 @@ SingleJointedArmSim::SingleJointedArmSim(
+ 
+ void SingleJointedArmSim::SetState(wpi::units::radian_t angle,
+                                    wpi::units::radians_per_second_t velocity) {
+-  SetState(wpi::math::Vectord<2>{std::clamp(angle, m_minAngle, m_maxAngle),
+-                                 velocity});
++  SetState(wpi::math::Vectord<2>{
++      std::clamp(angle, m_minAngle, m_maxAngle).value(), velocity.value()});
+ }
+ 
+ bool SingleJointedArmSim::WouldHitLowerLimit(
 @@ -78,7 +78,8 @@ wpi::units::radians_per_second_t SingleJointedArmSim::GetVelocity() const {
  wpi::units::ampere_t SingleJointedArmSim::GetCurrentDraw() const {
    // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
@@ -26,6 +150,19 @@ index d22ba2dacf..f8daa19989 100644
    return m_gearbox.Current(motorVelocity, wpi::units::volt_t{m_u(0)}) *
           wpi::util::sgn(m_u(0));
  }
+diff --git a/wpilibc/src/main/native/cpp/system/Notifier.cpp b/wpilibc/src/main/native/cpp/system/Notifier.cpp
+index 08aa2e066d..2d1b4d88c6 100644
+--- a/wpilibc/src/main/native/cpp/system/Notifier.cpp
++++ b/wpilibc/src/main/native/cpp/system/Notifier.cpp
+@@ -205,7 +205,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
+ }
+ 
+ void Notifier::UpdateAlarm() {
+-  UpdateAlarm(static_cast<uint64_t>(m_expirationTime * 1e6));
++  UpdateAlarm(static_cast<uint64_t>(m_expirationTime.value() * 1e6));
+ }
+ 
+ bool Notifier::SetHALThreadPriority(bool realTime, int32_t priority) {
 diff --git a/wpilibc/src/main/native/cpp/system/Watchdog.cpp b/wpilibc/src/main/native/cpp/system/Watchdog.cpp
 index 73a6fc5352..70b2f3cfd9 100644
 --- a/wpilibc/src/main/native/cpp/system/Watchdog.cpp
