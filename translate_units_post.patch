@@ -1,3 +1,45 @@
+diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
+index df3be984e6..7edc087327 100644
+--- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
++++ b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
+@@ -87,7 +87,7 @@ class UnitSubscriber : public Subscriber {
+    * @return value
+    */
+   ValueType Get(ParamType defaultValue) const {
+-    return T{::wpi::nt::GetDouble(m_subHandle, mp::value(defaultValue))};
++    return ::wpi::nt::GetDouble(m_subHandle, mp::value(defaultValue)) * T::unit;
+   }
+ 
+   /**
+@@ -300,7 +300,9 @@ class UnitTopic final : public Topic {
+    *
+    * @return True if unit matches, false if not matching or topic not published.
+    */
+-  bool IsMatchingUnit() const { return GetProperty("unit") == T{}.name(); }
++  bool IsMatchingUnit() const {
++    return GetProperty("unit") == mp::name(T::unit);
++  }
+ 
+   /**
+    * Create a new subscriber to the topic.
+@@ -369,7 +371,7 @@ class UnitTopic final : public Topic {
+   [[nodiscard]]
+   PublisherType Publish(const PubSubOptions& options = kDefaultPubSubOptions) {
+     return UnitPublisher<T>{::wpi::nt::PublishEx(
+-        m_handle, NT_DOUBLE, "double", {{"unit", T{}.name()}}, options)};
++        m_handle, NT_DOUBLE, "double", {{"unit", mp::name(T::unit)}}, options)};
+   }
+ 
+   /**
+@@ -395,7 +397,7 @@ class UnitTopic final : public Topic {
+       std::string_view typeString, const wpi::util::json& properties,
+       const PubSubOptions& options = kDefaultPubSubOptions) {
+     wpi::util::json props = properties;
+-    props["unit"] = T{}.name();
++    props["unit"] = mp::name(T::unit);
+     return UnitPublisher<T>{
+         ::wpi::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};
+   }
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 index 00cada6e1..821e2e09e 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp

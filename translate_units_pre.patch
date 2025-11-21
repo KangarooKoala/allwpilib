@@ -1,3 +1,111 @@
+diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
+index ff26afd4e9..7d451c3843 100644
+--- a/ntcore/src/main/native/cpp/NetworkServer.cpp
++++ b/ntcore/src/main/native/cpp/NetworkServer.cpp
+@@ -315,13 +315,14 @@ void NetworkServer::LoadPersistent() {
+                   std::filesystem::copy_options::overwrite_existing, ec);
+     // try to write an empty file so it doesn't happen again
+     wpi::util::raw_fd_ostream os{m_persistentFilename, ec, fs::F_Text};
+-    if (ec.value() == 0) {
++    if (ec.value() == 0) {  // non-unit .value()
+       os << "[]\n";
+       os.close();
+     }
+     return;
+   }
+   m_persistentData =
++      // next line non-unit .value()
+       std::string{fileBuffer.value()->begin(), fileBuffer.value()->end()};
+   DEBUG4("read data: {}", m_persistentData);
+ }
+@@ -332,7 +333,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
+   auto tmp = fmt::format("{}.tmp", filename);
+   std::error_code ec;
+   wpi::util::raw_fd_ostream os{tmp, ec, fs::F_Text};
+-  if (ec.value() != 0) {
++  if (ec.value() != 0) {  // non-unit .value()
+     INFO("could not open persistent file '{}' for write: {}", tmp,
+          ec.message());
+     return;
+@@ -349,7 +350,7 @@ void NetworkServer::SavePersistent(std::string_view filename,
+   fs::remove(bak, ec);
+   fs::rename(filename, bak, ec);
+   fs::rename(tmp, filename, ec);
+-  if (ec.value() != 0) {
++  if (ec.value() != 0) {  // non-unit .value()
+     // attempt to restore backup
+     fs::rename(bak, filename, ec);
+   }
+diff --git a/ntcore/src/main/native/cpp/Value.cpp b/ntcore/src/main/native/cpp/Value.cpp
+index 8aa2c316f1..7f7c0a9144 100644
+--- a/ntcore/src/main/native/cpp/Value.cpp
++++ b/ntcore/src/main/native/cpp/Value.cpp
+@@ -177,7 +177,7 @@ Value Value::MakeStringArray(std::vector<std::string>&& value, int64_t time) {
+ }
+ 
+ void wpi::nt::ConvertToC(const Value& in, NT_Value* out) {
+-  *out = in.value();
++  *out = in.value();  // non-unit .value()
+   switch (in.type()) {
+     case NT_STRING:
+       ConvertToC(in.GetString(), &out->data.v_string);
+diff --git a/ntcore/src/main/native/cpp/local/LocalTopic.cpp b/ntcore/src/main/native/cpp/local/LocalTopic.cpp
+index b201a4b90c..3be886a937 100644
+--- a/ntcore/src/main/native/cpp/local/LocalTopic.cpp
++++ b/ntcore/src/main/native/cpp/local/LocalTopic.cpp
+@@ -138,10 +138,10 @@ bool LocalTopic::SetProperties(const wpi::util::json& update) {
+     return false;
+   }
+   for (auto&& change : update.items()) {
+-    if (change.value().is_null()) {
++    if (change.value().is_null()) {  // non-unit .value()
+       properties.erase(change.key());
+     } else {
+-      properties[change.key()] = change.value();
++      properties[change.key()] = change.value();  // non-unit .value()
+     }
+   }
+   return true;
+@@ -159,8 +159,8 @@ wpi::util::json LocalTopic::CompareProperties(const wpi::util::json props) {
+   // added/changed
+   for (auto&& prop : props.items()) {
+     auto it = properties.find(prop.key());
+-    if (it == properties.end() || *it != prop.value()) {
+-      update[prop.key()] = prop.value();
++    if (it == properties.end() || *it != prop.value()) {  // non-unit .value()
++      update[prop.key()] = prop.value();                  // non-unit .value()
+     }
+   }
+   // removed
+diff --git a/ntcore/src/main/native/cpp/server/ServerTopic.cpp b/ntcore/src/main/native/cpp/server/ServerTopic.cpp
+index eaf85ddd76..e7f962636e 100644
+--- a/ntcore/src/main/native/cpp/server/ServerTopic.cpp
++++ b/ntcore/src/main/native/cpp/server/ServerTopic.cpp
+@@ -14,10 +14,10 @@ bool ServerTopic::SetProperties(const wpi::util::json& update) {
+   }
+   bool updated = false;
+   for (auto&& elem : update.items()) {
+-    if (elem.value().is_null()) {
++    if (elem.value().is_null()) {  // non-unit .value()
+       properties.erase(elem.key());
+     } else {
+-      properties[elem.key()] = elem.value();
++      properties[elem.key()] = elem.value();  // non-unit .value()
+     }
+     updated = true;
+   }
+diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
+index b113e56056..09bcf6b00b 100644
+--- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
++++ b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
+@@ -11,6 +11,7 @@
+ 
+ #include "wpi/nt/Topic.hpp"
+ #include "wpi/nt/ntcore_cpp.hpp"
++#include "wpi/units/base.hpp"
+ #include "wpi/util/json.hpp"
+ 
+ namespace wpi::nt {
 diff --git a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp b/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
 index 2e9fbc46d5..d816f2e66a 100644
 --- a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
