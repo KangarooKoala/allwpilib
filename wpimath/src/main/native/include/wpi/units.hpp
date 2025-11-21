@@ -183,6 +183,16 @@ constexpr double value(Quantity auto q) {
   return q.numerical_value_in(decltype(q)::unit);
 }
 
+// unit name accessor
+constexpr auto name(Unit auto u) {
+  return fmt::format("{:n}", u);
+}
+
+// unit name accessor
+constexpr auto unit_name(Quantity auto q) {
+  return name(decltype(q)::unit);
+}
+
 namespace detail {
 
 // use a wrapper type in a separate namespace so that the ADL picks up the

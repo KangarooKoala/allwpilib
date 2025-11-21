@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <gtest/gtest.h>
+
 #include "wpi/units.hpp"
 
 static_assert(mp::abs(mp::pow<2>(2.0 * mp::m) - 4.0 * mp::m2) < 1e-9 * mp::m2);
@@ -23,3 +25,9 @@ static_assert(mp::round<mp::cm>(1.25 * mp::m) == 125.0 * mp::cm);
 static_assert(mp::hypot(3.0 * mp::m, 4.0 * mp::m) == 5.0 * mp::m);
 static_assert(mp::hypot(1.0 * mp::m, 2.0 * mp::m, 2.0 * mp::m) == 3.0 * mp::m);
 static_assert(mp::log(mp::exp(1.0 * mp::m / mp::m)) == 1.0 * mp::m / mp::m);
+
+using namespace std::literals::string_view_literals;
+
+TEST(MpUnits, UnitName) {
+  EXPECT_EQ("m s⁻¹"sv, mp::unit_name(2.0 * mp::m / mp::s));
+}
