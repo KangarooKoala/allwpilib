@@ -435,6 +435,13 @@ def process_unit_type_initialization(
         and lines[first_ns_line_i][first_ns_pos:].startswith(".value()")
         or is_end_of_unit(lines, r_line_i, r_pos - 1)
     ):
+        # Parenthesize if necessary
+        if r_line_i != i or " " in lines[i][start:r_pos]:
+            lines[i] = insert(lines[i], start, "(")
+            if i == r_line_i:
+                r_pos += 1
+            lines[r_line_i] = insert(lines[r_line_i], r_pos, ")")
+            r_pos += 1
         # Unit conversion
         replacement = f".in({unit})"
         lines[r_line_i] = insert(lines[r_line_i], r_pos, replacement)
@@ -464,6 +471,26 @@ def check_variable_initializer(lines: list[str], i: int, end: int):
     # When they're ambiguous (most vexing parse), it's a function, but not all cases with parentheses are ambiguous
     if lines[i][pos] == "{":
         print(f"Line {i}: Quantity variable could be initialized from a scalar")
+
+
+def process_to_calls(lines: list[str], i: int):
+    """Processes any .to<>() occurences in the specified line."""
+    # Handle the simple conversions
+    lines[i] = lines[i].replace(".to<double>()", ".value()")
+    # Handle the conversions that need static_cast<>()
+    while (index := lines[i].find(".to<")) >= 0:
+        lbrac_pos: int = index + len(".to")
+        rbrac_line_i, rbrac_pos = find_match(lines, i, lbrac_pos)
+        if not lines[rbrac_line_i][rbrac_pos + 1 :].startswith("()"):
+            raise ValueError(f"Line {i}: Unexpected non-call .to<>!")
+        if rbrac_line_i != i:
+            raise ValueError(f"Line {i}: .to<>() call is too complicated!")
+        scalar_type: str = lines[i][lbrac_pos + 1 : rbrac_pos]
+        lines[i] = replace(lines[i], index, f".to<{scalar_type}>()", ".value())")
+        start_line_i, start_pos = find_expr_start(lines, i, index - 1)
+        lines[start_line_i] = insert(
+            lines[start_line_i], start_pos, f"static_cast<{scalar_type}>("
+        )
 
 
 def process_unit_t(
@@ -620,21 +647,6 @@ def process_value_calls(lines: list[str], i: int):
         lines[i] = delete(lines[i], index, SKIP_COMMENT)
         lines[i] = lines[i][:index].rstrip() + lines[i][index:]
         return
-    # Preprocess .to<>()
-    lines[i] = lines[i].replace(".to<double>()", ".value()")
-    while (index := lines[i].find(".to<")) >= 0:
-        lbrac_pos: int = index + len(".to")
-        rbrac_line_i, rbrac_pos = find_match(lines, i, lbrac_pos)
-        if not lines[rbrac_line_i][rbrac_pos + 1 :].startswith("()"):
-            raise ValueError(f"Line {i}: Unexpected non-call .to<>!")
-        if rbrac_line_i != i:
-            raise ValueError(f"Line {i}: .to<>() call too complicated!")
-        scalar_type: str = lines[i][lbrac_pos + 1 : rbrac_pos]
-        lines[i] = replace(lines[i], index, f".to<{scalar_type}>()", ".value())")
-        start_line_i, start_pos = find_expr_start(lines, i, index - 1)
-        lines[start_line_i] = insert(
-            lines[start_line_i], start_pos, f"static_cast<{scalar_type}>("
-        )
     # Process .value()
     while (index := lines[i].find(".value()")) >= 0:
         # Delete .value()
@@ -646,7 +658,8 @@ def process_value_calls(lines: list[str], i: int):
             lparen_line = lines[lparen_line_i]
             # Make sure this isn't a method call (which can have template arguments)
             if (
-                not lparen_line[lparen_pos - 1].isalpha()
+                not lparen_line[lparen_pos - 1].isalnum()
+                and lparen_line[lparen_pos - 1] != "_"
                 and lparen_line[lparen_pos - 1] != ">"
             ):
                 # Add mp::value before lparen
@@ -769,6 +782,11 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
             .replace("wpi::units::angle_unit auto", "mp::QuantityOf<mp::angle> auto")
             .replace("wpi::units::traits::is_unit_t_v", "mp::Quantity")
         )
+
+    # Process .to<>() calls
+    # This must be before processing unit_t types so that unit conversion detection works properly
+    for i in body_iter():
+        process_to_calls(lines, i)
 
     # Process function implementation parameter types separately to avoid counting those changes for IWYU
     for _, unit_t_to_unit in UNIT_T_TO_UNIT.items():
@@ -1082,6 +1100,21 @@ def run_tests() -> bool:
         ),
     )
     success &= test_translate(
+        "unit conversion .to<>()",
+        ("wpi::units::microsecond_t{time}.to<uint64_t>()\n",),
+        ("static_cast<uint64_t>(mp::value(time.in(mp::µs)))\n",),
+    )
+    success &= test_translate(
+        "unit conversion addition",
+        ("wpi::units::radian_t{a + b}.value()\n",),
+        ("mp::value((a + b).in(mp::rad))\n",),
+    )
+    success &= test_translate(
+        "unit conversion division",
+        ("wpi::units::radian_t{a / b}.value()\n",),
+        ("mp::value((a / b).in(mp::rad))\n",),
+    )
+    success &= test_translate(
         "unit_t integer",
         ("wpi::units::unit_t<kv_unit>(0)\n",),
         ("0.0 * kv_unit\n",),
@@ -1146,6 +1179,11 @@ def run_tests() -> bool:
             "mp::value(x * (y /\n",
             " z))\n",
         ),
+    )
+    success &= test_translate(
+        "method call result .value()",
+        ("RoboRioSim::GetUserVoltage3V3().value()\n",),
+        ("mp::value(RoboRioSim::GetUserVoltage3V3())\n",),
     )
     success &= test_translate(
         ".to<double>()",
