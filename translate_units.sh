@@ -4,6 +4,27 @@ readonly only_pre_flag="--only-pre"
 readonly skip_post_flag="--skip-post"
 
 if [ "$1" ]; then
+  if [ "$1" = "diff" ]; then
+    git diff $(cat translate_units_paths)
+    exit 0
+  elif [ "$1" = "reset" ]; then
+    git restore --worktree --staged -- $(cat translate_units_paths)
+    exit 0
+  elif [ "$1" = "update" ]; then
+    if [ "$2" = "pre" ]; then
+      patch_path="translate_units_pre.patch"
+    elif [ "$2" = "post" ]; then
+      patch_path="translate_units_post.patch"
+    else
+      echo "Expected 'pre' or 'post'"
+      exit 11
+    fi
+    git diff $(cat translate_units_paths) > $patch_path
+    if [ "$3" = "--add" ]; then
+      git add $patch_path
+    fi
+    exit 0
+  fi
   if [ "$1" = $skip_post_flag ]; then
     dummy=0
   elif [ "$1" = $only_pre_flag ]; then
