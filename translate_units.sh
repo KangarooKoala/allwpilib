@@ -32,7 +32,7 @@ if [ "$1" = $only_pre_flag ]; then
   exit 0
 fi
 
-./translate_units.py $file_paths
+python3 translate_units.py $file_paths
 
 start=$(date +%s)
 echo "Running format"
