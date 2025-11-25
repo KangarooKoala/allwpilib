@@ -446,6 +446,144 @@ index 2a23f86411..27e7b05ce5 100644
    double m_sensorMin{0.0};
    double m_sensorMax{1.0};
    bool m_isInverted{false};
+diff --git a/wpilibcExamples/src/main/cpp/examples/AddressableLED/include/Robot.hpp b/wpilibcExamples/src/main/cpp/examples/AddressableLED/include/Robot.hpp
+index db1c4e95bd..93f242a2c6 100644
+--- a/wpilibcExamples/src/main/cpp/examples/AddressableLED/include/Robot.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/AddressableLED/include/Robot.hpp
+@@ -24,7 +24,7 @@ class Robot : public wpi::TimedRobot {
+       m_ledBuffer;  // Reuse the buffer
+ 
+   // Our LED strip has a density of 120 LEDs per meter
+-  wpi::units::meter_t kLedSpacing{1 / 120.0};
++  wpi::units::meter_t kLedSpacing = wpi::units::meter_t{1 / 120.0};
+ 
+   // Create an LED pattern that will display a rainbow across
+   // all hues at maximum saturation and half brightness
+diff --git a/wpilibcExamples/src/main/cpp/examples/DifferentialDriveBot/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/DifferentialDriveBot/include/Drivetrain.hpp
+index e1707b4b44..2924313ad9 100644
+--- a/wpilibcExamples/src/main/cpp/examples/DifferentialDriveBot/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/DifferentialDriveBot/include/Drivetrain.hpp
+@@ -47,8 +47,9 @@ class Drivetrain {
+ 
+   static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+       3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+   void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
+   void Drive(wpi::units::meters_per_second_t xSpeed,
+diff --git a/wpilibcExamples/src/main/cpp/examples/DifferentialDrivePoseEstimator/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/DifferentialDrivePoseEstimator/include/Drivetrain.hpp
+index dac2ce98b2..d9562a63dc 100644
+--- a/wpilibcExamples/src/main/cpp/examples/DifferentialDrivePoseEstimator/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/DifferentialDrivePoseEstimator/include/Drivetrain.hpp
+@@ -43,8 +43,9 @@ class Drivetrain {
+ 
+   static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+       3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+   /**
+    * Sets the desired wheel speeds.
+diff --git a/wpilibcExamples/src/main/cpp/examples/DriveDistanceOffboard/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/DriveDistanceOffboard/include/Constants.hpp
+index 99c08bfaa9..2ffdd454cc 100644
+--- a/wpilibcExamples/src/main/cpp/examples/DriveDistanceOffboard/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/DriveDistanceOffboard/include/Constants.hpp
+@@ -22,7 +22,7 @@
+  */
+ 
+ namespace DriveConstants {
+-inline constexpr wpi::units::second_t kDt{0.02};
++inline constexpr wpi::units::second_t kDt = wpi::units::second_t{0.02};
+ inline constexpr int kLeftMotor1Port = 0;
+ inline constexpr int kLeftMotor2Port = 1;
+ inline constexpr int kRightMotor1Port = 2;
+diff --git a/wpilibcExamples/src/main/cpp/examples/MecanumBot/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/MecanumBot/include/Drivetrain.hpp
+index ad6ee91c60..2d75d62826 100644
+--- a/wpilibcExamples/src/main/cpp/examples/MecanumBot/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/MecanumBot/include/Drivetrain.hpp
+@@ -41,8 +41,9 @@ class Drivetrain {
+ 
+   static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+       3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+  private:
+   wpi::PWMSparkMax m_frontLeftMotor{1};
+diff --git a/wpilibcExamples/src/main/cpp/examples/MecanumDrivePoseEstimator/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/MecanumDrivePoseEstimator/include/Drivetrain.hpp
+index 5d606f7b76..18a1577915 100644
+--- a/wpilibcExamples/src/main/cpp/examples/MecanumDrivePoseEstimator/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/MecanumDrivePoseEstimator/include/Drivetrain.hpp
+@@ -41,8 +41,9 @@ class Drivetrain {
+   void UpdateOdometry();
+ 
+   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+  private:
+   wpi::PWMSparkMax m_frontLeftMotor{1};
+diff --git a/wpilibcExamples/src/main/cpp/examples/SimpleDifferentialDriveSimulation/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/SimpleDifferentialDriveSimulation/include/Drivetrain.hpp
+index 7e73fdbfeb..f16a9dad56 100644
+--- a/wpilibcExamples/src/main/cpp/examples/SimpleDifferentialDriveSimulation/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/SimpleDifferentialDriveSimulation/include/Drivetrain.hpp
+@@ -57,8 +57,9 @@ class Drivetrain {
+ 
+   static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+       3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+   void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
+   void Drive(wpi::units::meters_per_second_t xSpeed,
+diff --git a/wpilibcExamples/src/main/cpp/examples/SwerveBot/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/SwerveBot/include/Drivetrain.hpp
+index b2f575bab7..04bb1d7521 100644
+--- a/wpilibcExamples/src/main/cpp/examples/SwerveBot/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/SwerveBot/include/Drivetrain.hpp
+@@ -27,8 +27,9 @@ class Drivetrain {
+ 
+   static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+       3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+  private:
+   wpi::math::Translation2d m_frontLeftLocation{+0.381_m, +0.381_m};
+diff --git a/wpilibcExamples/src/main/cpp/examples/SwerveDrivePoseEstimator/include/Drivetrain.hpp b/wpilibcExamples/src/main/cpp/examples/SwerveDrivePoseEstimator/include/Drivetrain.hpp
+index 3ee387fd37..60e4f6dee9 100644
+--- a/wpilibcExamples/src/main/cpp/examples/SwerveDrivePoseEstimator/include/Drivetrain.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/SwerveDrivePoseEstimator/include/Drivetrain.hpp
+@@ -27,8 +27,9 @@ class Drivetrain {
+   void UpdateOdometry();
+ 
+   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
+-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+-      std::numbers::pi};  // 1/2 rotation per second
++  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed =
++      wpi::units::radians_per_second_t{
++          std::numbers::pi};  // 1/2 rotation per second
+ 
+  private:
+   wpi::math::Translation2d m_frontLeftLocation{+0.381_m, +0.381_m};
 diff --git a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp b/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
 index 8525923727..869ace9848 100644
 --- a/wpimath/src/main/native/cpp/controller/ArmFeedforward.cpp
