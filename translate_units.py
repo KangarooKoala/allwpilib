@@ -30,6 +30,7 @@ UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
         "meters_per_second": "mp::m / mp::s",
         "meters_per_second_squared": "mp::m / mp::s2",
         "radians_per_second": "mp::rad / mp::s",
+        "degrees_per_second": "mp::deg / mp::s",
         "turns_per_second": "mp::rev / mp::s",
         "revolutions_per_minute": "mp::rev / mp::min",
         "radians_per_second_squared": "mp::rad / mp::s2",
