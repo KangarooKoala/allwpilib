@@ -10,8 +10,21 @@ index 255321198a..56d7cf8446 100644
        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
  
    for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+diff --git a/commandsv2/src/main/native/cpp/frc2/command/CommandScheduler.cpp b/commandsv2/src/main/native/cpp/frc2/command/CommandScheduler.cpp
+index 348a27d1d0..dc2a6e4860 100644
+--- a/commandsv2/src/main/native/cpp/frc2/command/CommandScheduler.cpp
++++ b/commandsv2/src/main/native/cpp/frc2/command/CommandScheduler.cpp
+@@ -435,7 +435,7 @@ void CommandScheduler::RequireUngrouped(const Command* command) {
+         "Commands that have been composed may not be added to "
+         "another composition or scheduled individually!"
+         "\nOriginally composed at:\n{}",
+-        stacktrace.value());
++        stacktrace.value());  // non-unit .value()
+   }
+ }
+ 
 diff --git a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
-index 9b78ee611f..7fb015fb81 100644
+index 9b78ee611f..1066789c1a 100644
 --- a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
 +++ b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
 @@ -23,13 +23,13 @@ using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
@@ -31,6 +44,23 @@ index 9b78ee611f..7fb015fb81 100644
  
    /// Optional handle for recording test state in a third-party logging
    /// solution.
+@@ -54,13 +54,13 @@ class Config {
+          std::function<void(wpi::sysid::State)> recordState)
+       : m_recordState{std::move(recordState)} {
+     if (rampRate) {
+-      m_rampRate = rampRate.value();
++      m_rampRate = rampRate.value();  // non-unit .value()
+     }
+     if (stepVoltage) {
+-      m_stepVoltage = stepVoltage.value();
++      m_stepVoltage = stepVoltage.value();  // non-unit .value()
+     }
+     if (timeout) {
+-      m_timeout = timeout.value();
++      m_timeout = timeout.value();  // non-unit .value()
+     }
+   }
+ };
 @@ -190,7 +190,7 @@ class SysIdRoutine : public wpi::sysid::SysIdRoutineLog {
   private:
    Config m_config;
@@ -40,6 +70,26 @@ index 9b78ee611f..7fb015fb81 100644
    std::function<void(wpi::sysid::State)> m_recordState;
    wpi::Timer timer;
  };
+diff --git a/commandsv2/src/test/native/cpp/wpi/command/CommandSendableButtonTest.cpp b/commandsv2/src/test/native/cpp/wpi/command/CommandSendableButtonTest.cpp
+index 1e84dd8d63..b7c22a4cb0 100644
+--- a/commandsv2/src/test/native/cpp/wpi/command/CommandSendableButtonTest.cpp
++++ b/commandsv2/src/test/native/cpp/wpi/command/CommandSendableButtonTest.cpp
+@@ -47,6 +47,7 @@ TEST_F(CommandSendableButtonTest, trueAndNotScheduledSchedules) {
+ 
+ TEST_F(CommandSendableButtonTest, trueAndScheduledNoOp) {
+   // Scheduled and true -> no-op
++  // next line non-unit .value()
+   wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
+   GetScheduler().Run();
+   wpi::SmartDashboard::UpdateValues();
+@@ -80,6 +81,7 @@ TEST_F(CommandSendableButtonTest, falseAndNotScheduledNoOp) {
+ 
+ TEST_F(CommandSendableButtonTest, falseAndScheduledCancel) {
+   // Scheduled and false -> cancel
++  // next line non-unit .value()
+   wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
+   GetScheduler().Run();
+   wpi::SmartDashboard::UpdateValues();
 diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
 index ff26afd4e9..7d451c3843 100644
 --- a/ntcore/src/main/native/cpp/NetworkServer.cpp

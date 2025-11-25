@@ -34,6 +34,20 @@ index b7499b8f32..4779a062df 100644
  
  namespace wpi::apriltag {
  
+diff --git a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
+index c3abddc66b..8fc7b7f52c 100644
+--- a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
++++ b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
+@@ -16,8 +16,7 @@
+ 
+ namespace wpi::cmd::sysid {
+ 
+-using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
+-    mp::V, wpi::units::inverse<mp::s>>>;
++using ramp_rate_t = mp::quantity<mp::V / mp::s>;
+ 
+ /** Hardware-independent configuration for a SysId test routine. */
+ class Config {
 diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
 index df3be984e6..7edc087327 100644
 --- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
