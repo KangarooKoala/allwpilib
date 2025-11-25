@@ -1,5 +1,6 @@
 apriltag/src
 benchmark/src
+commandsv2/src
 ntcore/src
 wpimath/src
 wpilibc/src
