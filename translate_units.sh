@@ -8,6 +8,7 @@ if [ "$1" ]; then
     git diff $(cat translate_units_paths)
     exit 0
   elif [ "$1" = "reset" ]; then
+    git clean -f -- $(cat translate_units_paths)
     git restore --worktree --staged -- $(cat translate_units_paths)
     exit 0
   elif [ "$1" = "update" ]; then
@@ -39,6 +40,7 @@ file_paths=$(cat translate_units_paths)
 
 start=$(date +%s)
 echo "Restoring files and applying pre-patch"
+git clean -f -- $file_paths
 git restore --worktree --staged --source 2027 -- $file_paths
 git apply translate_units_pre.patch
 end=$(date +%s)
