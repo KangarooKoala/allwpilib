@@ -1,6 +1,10 @@
 apriltag/src
 benchmark/src
 commandsv2/src
+commandsv3/src
+developerRobot/src
 ntcore/src
 wpimath/src
 wpilibc/src
+romiVendordep/src
+xrpVendordep/src

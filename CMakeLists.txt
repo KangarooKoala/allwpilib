@@ -353,14 +353,14 @@ if(WITH_WPILIB)
     add_subdirectory(apriltag)
     add_subdirectory(wpilibj)
     add_subdirectory(wpilibc)
-    # add_subdirectory(commandsv3) # must be after wpilibj
+    add_subdirectory(commandsv3) # must be after wpilibj
     add_subdirectory(commandsv2)
-    # add_subdirectory(romiVendordep)
-    # add_subdirectory(xrpVendordep)
+    add_subdirectory(romiVendordep)
+    add_subdirectory(xrpVendordep)
     # if(WITH_EXAMPLES)
     #     add_subdirectory(wpilibcExamples)
     # endif()
-    # add_subdirectory(developerRobot)
+    add_subdirectory(developerRobot)
 endif()
 
 if(WITH_BENCHMARK)
