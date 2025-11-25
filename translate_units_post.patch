@@ -1,5 +1,5 @@
 diff --git a/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp b/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
-index a9beb4ce58..7388a2a8c5 100644
+index a9beb4ce5..7388a2a8c 100644
 --- a/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
 +++ b/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
 @@ -9,6 +9,7 @@
@@ -11,7 +11,7 @@ index a9beb4ce58..7388a2a8c5 100644
  
  using namespace wpi::apriltag;
 diff --git a/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp b/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
-index ed8c27f423..f2a7d18ec8 100644
+index ed8c27f42..f2a7d18ec 100644
 --- a/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
 +++ b/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
 @@ -9,6 +9,7 @@
@@ -23,7 +23,7 @@ index ed8c27f423..f2a7d18ec8 100644
  
  using namespace wpi::apriltag;
 diff --git a/apriltag/src/test/native/cpp/LoadConfigTest.cpp b/apriltag/src/test/native/cpp/LoadConfigTest.cpp
-index b7499b8f32..4779a062df 100644
+index b7499b8f3..4779a062d 100644
 --- a/apriltag/src/test/native/cpp/LoadConfigTest.cpp
 +++ b/apriltag/src/test/native/cpp/LoadConfigTest.cpp
 @@ -8,6 +8,7 @@
@@ -35,7 +35,7 @@ index b7499b8f32..4779a062df 100644
  namespace wpi::apriltag {
  
 diff --git a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
-index c3abddc66b..8fc7b7f52c 100644
+index 10df86ca5..4334fb571 100644
 --- a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
 +++ b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
 @@ -16,8 +16,7 @@
@@ -49,7 +49,7 @@ index c3abddc66b..8fc7b7f52c 100644
  /** Hardware-independent configuration for a SysId test routine. */
  class Config {
 diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
-index df3be984e6..7edc087327 100644
+index df3be984e..7edc08732 100644
 --- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
 +++ b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
 @@ -87,7 +87,7 @@ class UnitSubscriber : public Subscriber {
@@ -320,7 +320,7 @@ index 134eca888..379d8495a 100644
    /**
     * Get the current status of the CAN bus.
 diff --git a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
-index afd9b68e79..6fde438327 100644
+index afd9b68e7..6fde43832 100644
 --- a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
 +++ b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
 @@ -23,7 +23,7 @@ TEST_F(UnitNetworkTablesTest, Publish) {
@@ -333,7 +333,7 @@ index afd9b68e79..6fde438327 100644
  }
  
 diff --git a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
-index f54efb7846..b1a5908fb7 100644
+index f54efb784..b1a5908fb 100644
 --- a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
 +++ b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
 @@ -97,11 +97,11 @@ TEST(RoboRioSimTest, SetCPUTemp) {
@@ -352,7 +352,7 @@ index f54efb7846..b1a5908fb7 100644
  
  TEST(RoboRioSimTest, SetTeamNumber) {
 diff --git a/wpilibc/src/test/native/cpp/simulation/SingleJointedArmSimTest.cpp b/wpilibc/src/test/native/cpp/simulation/SingleJointedArmSimTest.cpp
-index c9234a7b7d..228c2fd575 100644
+index c9234a7b7..228c2fd57 100644
 --- a/wpilibc/src/test/native/cpp/simulation/SingleJointedArmSimTest.cpp
 +++ b/wpilibc/src/test/native/cpp/simulation/SingleJointedArmSimTest.cpp
 @@ -8,6 +8,8 @@
@@ -364,6 +364,128 @@ index c9234a7b7d..228c2fd575 100644
  TEST(SingleJointedArmTest, Disabled) {
    wpi::sim::SingleJointedArmSim sim(wpi::math::DCMotor::Vex775Pro(2), 300,
                                      3.0 * mp::kg * mp::m2, 30.0 * mp::in, -180.0 * mp::deg, 0.0 * mp::deg, true,
+diff --git a/wpilibcExamples/src/main/cpp/examples/ArmSimulation/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/ArmSimulation/include/Constants.hpp
+index c6092918d..b9a1d26e8 100644
+--- a/wpilibcExamples/src/main/cpp/examples/ArmSimulation/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/ArmSimulation/include/Constants.hpp
+@@ -6,8 +6,8 @@
+ 
+ #include <numbers>
+ 
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ /**
+  * The Constants header provides a convenient place for teams to hold robot-wide
+diff --git a/wpilibcExamples/src/main/cpp/examples/ElevatorExponentialSimulation/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/ElevatorExponentialSimulation/include/Constants.hpp
+index 502c92f43..d09fd3a16 100644
+--- a/wpilibcExamples/src/main/cpp/examples/ElevatorExponentialSimulation/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/ElevatorExponentialSimulation/include/Constants.hpp
+@@ -6,8 +6,8 @@
+ 
+ #include <numbers>
+ 
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ /**
+  * The Constants header provides a convenient place for teams to hold robot-wide
+diff --git a/wpilibcExamples/src/main/cpp/examples/ElevatorSimulation/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/ElevatorSimulation/include/Constants.hpp
+index 4459e8ddc..2e8720f76 100644
+--- a/wpilibcExamples/src/main/cpp/examples/ElevatorSimulation/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/ElevatorSimulation/include/Constants.hpp
+@@ -6,8 +6,8 @@
+ 
+ #include <numbers>
+ 
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ /**
+  * The Constants header provides a convenient place for teams to hold robot-wide
+diff --git a/wpilibcExamples/src/main/cpp/examples/RapidReactCommandBot/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/RapidReactCommandBot/include/Constants.hpp
+index 7379b1233..f96db9e96 100644
+--- a/wpilibcExamples/src/main/cpp/examples/RapidReactCommandBot/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/RapidReactCommandBot/include/Constants.hpp
+@@ -6,8 +6,8 @@
+ 
+ #include <numbers>
+ 
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ namespace DriveConstants {
+ inline constexpr int kLeftMotor1Port = 0;
+diff --git a/wpilibcExamples/src/main/cpp/examples/RomiReference/include/commands/AutonomousDistance.hpp b/wpilibcExamples/src/main/cpp/examples/RomiReference/include/commands/AutonomousDistance.hpp
+index 6029e35a1..41ef42035 100644
+--- a/wpilibcExamples/src/main/cpp/examples/RomiReference/include/commands/AutonomousDistance.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/RomiReference/include/commands/AutonomousDistance.hpp
+@@ -9,6 +9,7 @@
+ #include "subsystems/Drivetrain.hpp"
+ #include "wpi/commands2/CommandHelper.hpp"
+ #include "wpi/commands2/SequentialCommandGroup.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ class AutonomousDistance
+     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
+diff --git a/wpilibcExamples/src/main/cpp/examples/SysIdRoutine/include/Constants.hpp b/wpilibcExamples/src/main/cpp/examples/SysIdRoutine/include/Constants.hpp
+index a9f0eef6b..18fb06bca 100644
+--- a/wpilibcExamples/src/main/cpp/examples/SysIdRoutine/include/Constants.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/SysIdRoutine/include/Constants.hpp
+@@ -7,8 +7,8 @@
+ #include <array>
+ #include <numbers>
+ 
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ namespace constants {
+ namespace drive {
+@@ -30,14 +30,10 @@ inline constexpr mp::quantity<mp::m> kEncoderDistancePerPulse =
+ 
+ namespace shooter {
+ 
+-using kv_unit = wpi::units::compound_unit<
+-    wpi::units::compound_unit<mp::V, mp::s>,
+-    wpi::units::inverse<wpi::units::turns>>;
++inline static constexpr auto kv_unit = mp::V * mp::s / mp::rev;
+ using kv_unit_t = mp::quantity<kv_unit>;
+ 
+-using ka_unit = wpi::units::compound_unit<
+-    mp::V,
+-    wpi::units::inverse<wpi::units::turns_per_second_squared>>;
++inline static constexpr auto ka_unit = mp::V / (mp::rev / mp::s2);
+ using ka_unit_t = mp::quantity<ka_unit>;
+ 
+ inline constexpr std::array<int, 2> kEncoderPorts = {4, 5};
+diff --git a/wpilibcExamples/src/main/cpp/examples/XRPReference/include/commands/AutonomousDistance.hpp b/wpilibcExamples/src/main/cpp/examples/XRPReference/include/commands/AutonomousDistance.hpp
+index 6029e35a1..41ef42035 100644
+--- a/wpilibcExamples/src/main/cpp/examples/XRPReference/include/commands/AutonomousDistance.hpp
++++ b/wpilibcExamples/src/main/cpp/examples/XRPReference/include/commands/AutonomousDistance.hpp
+@@ -9,6 +9,7 @@
+ #include "subsystems/Drivetrain.hpp"
+ #include "wpi/commands2/CommandHelper.hpp"
+ #include "wpi/commands2/SequentialCommandGroup.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ class AutonomousDistance
+     : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
+diff --git a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
+index cc3970a0a..5f96ab65b 100644
+--- a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
++++ b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
+@@ -144,5 +144,5 @@ INSTANTIATE_TEST_SUITE_P(
+     testing::Values(kDefaultArmSetpoint, 25.0 * mp::deg, 50.0 * mp::deg),
+     [](const testing::TestParamInfo<mp::quantity<mp::deg>>& info) {
+       return testing::PrintToString(mp::value(info.param))
+-          .append(std::string(info.param.abbreviation()));
++          .append(mp::portable_unit_name(info.param));
+     });
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
 index df17a3be9..293b06ead 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
