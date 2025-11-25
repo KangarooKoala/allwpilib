@@ -6,5 +6,6 @@ developerRobot/src
 ntcore/src
 wpimath/src
 wpilibc/src
+wpilibcExamples/src
 romiVendordep/src
 xrpVendordep/src
