@@ -1329,7 +1329,7 @@ def run_conversions(paths: list[Path]):
         for dp, dn, fn in os.walk(path):
             dp = Path(dp)
             fn.sort()
-            if fn and "native" not in dp.parts:
+            if fn and not any(d in dp.parts for d in ("native", "cpp", "include")):
                 files_str: str = "1 file" if len(fn) == 1 else f"{len(fn)} files"
                 printer.run(lambda: print(f"{files_str} in non-native directory {dp}"))
             else:
@@ -1348,7 +1348,14 @@ def run_conversions(paths: list[Path]):
                         continue
                     files.append(dp / f)
             dn.sort()
-            for bad_dir in ("java", "python", "units", "thirdparty"):
+            for bad_dir in (
+                "generate",
+                "java",
+                "python",
+                "resources",
+                "thirdparty",
+                "units",
+            ):
                 if bad_dir in dn:
                     printer.run(lambda: print(f"directory {dp / bad_dir}"))
                     dn.remove(bad_dir)
