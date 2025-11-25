@@ -1,3 +1,39 @@
+diff --git a/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp b/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
+index a9beb4ce58..7388a2a8c5 100644
+--- a/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
++++ b/apriltag/src/test/native/cpp/AprilTagJsonTest.cpp
+@@ -9,6 +9,7 @@
+ #include "wpi/apriltag/AprilTag.hpp"
+ #include "wpi/apriltag/AprilTagFieldLayout.hpp"
+ #include "wpi/math/geometry/Pose3d.hpp"
++#include "wpi/units-usc.hpp"
+ #include "wpi/util/json.hpp"
+ 
+ using namespace wpi::apriltag;
+diff --git a/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp b/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
+index ed8c27f423..f2a7d18ec8 100644
+--- a/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
++++ b/apriltag/src/test/native/cpp/AprilTagPoseSetOriginTest.cpp
+@@ -9,6 +9,7 @@
+ #include "wpi/apriltag/AprilTag.hpp"
+ #include "wpi/apriltag/AprilTagFieldLayout.hpp"
+ #include "wpi/math/geometry/Pose3d.hpp"
++#include "wpi/units-usc.hpp"
+ #include "wpi/util/json.hpp"
+ 
+ using namespace wpi::apriltag;
+diff --git a/apriltag/src/test/native/cpp/LoadConfigTest.cpp b/apriltag/src/test/native/cpp/LoadConfigTest.cpp
+index b7499b8f32..4779a062df 100644
+--- a/apriltag/src/test/native/cpp/LoadConfigTest.cpp
++++ b/apriltag/src/test/native/cpp/LoadConfigTest.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include "wpi/apriltag/AprilTagFieldLayout.hpp"
+ #include "wpi/apriltag/AprilTagFields.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ namespace wpi::apriltag {
+ 
 diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
 index df3be984e6..7edc087327 100644
 --- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp

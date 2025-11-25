@@ -1,3 +1,15 @@
+diff --git a/apriltag/src/main/native/cpp/AprilTagFieldLayout.cpp b/apriltag/src/main/native/cpp/AprilTagFieldLayout.cpp
+index 255321198a..56d7cf8446 100644
+--- a/apriltag/src/main/native/cpp/AprilTagFieldLayout.cpp
++++ b/apriltag/src/main/native/cpp/AprilTagFieldLayout.cpp
+@@ -23,6 +23,7 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
+   }
+ 
+   wpi::util::json json =
++      // next line non-unit .value()
+       wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
+ 
+   for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
 diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
 index ff26afd4e9..7d451c3843 100644
 --- a/ntcore/src/main/native/cpp/NetworkServer.cpp
