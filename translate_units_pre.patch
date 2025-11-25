@@ -10,6 +10,36 @@ index 255321198a..56d7cf8446 100644
        wpi::util::json::parse(fileBuffer.value()->GetCharBuffer());
  
    for (const auto& tag : json.at("tags").get<std::vector<AprilTag>>()) {
+diff --git a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
+index 9b78ee611f..7fb015fb81 100644
+--- a/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
++++ b/commandsv2/src/main/native/include/wpi/commands2/sysid/SysIdRoutine.hpp
+@@ -23,13 +23,13 @@ using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
+ class Config {
+  public:
+   /// The voltage ramp rate used for quasistatic test routines.
+-  ramp_rate_t m_rampRate{1_V / 1_s};
++  ramp_rate_t m_rampRate = 1_V / 1_s;
+ 
+   /// The step voltage output used for dynamic test routines.
+-  wpi::units::volt_t m_stepVoltage{7_V};
++  wpi::units::volt_t m_stepVoltage = 7_V;
+ 
+   /// Safety timeout for the test routine commands.
+-  wpi::units::second_t m_timeout{10_s};
++  wpi::units::second_t m_timeout = 10_s;
+ 
+   /// Optional handle for recording test state in a third-party logging
+   /// solution.
+@@ -190,7 +190,7 @@ class SysIdRoutine : public wpi::sysid::SysIdRoutineLog {
+  private:
+   Config m_config;
+   Mechanism m_mechanism;
+-  wpi::units::volt_t m_outputVolts{0};
++  wpi::units::volt_t m_outputVolts = wpi::units::volt_t{0};
+   std::function<void(wpi::sysid::State)> m_recordState;
+   wpi::Timer timer;
+ };
 diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
 index ff26afd4e9..7d451c3843 100644
 --- a/ntcore/src/main/native/cpp/NetworkServer.cpp
