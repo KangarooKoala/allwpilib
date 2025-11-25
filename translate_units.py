@@ -48,6 +48,7 @@ UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
 BASE_UDL_TO_UNIT: dict[str, str] = {
     "m": "mp::m",
     "cm": "mp::cm",
+    "mm": "mp::mm",
     "s": "mp::s",
     "ms": "mp::ms",
     "us": "mp::µs",
@@ -66,6 +67,7 @@ BASE_UDL_TO_UNIT: dict[str, str] = {
     "rad_per_s_sq": "mp::rad / mp::s2",
     "deg_per_s": "mp::deg / mp::s",
     "deg_per_s_sq": "mp::deg / mp::s2",
+    "rev_per_m_per_s": "mp::rev / mp::min / mp::s",
     "rpm": "mp::rev / mp::min",
     "Nm": "mp::N * mp::m",
     "kg_sq_m": "mp::kg * mp::m2",
@@ -538,6 +540,7 @@ def process_unit_t(
 def process_unit(lines: list[str], i: int):
     """Processes any unit type occurences in the specified line."""
     for nh_unit_sing, nh_unit_plural, mp_unit in (
+        ("scalar", "scalar", "mp::one"),
         ("meter", "meters", "mp::m"),
         ("centimeter", "centimeters", "mp::cm"),
         ("radian", "radians", "mp::rad"),
