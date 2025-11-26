@@ -63,6 +63,13 @@ wpiformat -f $(cat translate_units_format_files)
 end=$(date +%s)
 printf "  Done formatting %s files in %s seconds\n" $(cat translate_units_format_files | wc -l) $((end - start))
 
+start=$(date +%s)
+echo "Deleting old units files"
+rm -r wpimath/src/main/native/include/wpi/units
+rm wpimath/src/test/native/cpp/UnitsTest.cpp
+end=$(date +%s)
+printf "  Done in %s seconds\n" $((end - start))
+
 if [ "$1" != $skip_post_flag ]; then
   git add .
 
