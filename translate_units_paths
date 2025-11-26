@@ -3,9 +3,11 @@ benchmark/src
 commandsv2/src
 commandsv3/src
 developerRobot/src
+glass/src
 ntcore/src
 wpimath/src
 wpilibc/src
 wpilibcExamples/src
 romiVendordep/src
+tools/sysid/src
 xrpVendordep/src
