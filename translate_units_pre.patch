@@ -90,6 +90,19 @@ index 1e84dd8d6..b7c22a4cb 100644
    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
    GetScheduler().Run();
    wpi::SmartDashboard::UpdateValues();
+diff --git a/glass/src/lib/native/cpp/other/Field2D.cpp b/glass/src/lib/native/cpp/other/Field2D.cpp
+index 099647102..6a605a794 100644
+--- a/glass/src/lib/native/cpp/other/Field2D.cpp
++++ b/glass/src/lib/native/cpp/other/Field2D.cpp
+@@ -312,7 +312,7 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
+                              double step_fast = 0.0,
+                              const char* format = "%.3f",
+                              ImGuiInputTextFlags flags = 0) {
+-  wpi::units::meter_t uv{*v};
++  wpi::units::meter_t uv = wpi::units::meter_t{*v};
+   if (InputLength(label, &uv, step, step_fast, format, flags)) {
+     *v = uv.to<float>();
+     return true;
 diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
 index ff26afd4e..7d451c384 100644
 --- a/ntcore/src/main/native/cpp/NetworkServer.cpp
@@ -198,6 +211,22 @@ index b113e5605..09bcf6b00 100644
  #include "wpi/util/json.hpp"
  
  namespace wpi::nt {
+diff --git a/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp b/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp
+index dabfc624d..fbf43c6e5 100644
+--- a/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp
++++ b/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp
+@@ -340,8 +340,9 @@ class AnalysisManager {
+   // controller preset, LQR parameters, acceleration window size, etc.
+   Settings& m_settings;
+ 
+-  wpi::units::second_t m_minStepTime{0};
+-  wpi::units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
++  wpi::units::second_t m_minStepTime = wpi::units::second_t{0};
++  wpi::units::second_t m_maxStepTime =
++      wpi::units::second_t{std::numeric_limits<double>::infinity()};
+   std::vector<wpi::units::second_t> m_positionDelays;
+   std::vector<wpi::units::second_t> m_velocityDelays;
+ 
 diff --git a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp b/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
 index 2e9fbc46d..d816f2e66 100644
 --- a/wpilibc/src/main/native/cpp/ExpansionHubServo.cpp
