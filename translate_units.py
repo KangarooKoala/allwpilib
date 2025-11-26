@@ -40,6 +40,8 @@ UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
         "kilogram_square_meter": "mp::kg * mp::m2",
     },
     "usc": {
+        "inch": "mp::in",
+        "foot": "mp::ft",
         "pounds_per_square_inch": "mp::lb / mp::in / mp::in",
     },
 }
@@ -636,20 +638,12 @@ def process_value_calls(lines: list[str], i: int):
     # Check for skips
     NEXT_LINE_SKIP_COMMENT: str = "// next line non-unit .value()"
     SKIP_COMMENT: str = "// non-unit .value()"
-    if lines[i].strip() == NEXT_LINE_SKIP_COMMENT:
-        # Don't mangle the comment, but wait to delete until the next line
-        return
-    if i > 0 and NEXT_LINE_SKIP_COMMENT in lines[i - 1]:
-        del lines[i - 1]
-        return
-    if SKIP_COMMENT in lines[i]:
-        if lines[i].count(SKIP_COMMENT) != 1:
-            raise ValueError(
-                "Multiple occurences of skip .value() comment in line {i + 1}!"
-            )
-        index = lines[i].find(SKIP_COMMENT)
-        lines[i] = delete(lines[i], index, SKIP_COMMENT)
-        lines[i] = lines[i][:index].rstrip() + lines[i][index:]
+    if (
+        lines[i].strip() == NEXT_LINE_SKIP_COMMENT
+        or i > 0
+        and NEXT_LINE_SKIP_COMMENT in lines[i - 1]
+        or SKIP_COMMENT in lines[i]
+    ):
         return
     # Process .value()
     while (index := lines[i].find(".value()")) >= 0:
@@ -676,7 +670,25 @@ def process_value_calls(lines: list[str], i: int):
         lines[start_line_i] = insert(lines[start_line_i], start_pos, "mp::value(")
 
 
-def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
+def remove_skip_comments(lines: list[str], i: int):
+    """Removes any suppressions in the specified line."""
+    NEXT_LINE_SKIP_COMMENT: str = "// next line non-unit .value()"
+    SKIP_COMMENT: str = "// non-unit .value()"
+    if NEXT_LINE_SKIP_COMMENT in lines[i]:
+        del lines[i]
+    elif SKIP_COMMENT in lines[i]:
+        if lines[i].count(SKIP_COMMENT) != 1:
+            raise ValueError(
+                "Multiple occurences of skip .value() comment in line {i + 1}!"
+            )
+        index = lines[i].find(SKIP_COMMENT)
+        lines[i] = delete(lines[i], index, SKIP_COMMENT)
+        lines[i] = lines[i][:index].rstrip() + lines[i][index:]
+
+
+def translate_lines(
+    lines: list[str], *, check_iwyu: bool = True, check_value_call: bool = True
+) -> bool:
     """Modifies the provided lines in place to translate from nholthaus units to mp-units"""
 
     def line_iter() -> Iterable[int]:
@@ -724,13 +736,15 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
 
     # Flags for kinds of changes made
     changed_body: bool = False
+    has_non_value_change: bool = False
     need_base_include: bool = False
     need_usc_include: bool = False
 
-    def body_iter(*, include_kind: str = "base"):
+    def body_iter(*, include_kind: str = "base", is_value: bool = False):
         nonlocal changed_body
         nonlocal need_base_include
         nonlocal need_usc_include
+        nonlocal has_non_value_change
         it = iter(line_iter())
         try:
             while True:
@@ -741,6 +755,8 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
                 need_base_include |= s.value
             if include_kind == "usc":
                 need_usc_include |= s.value
+            if not is_value:
+                has_non_value_change |= s.value
 
     # We detect function headers as :: followed by an identifier followed by an lparen
     # This technically also matches function calls, but those shouldn't have types, so it's okay to include them
@@ -827,12 +843,16 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
             raise
 
     # Process .value()
-    for i in body_iter():
+    for i in body_iter(is_value=True):
         process_value_calls(lines, i)
 
     # Clean up double division
     for i in body_iter():
         lines[i] = lines[i].replace("/ mp::s / mp::s", "/ mp::s2")
+
+    # Remove skip comments
+    for i in body_iter():
+        remove_skip_comments(lines, i)
 
     # Warn about remaining instances
     nh_units_count: int = sum(x.count("wpi::units::") for x in lines)
@@ -847,6 +867,12 @@ def translate_lines(lines: list[str], *, check_iwyu: bool = True) -> bool:
         i: int = base_include_line
         # Note that units-usc.hpp is before units.hpp
         lines.insert(i, '#include "wpi/units-usc.hpp"\n')
+
+    if check_value_call:
+        if changed_body and not has_non_value_change:
+            print(
+                "Warning: Made .value() changes without any other unit changes; May have false positives"
+            )
 
     # Do a basic IWYU (Include What You Use) check
     added_include: bool = base_include_line >= 0
@@ -919,6 +945,8 @@ def test_translate(
     test_input: tuple[str],
     expected: tuple[str],
     expected_output: tuple[str] = (),
+    *,
+    check_value_call: bool = False,
 ) -> bool:
     if isinstance(test_input, str):
         print("test_input is a str!")
@@ -929,7 +957,11 @@ def test_translate(
     lines: list[str] = list(test_input)
     print_capturer = PrintCapturer()
     try:
-        dirty = print_capturer.run(lambda: translate_lines(lines, check_iwyu=False))
+        dirty = print_capturer.run(
+            lambda: translate_lines(
+                lines, check_iwyu=False, check_value_call=check_value_call
+            )
+        )
     except:
         print(f'Error running test "{name}"!')
         print("Logged output:")
@@ -1188,6 +1220,21 @@ def run_tests() -> bool:
         "method call result .value()",
         ("RoboRioSim::GetUserVoltage3V3().value()\n",),
         ("mp::value(RoboRioSim::GetUserVoltage3V3())\n",),
+    )
+    success &= test_translate(
+        ".value() warning",
+        ("opt.value()\n",),
+        ("mp::value(opt)\n",),
+        expected_output=(
+            "Warning: Made .value() changes without any other unit changes; May have false positives\n",
+        ),
+        check_value_call=True,
+    )
+    success &= test_translate(
+        ".value() no warning when skipped",
+        ("opt.value()  // non-unit .value()\n",),
+        ("opt.value()\n",),
+        check_value_call=True,
     )
     success &= test_translate(
         ".to<double>()",
