@@ -1380,7 +1380,13 @@ def run_conversions(paths: list[Path]):
         for dp, dn, fn in os.walk(path):
             dp = Path(dp)
             fn.sort()
-            if fn and not any(d in dp.parts for d in ("native", "cpp", "include")):
+            if "semiwrap" in dp.parts:
+                for f in fn:
+                    if not f.endswith(".yml"):
+                        printer.run(lambda: print(f"non-yml semiwrap file {dp / f}"))
+                        continue
+                    files.append(dp / f)
+            elif fn and not any(d in dp.parts for d in ("native", "cpp", "include")):
                 files_str: str = "1 file" if len(fn) == 1 else f"{len(fn)} files"
                 printer.run(lambda: print(f"{files_str} in non-native directory {dp}"))
             else:
@@ -1402,7 +1408,6 @@ def run_conversions(paths: list[Path]):
             for bad_dir in (
                 "generate",
                 "java",
-                "python",
                 "resources",
                 "thirdparty",
                 "units",
