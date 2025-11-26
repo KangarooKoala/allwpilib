@@ -49,6 +49,7 @@ printf "  Done in %s seconds\n" $((end - start))
 git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include/wpi/units.hpp
 git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include/wpi/units-usc.hpp
 git restore --worktree --staged --source HEAD -- wpimath/src/main/native/thirdparty
+git restore --worktree --staged --source HEAD -- wpimath/src/main/python/pyproject.toml
 git restore --worktree --staged --source HEAD -- wpimath/src/test/native/cpp/MpUnitsTest.cpp
 
 if [ "$1" = $only_pre_flag ]; then

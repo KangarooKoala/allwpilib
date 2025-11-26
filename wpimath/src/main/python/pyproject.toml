@@ -90,6 +90,9 @@ scan_headers_ignore = [
     "wpi/math/struct/*",
     "wpi/math/*/struct/*",
 
+    "wpi/units.hpp",
+    "wpi/units-usc.hpp",
+
     "[eE]igen/*",
 
     "gcem.hpp",
