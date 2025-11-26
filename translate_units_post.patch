@@ -48,6 +48,22 @@ index 10df86ca5..4334fb571 100644
  
  /** Hardware-independent configuration for a SysId test routine. */
  class Config {
+diff --git a/glass/src/lib/native/cpp/other/Field2D.cpp b/glass/src/lib/native/cpp/other/Field2D.cpp
+index 3a330c440..b4357cedf 100644
+--- a/glass/src/lib/native/cpp/other/Field2D.cpp
++++ b/glass/src/lib/native/cpp/other/Field2D.cpp
+@@ -272,9 +272,9 @@ static DisplayUnits gDisplayUnits = kDisplayMeters;
+ static double ConvertDisplayLength(mp::quantity<mp::m> v) {
+   switch (gDisplayUnits) {
+     case kDisplayFeet:
+-      return mp::value(v.convert<wpi::units::feet>());
++      return mp::value(v.in(mp::ft));
+     case kDisplayInches:
+-      return mp::value(v.convert<wpi::units::inches>());
++      return mp::value(v.in(mp::in));
+     case kDisplayMeters:
+     default:
+       return mp::value(v);
 diff --git a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp b/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
 index df3be984e..7edc08732 100644
 --- a/ntcore/src/main/native/include/wpi/nt/UnitTopic.hpp
@@ -90,6 +106,59 @@ index df3be984e..7edc08732 100644
      return UnitPublisher<T>{
          ::wpi::nt::PublishEx(m_handle, NT_DOUBLE, typeString, props, options)};
    }
+diff --git a/tools/sysid/src/main/native/cpp/analysis/FeedbackAnalysis.cpp b/tools/sysid/src/main/native/cpp/analysis/FeedbackAnalysis.cpp
+index 4009fae2b..96a44b783 100644
+--- a/tools/sysid/src/main/native/cpp/analysis/FeedbackAnalysis.cpp
++++ b/tools/sysid/src/main/native/cpp/analysis/FeedbackAnalysis.cpp
+@@ -14,8 +14,8 @@
+ 
+ using namespace sysid;
+ 
+-using Kv_t = mp::quantity<mp::V / (mp::m / mp::s)>;
+-using Ka_t = mp::quantity<mp::V / (mp::m / mp::s2)>;
++inline constexpr auto Kv_unit = mp::V / (mp::m / mp::s);
++inline constexpr auto Ka_unit = mp::V / (mp::m / mp::s2);
+ using Matrix1d = Eigen::Matrix<double, 1, 1>;
+ 
+ FeedbackGains sysid::CalculatePositionFeedbackGains(
+@@ -43,7 +43,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
+ 
+   auto system =
+       wpi::math::LinearSystemId::IdentifyPositionSystem<mp::m>(
+-          Kv_t{Kv}, Ka_t{Ka});
++          Kv * Kv_unit, Ka * Ka_unit);
+ 
+   wpi::math::LinearQuadraticRegulator<2, 1> controller{
+       system, {params.qp, params.qv}, {params.r}, preset.period};
+@@ -72,7 +72,7 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
+ 
+   auto system =
+       wpi::math::LinearSystemId::IdentifyVelocitySystem<mp::m>(
+-          Kv_t{Kv}, Ka_t{Ka});
++          Kv * Kv_unit, Ka * Ka_unit);
+   wpi::math::LinearQuadraticRegulator<1, 1> controller{
+       system, {params.qv}, {params.r}, preset.period};
+   controller.LatencyCompensate(system, preset.period, preset.measurementDelay);
+diff --git a/tools/sysid/src/main/native/cpp/view/DataSelector.cpp b/tools/sysid/src/main/native/cpp/view/DataSelector.cpp
+index 387443bc5..da3bd2025 100644
+--- a/tools/sysid/src/main/native/cpp/view/DataSelector.cpp
++++ b/tools/sysid/src/main/native/cpp/view/DataSelector.cpp
+@@ -252,8 +252,13 @@ static void AddSamples(std::vector<MotorData::Run::Sample<T>>& samples,
+       [](const auto& datapoint, double val) { return datapoint.first < val; });
+ 
+   for (auto it = begin; it != end; ++it) {
+-    samples.emplace_back(it->first * 1.0e-6 * mp::s,
+-                         T{it->second});
++    if constexpr (mp::Quantity<T>) {
++      samples.emplace_back(it->first * 1.0e-6 * mp::s,
++                           it->second * T::unit);
++    } else {
++      samples.emplace_back(it->first * 1.0e-6 * mp::s,
++                           T{it->second});
++    }
+   }
+ }
+ 
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 index 00cada6e1..821e2e09e 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp

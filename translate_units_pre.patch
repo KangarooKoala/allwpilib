@@ -90,8 +90,106 @@ index 1e84dd8d6..b7c22a4cb 100644
    wpi::cmd::CommandScheduler::GetInstance().Schedule(m_command.value());
    GetScheduler().Run();
    wpi::SmartDashboard::UpdateValues();
+diff --git a/glass/src/lib/native/cpp/Context.cpp b/glass/src/lib/native/cpp/Context.cpp
+index 507f1e95e..7da551801 100644
+--- a/glass/src/lib/native/cpp/Context.cpp
++++ b/glass/src/lib/native/cpp/Context.cpp
+@@ -71,20 +71,21 @@ static bool JsonToWindow(const wpi::util::json& jfile, const char* filename) {
+     if (jsection.key() == "Docking") {
+       continue;
+     }
+-    if (!jsection.value().is_object()) {
++    if (!jsection.value().is_object()) {  // non-unit .value()
+       ImGui::LogText("%s section %s is not object", filename,
+                      jsection.key().c_str());
+       return false;
+     }
+-    for (auto&& jsubsection : jsection.value().items()) {
+-      if (!jsubsection.value().is_object()) {
++    for (auto&& jsubsection : jsection.value().items()) {  // non-unit .value()
++      if (!jsubsection.value().is_object()) {              // non-unit .value()
+         ImGui::LogText("%s section %s subsection %s is not object", filename,
+                        jsection.key().c_str(), jsubsection.key().c_str());
+         return false;
+       }
+       ini << '[' << jsection.key() << "][" << jsubsection.key() << "]\n";
+-      for (auto&& jkv : jsubsection.value().items()) {
++      for (auto&& jkv : jsubsection.value().items()) {  // non-unit .value()
+         try {
++          // next line non-unit .value()
+           auto& value = jkv.value().get_ref<const std::string&>();
+           ini << jkv.key() << '=' << value << "\n";
+         } catch (wpi::util::json::exception&) {
+@@ -102,13 +103,13 @@ static bool JsonToWindow(const wpi::util::json& jfile, const char* filename) {
+   auto docking = jfile.find("Docking");
+   if (docking != jfile.end()) {
+     for (auto&& jsubsection : docking->items()) {
+-      if (!jsubsection.value().is_array()) {
++      if (!jsubsection.value().is_array()) {  // non-unit .value()
+         ImGui::LogText("%s section %s subsection %s is not array", filename,
+                        "Docking", jsubsection.key().c_str());
+         return false;
+       }
+       ini << "[Docking][" << jsubsection.key() << "]\n";
+-      for (auto&& jv : jsubsection.value()) {
++      for (auto&& jv : jsubsection.value()) {  // non-unit .value()
+         try {
+           auto& value = jv.get_ref<const std::string&>();
+           ini << value << "\n";
+@@ -137,6 +138,7 @@ static bool LoadWindowStorageImpl(const std::string& filename) {
+   }
+   try {
+     return JsonToWindow(
++        // next line non-unit .value()
+         wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
+         filename.c_str());
+   } catch (wpi::util::json::parse_error& e) {
+@@ -156,6 +158,7 @@ static bool LoadStorageRootImpl(Context* ctx, const std::string& filename,
+   auto [it, createdStorage] = ctx->storageRoots.try_emplace(rootName);
+   try {
+     it->second.FromJson(
++        // next line non-unit .value()
+         wpi::util::json::parse(fileBuffer.value()->GetCharBuffer()),
+         filename.c_str());
+   } catch (wpi::util::json::parse_error& e) {
+diff --git a/glass/src/lib/native/cpp/Storage.cpp b/glass/src/lib/native/cpp/Storage.cpp
+index a0cb6e868..fe6ab9dcf 100644
+--- a/glass/src/lib/native/cpp/Storage.cpp
++++ b/glass/src/lib/native/cpp/Storage.cpp
+@@ -25,19 +25,19 @@ bool ConvertFromString(To* out, std::string_view str) {
+     } else if (str == "false") {
+       *out = false;
+     } else if (auto val = wpi::util::parse_integer<int>(str, 10)) {
+-      *out = val.value() != 0;
++      *out = val.value() != 0;  // non-unit .value()
+     } else {
+       return false;
+     }
+   } else if constexpr (std::floating_point<To>) {
+     if (auto val = wpi::util::parse_float<To>(str)) {
+-      *out = val.value();
++      *out = val.value();  // non-unit .value()
+     } else {
+       return false;
+     }
+   } else {
+     if (auto val = wpi::util::parse_integer<To>(str, 10)) {
+-      *out = val.value();
++      *out = val.value();  // non-unit .value()
+     } else {
+       return false;
+     }
+@@ -481,7 +481,7 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
+       valuePtr = std::make_unique<Value>();
+       created = true;
+     }
+-    auto& jvalue = jkv.value();
++    auto& jvalue = jkv.value();  // non-unit .value()
+     switch (jvalue.type()) {
+       case wpi::util::json::value_t::boolean:
+         valuePtr->Reset(Value::kBool);
 diff --git a/glass/src/lib/native/cpp/other/Field2D.cpp b/glass/src/lib/native/cpp/other/Field2D.cpp
-index 099647102..6a605a794 100644
+index 099647102..9d0b05001 100644
 --- a/glass/src/lib/native/cpp/other/Field2D.cpp
 +++ b/glass/src/lib/native/cpp/other/Field2D.cpp
 @@ -312,7 +312,7 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
@@ -103,6 +201,131 @@ index 099647102..6a605a794 100644
    if (InputLength(label, &uv, step, step_fast, format, flags)) {
      *v = uv.to<float>();
      return true;
+@@ -512,8 +512,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
+ 
+   // convert size units to meters
+   if (unit == "foot" || unit == "feet") {
+-    width = wpi::units::convert<wpi::units::feet, wpi::units::meters>(width);
+-    height = wpi::units::convert<wpi::units::feet, wpi::units::meters>(height);
++    width = wpi::units::meter_t{wpi::units::foot_t{width}}.value();
++    height = wpi::units::meter_t{wpi::units::foot_t{height}}.value();
+   }
+ 
+   // check scaling
+@@ -553,8 +553,9 @@ void FieldInfo::LoadJsonFile(std::string_view jsonfile) {
+     std::fputs("GUI: could not open field JSON file\n", stderr);
+     return;
+   }
++  // next line non-unit .value()
+   LoadJson({reinterpret_cast<const char*>(fileBuffer.value()->begin()),
+-            fileBuffer.value()->size()},
++            fileBuffer.value()->size()},  // non-unit .value()
+            jsonfile);
+ }
+ 
+@@ -788,8 +789,8 @@ PoseFrameData::PoseFrameData(const wpi::math::Pose2d& pose,
+       m_index{index},
+       m_ffd{ffd},
+       m_displayOptions{displayOptions},
+-      m_width2(ffd.scale * displayOptions.width / 2),
+-      m_length2(ffd.scale * displayOptions.length / 2),
++      m_width2(ffd.scale * displayOptions.width.value() / 2),
++      m_length2(ffd.scale * displayOptions.length.value() / 2),
+       m_hitRadius((std::min)(m_width2, m_length2) / 2),
+       m_pose{pose} {
+   UpdateFrameData();
+diff --git a/glass/src/lib/native/cpp/other/Plot.cpp b/glass/src/lib/native/cpp/other/Plot.cpp
+index e8de7f325..e7fa7f582 100644
+--- a/glass/src/lib/native/cpp/other/Plot.cpp
++++ b/glass/src/lib/native/cpp/other/Plot.cpp
+@@ -954,6 +954,7 @@ PlotProvider::PlotProvider(Storage& storage) : WindowManager{storage} {
+       // get or create view
+       auto view = static_cast<PlotView*>(win->GetView());
+       if (!view) {
++        // next line non-unit .value()
+         win->SetView(std::make_unique<PlotView>(this, windowkv.value()));
+         view = static_cast<PlotView*>(win->GetView());
+       }
+diff --git a/glass/src/lib/native/cpp/support/ExpressionParser.cpp b/glass/src/lib/native/cpp/support/ExpressionParser.cpp
+index 54c787840..af8644b8f 100644
+--- a/glass/src/lib/native/cpp/support/ExpressionParser.cpp
++++ b/glass/src/lib/native/cpp/support/ExpressionParser.cpp
+@@ -268,7 +268,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
+         auto value =
+             ValueFromString<V>(std::string_view(token.str, token.strLen));
+         if (value) {
+-          valStack.push(value.value());
++          valStack.push(value.value());  // non-unit .value()
+         } else {
+           return wpi::util::unexpected("Invalid number");
+         }
+@@ -286,7 +286,7 @@ wpi::util::expected<V, std::string> ParseExpr(Lexer& lexer, bool insideParen) {
+         if (!result) {
+           return result;
+         }
+-        valStack.push(result.value());
++        valStack.push(result.value());  // non-unit .value()
+ 
+         TokenType nextType = lexer.NextToken().type;
+         if (nextType != TokenType::CloseParen) {
+diff --git a/glass/src/lib/native/cpp/support/ExtraGuiWidgets.cpp b/glass/src/lib/native/cpp/support/ExtraGuiWidgets.cpp
+index 0950b1529..e4f17e30f 100644
+--- a/glass/src/lib/native/cpp/support/ExtraGuiWidgets.cpp
++++ b/glass/src/lib/native/cpp/support/ExtraGuiWidgets.cpp
+@@ -269,7 +269,7 @@ bool InputExpr(const char* label, V* v, const char* format,
+     // Attempt to parse current value
+     auto result = wpi::glass::expression::TryParseExpr<V>(state.inputBuffer);
+     if (result) {
+-      *v = result.value();
++      *v = result.value();  // non-unit .value()
+     } else if (active) {
+       ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "%s",
+                          result.error().c_str());
+diff --git a/glass/src/libnt/native/cpp/NTMechanism2D.cpp b/glass/src/libnt/native/cpp/NTMechanism2D.cpp
+index f0b11e380..e29311495 100644
+--- a/glass/src/libnt/native/cpp/NTMechanism2D.cpp
++++ b/glass/src/libnt/native/cpp/NTMechanism2D.cpp
+@@ -25,7 +25,7 @@ static void ConvertColor(std::string_view in, ImU32* out) {
+     return;
+   }
+   if (auto v = wpi::util::parse_integer<ImU32>(wpi::util::drop_front(in), 16)) {
+-    ImU32 val = v.value();
++    ImU32 val = v.value();  // non-unit .value()
+     *out = IM_COL32((val >> 16) & 0xff, (val >> 8) & 0xff, val & 0xff, 255);
+   }
+ }
+diff --git a/glass/src/libnt/native/cpp/NetworkTables.cpp b/glass/src/libnt/native/cpp/NetworkTables.cpp
+index 854942aac..211711083 100644
+--- a/glass/src/libnt/native/cpp/NetworkTables.cpp
++++ b/glass/src/libnt/native/cpp/NetworkTables.cpp
+@@ -656,6 +656,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
+         auto it = elems.find(kv.key());
+         if (it != elems.end()) {
+           auto& child = out->valueChildren[it->second];
++          // next line non-unit .value()
+           UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
+           elems.erase(it);
+         } else {
+@@ -664,6 +665,7 @@ static void UpdateJsonValueSource(NetworkTablesModel& model,
+           auto& child = out->valueChildren.back();
+           child.name = kv.key();
+           child.path = fmt::format("{}/{}", name, child.name);
++          // next line non-unit .value()
+           UpdateJsonValueSource(model, &child, kv.value(), child.path, time);
+         }
+       }
+diff --git a/glass/src/libnt/native/cpp/NetworkTablesSettings.cpp b/glass/src/libnt/native/cpp/NetworkTablesSettings.cpp
+index 9ac653eae..a4fefc221 100644
+--- a/glass/src/libnt/native/cpp/NetworkTablesSettings.cpp
++++ b/glass/src/libnt/native/cpp/NetworkTablesSettings.cpp
+@@ -66,6 +66,7 @@ void NetworkTablesSettings::Thread::Main() {
+ 
+       if (!wpi::util::contains(serverTeam, '.') &&
+           (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
++        // next line non-unit .value()
+         wpi::nt::SetServerTeam(m_inst, team.value(), m_port);
+       } else {
+         std::vector<std::pair<std::string_view, unsigned int>> servers;
 diff --git a/ntcore/src/main/native/cpp/NetworkServer.cpp b/ntcore/src/main/native/cpp/NetworkServer.cpp
 index ff26afd4e..7d451c384 100644
 --- a/ntcore/src/main/native/cpp/NetworkServer.cpp
@@ -211,6 +434,70 @@ index b113e5605..09bcf6b00 100644
  #include "wpi/util/json.hpp"
  
  namespace wpi::nt {
+diff --git a/tools/sysid/src/main/native/cpp/analysis/AnalysisManager.cpp b/tools/sysid/src/main/native/cpp/analysis/AnalysisManager.cpp
+index 9e5b1d1b0..509f6fe19 100644
+--- a/tools/sysid/src/main/native/cpp/analysis/AnalysisManager.cpp
++++ b/tools/sysid/src/main/native/cpp/analysis/AnalysisManager.cpp
+@@ -36,8 +36,9 @@ static double Lerp(wpi::units::second_t time,
+ 
+   const auto prev = next - 1;
+ 
+-  return wpi::util::Lerp(prev->measurement, next->measurement,
+-                         (time - prev->time) / (next->time - prev->time));
++  return wpi::util::Lerp(
++      prev->measurement, next->measurement,
++      double{(time - prev->time) / (next->time - prev->time)});
+ }
+ 
+ /**
+diff --git a/tools/sysid/src/main/native/cpp/analysis/OLS.cpp b/tools/sysid/src/main/native/cpp/analysis/OLS.cpp
+index a04482ada..b494e7a2b 100644
+--- a/tools/sysid/src/main/native/cpp/analysis/OLS.cpp
++++ b/tools/sysid/src/main/native/cpp/analysis/OLS.cpp
+@@ -64,7 +64,7 @@ OLSResult OLS(const Eigen::MatrixXd& X, const Eigen::VectorXd& y) {
+   double SSTO =
+       (y.transpose() * y - 1.0 / y.rows() * y.transpose() *
+                                Eigen::MatrixXd::Ones(y.rows(), y.rows()) * y)
+-          .value();
++          .value();  // non-unit .value()
+ 
+   // R² or the coefficient of determination, which represents how much of the
+   // total variation (variation in y) can be explained by the regression model
+diff --git a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
+index a5d8e0fd5..8f2bb97f7 100644
+--- a/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
++++ b/tools/sysid/src/main/native/cpp/view/Analyzer.cpp
+@@ -55,8 +55,8 @@ void Analyzer::UpdateFeedforwardGains() {
+     m_settings.preset.measurementDelay =
+         m_settings.type == FeedbackControllerLoopType::kPosition
+             // Clamp feedback measurement delay to ≥ 0
+-            ? wpi::units::math::max(0_s, m_manager->GetPositionDelay())
+-            : wpi::units::math::max(0_s, m_manager->GetVelocityDelay());
++            ? std::max(0_ms, m_manager->GetPositionDelay())
++            : std::max(0_ms, m_manager->GetVelocityDelay());
+     PrepareGraphs();
+   } catch (const sysid::InvalidDataError& e) {
+     m_state = AnalyzerState::kGeneralDataError;
+diff --git a/tools/sysid/src/main/native/cpp/view/AnalyzerPlot.cpp b/tools/sysid/src/main/native/cpp/view/AnalyzerPlot.cpp
+index 8ce2664c1..7e7f20b6d 100644
+--- a/tools/sysid/src/main/native/cpp/view/AnalyzerPlot.cpp
++++ b/tools/sysid/src/main/native/cpp/view/AnalyzerPlot.cpp
+@@ -357,13 +357,11 @@ void AnalyzerPlot::SetData(
+     }
+   }
+ 
+-  auto minTime =
+-      wpi::units::math::min(slow.front().timestamp, fast.front().timestamp);
++  auto minTime = std::min(slow.front().timestamp, fast.front().timestamp);
+   m_timestepData.fitLine[0] =
+       ImPlotPoint{minTime.value(), wpi::units::millisecond_t{dtMean}.value()};
+ 
+-  auto maxTime =
+-      wpi::units::math::max(slow.back().timestamp, fast.back().timestamp);
++  auto maxTime = std::max(slow.back().timestamp, fast.back().timestamp);
+   m_timestepData.fitLine[1] =
+       ImPlotPoint{maxTime.value(), wpi::units::millisecond_t{dtMean}.value()};
+ 
 diff --git a/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp b/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp
 index dabfc624d..fbf43c6e5 100644
 --- a/tools/sysid/src/main/native/include/wpi/sysid/analysis/AnalysisManager.hpp
