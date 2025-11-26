@@ -42,6 +42,7 @@ UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
     "usc": {
         "inch": "mp::in",
         "foot": "mp::ft",
+        "feet_per_second": "mp::ft / mp::s",
         "pounds_per_square_inch": "mp::lb / mp::in / mp::in",
     },
 }
