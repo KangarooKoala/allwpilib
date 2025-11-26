@@ -623,6 +623,56 @@ index 0125dbb90..10e45c563 100644
      constexpr size_t kKsOff = 0;
      constexpr size_t kKvOff = kKsOff + 8;
      constexpr size_t kKaOff = kKvOff + 8;
+diff --git a/wpimath/src/main/native/include/wpi/math/filter/LinearFilter.hpp b/wpimath/src/main/native/include/wpi/math/filter/LinearFilter.hpp
+index 5c13e88a8..faf1a21f3 100644
+--- a/wpimath/src/main/native/include/wpi/math/filter/LinearFilter.hpp
++++ b/wpimath/src/main/native/include/wpi/math/filter/LinearFilter.hpp
+@@ -88,10 +88,10 @@ class LinearFilter {
+         m_inputGains(ffGains.begin(), ffGains.end()),
+         m_outputGains(fbGains.begin(), fbGains.end()) {
+     for (size_t i = 0; i < ffGains.size(); ++i) {
+-      m_inputs.emplace_front(0.0);
++      m_inputs.emplace_front(MakeValue(0.0));
+     }
+     for (size_t i = 0; i < fbGains.size(); ++i) {
+-      m_outputs.emplace_front(0.0);
++      m_outputs.emplace_front(MakeValue(0.0));
+     }
+ 
+     if (!std::is_constant_evaluated()) {
+@@ -353,7 +353,7 @@ class LinearFilter {
+    * @return The filtered value at this step
+    */
+   constexpr T Calculate(T input) {
+-    T retVal{0.0};
++    T retVal = MakeValue(0.0);
+ 
+     // Rotate the inputs
+     if (m_inputGains.size() > 0) {
+@@ -389,7 +389,7 @@ class LinearFilter {
+   wpi::util::circular_buffer<T> m_outputs;
+   std::vector<double> m_inputGains;
+   std::vector<double> m_outputGains;
+-  T m_lastOutput{0.0};
++  T m_lastOutput = MakeValue(0.0);
+ 
+   // Usage reporting instances
+   inline static int instances = 0;
+@@ -406,6 +406,14 @@ class LinearFilter {
+       return n * Factorial(n - 1);
+     }
+   }
++
++  static constexpr T MakeValue(double value) {
++    if constexpr (mp::Quantity<T>) {
++      return value * T::unit;
++    } else {
++      return T{value};
++    }
++  }
+ };
+ 
+ }  // namespace wpi::math
 diff --git a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
 index b16771ff8..179b5e404 100644
 --- a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
