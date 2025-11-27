@@ -183,14 +183,22 @@ constexpr double value(Quantity auto q) {
   return q.numerical_value_in(decltype(q)::unit);
 }
 
-// unit name accessor
+// unit name accessors
+
 constexpr auto name(Unit auto u) {
   return fmt::format("{:n}", u);
 }
 
-// unit name accessor
+constexpr auto portable_name(Unit auto u) {
+  return fmt::format("{:nP}", u);
+}
+
 constexpr auto unit_name(Quantity auto q) {
   return name(decltype(q)::unit);
+}
+
+constexpr auto portable_unit_name(Quantity auto q) {
+  return portable_name(decltype(q)::unit);
 }
 
 namespace detail {

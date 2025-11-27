@@ -31,3 +31,7 @@ using namespace std::literals::string_view_literals;
 TEST(MpUnits, UnitName) {
   EXPECT_EQ("m s⁻¹"sv, mp::unit_name(2.0 * mp::m / mp::s));
 }
+
+TEST(MpUnits, PortableUnitName) {
+  EXPECT_EQ("deg s^-1"sv, mp::portable_unit_name(30.0 * mp::deg / mp::s));
+}
