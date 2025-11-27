@@ -614,15 +614,16 @@ index 7f4e7994a..3d46fd1e3 100644
      } else {
        double A = -mp::value(kV) / mp::value(kA);
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
-index 42948aa07..910962a11 100644
+index 42948aa07..446fa8336 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
-@@ -27,17 +27,15 @@ int IncrementAndGetProfiledPIDControllerInstances();
+@@ -27,17 +27,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
   * Implements a PID control loop whose setpoint is constrained by a trapezoid
   * profile.
   */
 -template <class Distance>
-+template <mp::Unit auto Distance>
++template <auto Distance>
++  requires mp::Unit<decltype(Distance)>
  class ProfiledPIDController
      : public wpi::util::Sendable,
        public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
@@ -638,7 +639,7 @@ index 42948aa07..910962a11 100644
    using Acceleration_t = mp::quantity<Acceleration>;
    using State = typename TrapezoidProfile<Distance>::State;
    using Constraints = typename TrapezoidProfile<Distance>::Constraints;
-@@ -201,7 +199,7 @@ class ProfiledPIDController
+@@ -201,7 +200,7 @@ class ProfiledPIDController
     *
     * @param goal The desired unprofiled setpoint.
     */
@@ -647,7 +648,7 @@ index 42948aa07..910962a11 100644
  
    /**
     * Gets the goal for the ProfiledPIDController.
-@@ -411,7 +409,7 @@ class ProfiledPIDController
+@@ -411,7 +410,7 @@ class ProfiledPIDController
     * velocity is assumed to be zero.
     */
    constexpr void Reset(Distance_t measuredPosition) {
@@ -656,7 +657,7 @@ index 42948aa07..910962a11 100644
    }
  
    void InitSendable(wpi::util::SendableBuilder& builder) override {
-@@ -430,24 +428,24 @@ class ProfiledPIDController
+@@ -430,24 +429,24 @@ class ProfiledPIDController
          [this] { return mp::value(GetConstraints().maxVelocity); },
          [this](double value) {
            SetConstraints(
@@ -687,7 +688,7 @@ index 42948aa07..910962a11 100644
    typename wpi::math::TrapezoidProfile<Distance>::Constraints m_constraints;
    TrapezoidProfile<Distance> m_profile;
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
-index 721de32c6..174c07a05 100644
+index 721de32c6..c3d4290fa 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
 @@ -16,18 +16,15 @@ namespace wpi::math {
@@ -696,7 +697,7 @@ index 721de32c6..174c07a05 100644
   */
 -template <class Distance>
 -  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
-+template <mp::Unit auto Distance>
++template <auto Distance>
 +  requires mp::UnitOf<decltype(Distance), mp::length> ||
 +           mp::UnitOf<decltype(Distance), mp::angle>
  class SimpleMotorFeedforward {
@@ -865,15 +866,16 @@ index 5c13e88a8..faf1a21f3 100644
  
  }  // namespace wpi::math
 diff --git a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
-index b16771ff8..179b5e404 100644
+index b16771ff8..c953d5dab 100644
 --- a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
-@@ -20,11 +20,11 @@ namespace wpi::math {
+@@ -20,11 +20,12 @@ namespace wpi::math {
   *
   * @see TrapezoidProfile
   */
 -template <class Unit>
-+template <mp::Unit auto Unit>
++template <auto Unit>
++  requires mp::Unit<decltype(Unit)>
  class SlewRateLimiter {
   public:
    using Unit_t = mp::quantity<Unit>;
@@ -882,7 +884,7 @@ index b16771ff8..179b5e404 100644
    using Rate_t = mp::quantity<Rate>;
  
    /**
-@@ -40,7 +40,7 @@ class SlewRateLimiter {
+@@ -40,7 +41,7 @@ class SlewRateLimiter {
     * @param initialValue The initial value of the input.
     */
    SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
@@ -910,7 +912,7 @@ index aec4f4820..917075243 100644
    /// Voltage at which the motor constants were measured.
    mp::quantity<mp::V> nominalVoltage;
 diff --git a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
-index bd3c8088a..d1bb4ebef 100644
+index bd3c8088a..da91ef0d7 100644
 --- a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
 @@ -20,14 +20,11 @@ namespace wpi::math {
@@ -920,14 +922,14 @@ index bd3c8088a..d1bb4ebef 100644
 -  template <typename Distance>
 -  using Velocity_t = wpi::units::unit_t<
 -      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>>;
-+  template <mp::Unit auto Distance>
++  template <auto Distance>
 +  using Velocity_t = mp::quantity<Distance / mp::s>;
  
 -  template <typename Distance>
 -  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
 -      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>,
 -      wpi::units::inverse<mp::s>>>;
-+  template <mp::Unit auto Distance>
++  template <auto Distance>
 +  using Acceleration_t = mp::quantity<Distance / mp::s2>;
  
    /**
@@ -938,8 +940,8 @@ index bd3c8088a..d1bb4ebef 100644
     */
 -  template <typename Distance>
 -    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
-+  template <mp::Unit auto Distance>
-+    requires(mp::m == Distance) || (mp::rad == Distance)
++  template <auto Distance>
++    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<1, 1, 1> IdentifyVelocitySystem(
 -      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
 -      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
@@ -960,8 +962,8 @@ index bd3c8088a..d1bb4ebef 100644
     */
 -  template <typename Distance>
 -    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
-+  template <mp::Unit auto Distance>
-+    requires(mp::m == Distance) || (mp::rad == Distance)
++  template <auto Distance>
++    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
 -      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
 -      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
@@ -1024,8 +1026,8 @@ index bd3c8088a..d1bb4ebef 100644
     */
 -  template <typename Distance>
 -    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
-+  template <mp::Unit auto Distance>
-+    requires(mp::m == Distance) || (mp::rad == Distance)
++  template <auto Distance>
++    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
 -      mp::quantity<mp::V / Velocity_t<Distance>(1)> kV,
 -      mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA) {
@@ -1041,15 +1043,16 @@ index bd3c8088a..d1bb4ebef 100644
      }
  
 diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-index 80c61104f..72f9f6cee 100644
+index 80c61104f..892a55fcc 100644
 --- a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-@@ -36,23 +36,19 @@ namespace wpi::math {
+@@ -36,23 +36,20 @@ namespace wpi::math {
   * `Calculate()` and to determine when the profile has completed via
   * `IsFinished()`.
   */
 -template <class Distance, class Input>
-+template <mp::Unit auto Distance, mp::Unit auto Input>
++template <auto Distance, auto Input>
++  requires mp::Unit<decltype(Distance)> && mp::Unit<decltype(Input)>
  class ExponentialProfile {
   public:
    using Distance_t = mp::quantity<Distance>;
@@ -1075,7 +1078,7 @@ index 80c61104f..72f9f6cee 100644
    using kA_t = mp::quantity<KA>;
  
    /**
-@@ -113,20 +109,20 @@ class ExponentialProfile {
+@@ -113,20 +110,20 @@ class ExponentialProfile {
      Input_t maxInput{0};
  
      /// The State-Space 1x1 system matrix.
@@ -1100,7 +1103,7 @@ index 80c61104f..72f9f6cee 100644
  
      constexpr bool operator==(const State&) const = default;
    };
-@@ -280,7 +276,7 @@ class ExponentialProfile {
+@@ -280,7 +277,7 @@ class ExponentialProfile {
      // For cases 1 and 3, we want to subtract epsilon from the inflection point
      // velocity For cases 2 and 4, we want to add epsilon to the inflection
      // point velocity. For case 5, we have reached inflection point velocity.
@@ -1109,7 +1112,7 @@ index 80c61104f..72f9f6cee 100644
      if (mp::abs(u_dir * m_constraints.MaxVelocity() -
                  inflectionPoint.velocity) < epsilon) {
        auto solvableV = inflectionPoint.velocity;
-@@ -431,7 +427,7 @@ class ExponentialProfile {
+@@ -431,7 +428,7 @@ class ExponentialProfile {
      if (-1e-9 < mp::value(c) && mp::value(c) < 0) {
        // numeric instability - the heuristic gets it right but c is around
        // -1e-13
@@ -1118,7 +1121,7 @@ index 80c61104f..72f9f6cee 100644
      }
  
      return u_dir * mp::sqrt(-c / a);
-@@ -465,8 +461,8 @@ class ExponentialProfile {
+@@ -465,8 +462,8 @@ class ExponentialProfile {
        return xf < x_forward;
      }
  
@@ -1130,15 +1133,16 @@ index 80c61104f..72f9f6cee 100644
      auto d = xf >= x_reverse;
  
 diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
-index 81e727192..27cc42414 100644
+index 81e727192..d8aba361e 100644
 --- a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
-@@ -42,15 +42,13 @@ namespace wpi::math {
+@@ -42,15 +42,14 @@ namespace wpi::math {
   * `Calculate()` and to determine when the profile has completed via
   * `IsFinished()`.
   */
 -template <class Distance>
-+template <mp::Unit auto Distance>
++template <auto Distance>
++  requires mp::Unit<decltype(Distance)>
  class TrapezoidProfile {
   public:
    using Distance_t = mp::quantity<Distance>;
@@ -1152,7 +1156,7 @@ index 81e727192..27cc42414 100644
    using Acceleration_t = mp::quantity<Acceleration>;
  
    /**
-@@ -86,7 +84,7 @@ class TrapezoidProfile {
+@@ -86,7 +85,7 @@ class TrapezoidProfile {
          wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
        }
  
@@ -1161,7 +1165,7 @@ index 81e727192..27cc42414 100644
          throw std::domain_error("Constraints must be non-negative");
        }
      }
-@@ -98,10 +96,10 @@ class TrapezoidProfile {
+@@ -98,10 +97,10 @@ class TrapezoidProfile {
    class State {
     public:
      /// The position at this state.
@@ -1174,7 +1178,7 @@ index 81e727192..27cc42414 100644
  
      constexpr bool operator==(const State&) const = default;
    };
-@@ -164,10 +162,10 @@ class TrapezoidProfile {
+@@ -164,10 +163,10 @@ class TrapezoidProfile {
          accelerationTime * accelerationTime * m_constraints.maxAcceleration;
  
      // Handle the case where the profile never reaches full speed
@@ -1187,7 +1191,7 @@ index 81e727192..27cc42414 100644
      }
  
      m_endAccel = accelerationTime - cutoffBegin;
-@@ -228,7 +226,7 @@ class TrapezoidProfile {
+@@ -228,7 +227,7 @@ class TrapezoidProfile {
  
      Distance_t distToTarget = mp::abs(target - position);
  
@@ -1196,7 +1200,7 @@ index 81e727192..27cc42414 100644
        return 0.0 * mp::s;
      }
  
-@@ -248,11 +246,11 @@ class TrapezoidProfile {
+@@ -248,11 +247,11 @@ class TrapezoidProfile {
  
      if (accelDist > distToTarget) {
        accelDist = distToTarget;
