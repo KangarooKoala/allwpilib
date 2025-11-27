@@ -1,0 +1,324 @@
+diff --git a/wpimath/src/main/python/semiwrap/MathUtil.yml b/wpimath/src/main/python/semiwrap/MathUtil.yml
+index 9d1bfef23..0319ba8ce 100644
+--- a/wpimath/src/main/python/semiwrap/MathUtil.yml
++++ b/wpimath/src/main/python/semiwrap/MathUtil.yml
+@@ -42,3 +42,4 @@ functions:
+       const Eigen::Vector<T, N>&, double, T:
+         ignore: true
+   MakeValue:
++    ignore: true
+diff --git a/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml b/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml
+index 3d7202678..1e0897a21 100644
+--- a/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml
+@@ -1,6 +1,9 @@
+ defaults:
+   subpackage: constraint
+ 
++extra_includes:
++- wpi/units-usc.hpp
++
+ classes:
+   wpi::math::CentripetalAccelerationConstraint:
+     typealias:
+diff --git a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveKinematicsConstraint.yml b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveKinematicsConstraint.yml
+index 91fa442cc..6355bd29c 100644
+--- a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveKinematicsConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveKinematicsConstraint.yml
+@@ -1,6 +1,9 @@
+ defaults:
+   subpackage: constraint
+ 
++extra_includes:
++- wpi/units-usc.hpp
++
+ classes:
+   wpi::math::DifferentialDriveKinematicsConstraint:
+     typealias:
+diff --git a/wpimath/src/main/python/semiwrap/controls/EllipticalRegionConstraint.yml b/wpimath/src/main/python/semiwrap/controls/EllipticalRegionConstraint.yml
+index 613f001fd..330cc43a9 100644
+--- a/wpimath/src/main/python/semiwrap/controls/EllipticalRegionConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/EllipticalRegionConstraint.yml
+@@ -3,6 +3,7 @@ defaults:
+ 
+ extra_includes:
+ - PyTrajectoryConstraint.h
++- wpi/units-usc.hpp
+ 
+ classes:
+   wpi::math::EllipticalRegionConstraint:
+diff --git a/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml b/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
+index cadfb8fb7..6a9370252 100644
+--- a/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
++++ b/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
+@@ -25,15 +25,25 @@ classes:
+           }
+       IdentifyDrivetrainSystem:
+         overloads:
+-          ? mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>, mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>
+-          :
+-          ? mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>, mp::quantity<mp::V/(mp::rad/mp::s)>, mp::quantity<mp::V/(mp::rad/mp::s2)>, mp::quantity<mp::m>
+-          :
++          mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>, mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>:
++            cpp_code: |
++              [](kv_meters kVlinear, ka_meters kAlinear, kv_meters kVangular, ka_meters kAangular) {
++                return wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVlinear, kAlinear, kVangular, kAangular);
++              }
++          mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>, mp::quantity<mp::V/(mp::rad/mp::s)>, mp::quantity<mp::V/(mp::rad/mp::s2)>, mp::quantity<mp::m>:
++            cpp_code: |
++              [](kv_meters kVlinear, ka_meters kAlinear, kv_radians kVangular, ka_radians kAangular, wpi::units::meter_t trackWidth) {
++                return wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVlinear, kAlinear, kVangular, kAangular, trackWidth);
++              }
+       FlywheelSystem:
+       DCMotorSystem:
+         overloads:
+           DCMotor, mp::quantity<mp::kg * mp::m2>, double:
+           mp::quantity<mp::V/Velocity_t<Distance>::unit>, mp::quantity<mp::V/Acceleration_t<Distance>::unit>:
++            cpp_code: |
++              [](kv_meters kv, ka_meters ka) {
++                return wpi::math::LinearSystemId::DCMotorSystem<mp::m>(kv, ka);
++              }
+       DrivetrainVelocitySystem:
+ 
+     inline_code: |
+diff --git a/wpimath/src/main/python/semiwrap/controls/MaxVelocityConstraint.yml b/wpimath/src/main/python/semiwrap/controls/MaxVelocityConstraint.yml
+index c1ba14c31..319e97f52 100644
+--- a/wpimath/src/main/python/semiwrap/controls/MaxVelocityConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/MaxVelocityConstraint.yml
+@@ -1,6 +1,9 @@
+ defaults:
+   subpackage: constraint
+ 
++extra_includes:
++- wpi/units-usc.hpp
++
+ classes:
+   wpi::math::MaxVelocityConstraint:
+     typealias:
+diff --git a/wpimath/src/main/python/semiwrap/controls/MecanumDriveKinematicsConstraint.yml b/wpimath/src/main/python/semiwrap/controls/MecanumDriveKinematicsConstraint.yml
+index cb4564482..e25d606fe 100644
+--- a/wpimath/src/main/python/semiwrap/controls/MecanumDriveKinematicsConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/MecanumDriveKinematicsConstraint.yml
+@@ -1,6 +1,9 @@
+ defaults:
+   subpackage: constraint
+ 
++extra_includes:
++- wpi/units-usc.hpp
++
+ classes:
+   wpi::math::MecanumDriveKinematicsConstraint:
+     typealias:
+diff --git a/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml b/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml
+index 264d73f7b..375014e8d 100644
+--- a/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml
++++ b/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml
+@@ -1,6 +1,9 @@
+ defaults:
+   subpackage: constraint
+ 
++extra_includes:
++- wpi/units-usc.hpp
++
+ classes:
+   wpi::math::SwerveDriveKinematicsConstraint:
+     template_params:
+diff --git a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
+index d5e7873c3..6bbead992 100644
+--- a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
++++ b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
+@@ -3,6 +3,7 @@ defaults:
+ 
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ 
+ functions:
+   to_json:
+diff --git a/wpimath/src/main/python/semiwrap/controls/TrajectoryConfig.yml b/wpimath/src/main/python/semiwrap/controls/TrajectoryConfig.yml
+index 0b3bd6d45..01d2218f4 100644
+--- a/wpimath/src/main/python/semiwrap/controls/TrajectoryConfig.yml
++++ b/wpimath/src/main/python/semiwrap/controls/TrajectoryConfig.yml
+@@ -3,6 +3,7 @@ defaults:
+ 
+ extra_includes:
+ - PyTrajectoryConstraint.h
++- wpi/units-usc.hpp
+ 
+ classes:
+   wpi::math::TrajectoryConfig:
+diff --git a/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml b/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml
+index ed0c94637..0e61a0c6c 100644
+--- a/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml
++++ b/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml
+@@ -1,10 +1,7 @@
+ classes:
+   wpi::math::SlewRateLimiter:
+     template_params:
+-    - Unit
+-    typealias:
+-    - Unit_t = mp::quantity<Unit>
+-    - Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<mp::s>>
++    - auto Unit
+     methods:
+       SlewRateLimiter:
+         overloads:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Ellipse2d.yml b/wpimath/src/main/python/semiwrap/geometry/Ellipse2d.yml
+index aa0d469fc..dfe5df4f2 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Ellipse2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Ellipse2d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Pose2d.yml b/wpimath/src/main/python/semiwrap/geometry/Pose2d.yml
+index 07908e508..619d92bf9 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Pose2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Pose2d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ functions:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Pose3d.yml b/wpimath/src/main/python/semiwrap/geometry/Pose3d.yml
+index a606f9004..b8c4face1 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Pose3d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Pose3d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ functions:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Rectangle2d.yml b/wpimath/src/main/python/semiwrap/geometry/Rectangle2d.yml
+index 688777ed0..8277e984f 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Rectangle2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Rectangle2d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Transform2d.yml b/wpimath/src/main/python/semiwrap/geometry/Transform2d.yml
+index f30ce98ea..24945e15b 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Transform2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Transform2d.yml
+@@ -1,6 +1,7 @@
+ extra_includes:
+ - wpi/math/geometry/Pose2d.hpp
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Transform3d.yml b/wpimath/src/main/python/semiwrap/geometry/Transform3d.yml
+index df21aa034..80e3bf959 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Transform3d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Transform3d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Translation2d.yml b/wpimath/src/main/python/semiwrap/geometry/Translation2d.yml
+index ea2da02fb..1ac359aca 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Translation2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Translation2d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ - pybind11/eigen.h
+ 
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Translation3d.yml b/wpimath/src/main/python/semiwrap/geometry/Translation3d.yml
+index 24ad6da81..9e8412a19 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Translation3d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Translation3d.yml
+@@ -1,5 +1,6 @@
+ extra_includes:
+ - rpy/geometryToString.h
++- wpi/units-usc.hpp
+ - wpystruct.h
+ - pybind11/eigen.h
+ 
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
+index 56969c7e5..5f871a5b7 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
+index 4dea83991..414a580d9 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
+index 089d90115..b9d18821b 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
+index d51faf8af..439df630d 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
+index 742186afb..4373d7b96 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
+index 8be5854d4..db1b9d745 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
+index 3e5e041cc..c42fc521a 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
+@@ -1,4 +1,5 @@
+ extra_includes:
++- wpi/units-usc.hpp
+ - wpystruct.h
+ 
+ classes:
