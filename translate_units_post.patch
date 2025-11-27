@@ -1,5 +1,5 @@
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 00cada6e16..821e2e09e2 100644
+index 00cada6e1..821e2e09e 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 @@ -38,9 +38,8 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
@@ -27,7 +27,7 @@ index 00cada6e16..821e2e09e2 100644
        m_x(1) * mp::m / mp::s;
    mp::quantity<mp::rad / mp::s> motorVelocity = velocity * Kv * m_gearbox.Kv;
 diff --git a/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp b/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
-index 1a711d4806..83bf466abf 100644
+index 1a711d480..83bf466ab 100644
 --- a/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/RoboRioSim.cpp
 @@ -123,12 +123,12 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterCPUTempCallback(
@@ -48,7 +48,7 @@ index 1a711d4806..83bf466abf 100644
  
  std::unique_ptr<CallbackStore> RoboRioSim::RegisterTeamNumberCallback(
 diff --git a/wpilibc/src/main/native/cpp/system/RobotController.cpp b/wpilibc/src/main/native/cpp/system/RobotController.cpp
-index e514a1c063..e0f984a341 100644
+index e514a1c06..e0f984a34 100644
 --- a/wpilibc/src/main/native/cpp/system/RobotController.cpp
 +++ b/wpilibc/src/main/native/cpp/system/RobotController.cpp
 @@ -155,11 +155,11 @@ void RobotController::SetBrownoutVoltage(mp::quantity<mp::V> brownoutVoltage) {
@@ -65,8 +65,22 @@ index e514a1c063..e0f984a341 100644
  }
  
  CANStatus RobotController::GetCANStatus(int busId) {
+diff --git a/wpilibc/src/main/native/include/wpi/hardware/pneumatic/PneumaticsBase.hpp b/wpilibc/src/main/native/include/wpi/hardware/pneumatic/PneumaticsBase.hpp
+index 094d9a858..7d2768d38 100644
+--- a/wpilibc/src/main/native/include/wpi/hardware/pneumatic/PneumaticsBase.hpp
++++ b/wpilibc/src/main/native/include/wpi/hardware/pneumatic/PneumaticsBase.hpp
+@@ -9,8 +9,8 @@
+ 
+ #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+ #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+-#include "wpi/units-usc.hpp"
+ #include "wpi/units.hpp"
++#include "wpi/units-usc.hpp"
+ 
+ namespace wpi {
+ class Solenoid;
 diff --git a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
-index a6ee90868e..afdbd23266 100644
+index a6ee90868..afdbd2326 100644
 --- a/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
 +++ b/wpilibc/src/main/native/include/wpi/simulation/ElevatorSim.hpp
 @@ -16,15 +16,11 @@ namespace wpi::sim {
@@ -102,7 +116,7 @@ index a6ee90868e..afdbd23266 100644
                mp::quantity<mp::V / Acceleration_t<Distance>(1)> kA,
                const wpi::math::DCMotor& gearbox, mp::quantity<mp::m> minHeight,
 diff --git a/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp b/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
-index f023eb4468..1165060ae7 100644
+index f023eb446..1165060ae 100644
 --- a/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
 +++ b/wpilibc/src/main/native/include/wpi/simulation/RoboRioSim.hpp
 @@ -189,14 +189,14 @@ class RoboRioSim {
@@ -123,7 +137,7 @@ index f023eb4468..1165060ae7 100644
    /**
     * Register a callback to be run whenever the team number changes.
 diff --git a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp b/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
-index 2e82c135e2..69faab69a0 100644
+index 2e82c135e..69faab69a 100644
 --- a/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
 +++ b/wpilibc/src/main/native/include/wpi/sysid/SysIdRoutineLog.hpp
 @@ -58,7 +58,7 @@ class SysIdRoutineLog {
@@ -201,7 +215,7 @@ index 2e82c135e2..69faab69a0 100644
  
     private:
 diff --git a/wpilibc/src/main/native/include/wpi/system/RobotController.hpp b/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
-index 134eca8885..379d8495a0 100644
+index 134eca888..379d8495a 100644
 --- a/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
 +++ b/wpilibc/src/main/native/include/wpi/system/RobotController.hpp
 @@ -191,7 +191,7 @@ class RobotController {
@@ -214,7 +228,7 @@ index 134eca8885..379d8495a0 100644
    /**
     * Get the current status of the CAN bus.
 diff --git a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
-index 30c63bc3df..0aa515a878 100644
+index 30c63bc3d..0aa515a87 100644
 --- a/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
 +++ b/wpilibc/src/test/native/cpp/simulation/RoboRioSimTest.cpp
 @@ -97,11 +97,11 @@ TEST(RoboRioSimTest, SetCPUTemp) {
