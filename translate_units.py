@@ -77,6 +77,7 @@ USC_UDL_TO_UNIT: dict[str, str] = {
     "lb": "mp::lb",
     "fps": "mp::ft / mp::s",
     "fps_sq": "mp::ft / mp::s2",
+    "psi": "mp::lb / mp::in / mp::in",
 }
 
 
