@@ -132,6 +132,26 @@ index f41c2d1abe..a5d81703b4 100644
  }
  
  bool Tachometer::GetStopped() const {
+diff --git a/wpilibc/src/main/native/cpp/hardware/led/LEDPattern.cpp b/wpilibc/src/main/native/cpp/hardware/led/LEDPattern.cpp
+index c4b05d5ecb..72e72d1e5f 100644
+--- a/wpilibc/src/main/native/cpp/hardware/led/LEDPattern.cpp
++++ b/wpilibc/src/main/native/cpp/hardware/led/LEDPattern.cpp
+@@ -128,12 +128,12 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
+ }
+ 
+ LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
+-  auto periodMicros = wpi::units::microsecond_t{period};
++  double periodMicros = wpi::units::microsecond_t{period}.value();
+ 
+   return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
+     self.ApplyTo(data, [&writer, periodMicros](int i, Color color) {
+-      double t = (wpi::util::Now() % periodMicros.to<uint64_t>()) /
+-                 periodMicros.to<double>();
++      double t = (wpi::util::Now() % static_cast<uint64_t>(periodMicros)) /
++                 periodMicros;
+       double phase = t * 2 * std::numbers::pi;
+ 
+       // Apply the cosine function and shift its output from [-1, 1] to [0, 1]
 diff --git a/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp b/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp
 index 1dacd45b22..6aab8b61d6 100644
 --- a/wpilibc/src/main/native/cpp/hardware/rotation/DutyCycleEncoder.cpp
