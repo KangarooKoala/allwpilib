@@ -50,6 +50,8 @@ git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include
 git restore --worktree --staged --source HEAD -- wpimath/src/main/native/include/wpi/units-usc.hpp
 git restore --worktree --staged --source HEAD -- wpimath/src/main/native/thirdparty
 git restore --worktree --staged --source HEAD -- wpimath/src/main/python/pyproject.toml
+git restore --worktree --staged --source HEAD -- wpimath/src/main/python/tools/create_units.py
+git restore --worktree --staged --source HEAD -- wpimath/src/main/python/wpimath/_impl/src/type_casters
 git restore --worktree --staged --source HEAD -- wpimath/src/test/native/cpp/MpUnitsTest.cpp
 
 if [ "$1" = $only_pre_flag ]; then

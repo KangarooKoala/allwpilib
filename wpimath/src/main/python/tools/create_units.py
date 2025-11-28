@@ -8,59 +8,70 @@ import subprocess
 import sys
 import toml
 
-out = {}
+def main():
+    base_path: pathlib.Path = pathlib.Path(sys.argv[1])
 
-for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
-    if f.name == "base.h":
-        continue
+    out = {}
 
-    names = []
+    for f, name in ((base_path / "units.hpp", "base"), (base_path / "units-usc.hpp", "usc")):
+        units: list[tuple[str, str]] = []
 
-    with open(f) as fp:
-        last_line = None
-        for line in fp.readlines():
-            line = line.strip()
-            if last_line is not None:
-                line = last_line + line
-                last_line = None
-            elif line.endswith("(") or line.endswith(","):
-                last_line = line
-                continue
+        with open(f) as reader:
+            in_unit_symbols_namespace: bool = False
+            for line in reader:
+                line = line.rstrip()
 
-            m = re.match(r"UNIT_ADD\(\w+, (\w+), (\w+),", line)
-            if m:
-                names.append((m.group(1), m.group(2)))
-            else:
-                m = re.match(r"UNIT_ADD_WITH_METRIC_PREFIXES\(\w+, (\w+), (\w+),", line)
-                if m:
-                    names.append((m.group(1), m.group(2)))
-                    for i in ("nano", "micro", "milli", "kilo"):
-                        names.append((f"{i}{m.group(1)}", f"{i}{m.group(2)}"))
+                if line == "namespace unit_symbols {":
+                    in_unit_symbols_namespace = True
+                elif line == "}  // namespace unit_symbols":
+                    in_unit_symbols_namespace = False
 
-    out_name = f"units_{f.name[:-2]}_type_caster.h"
+                if not in_unit_symbols_namespace:
+                    continue
 
-    if names:
-        if True:
+                unit_symbol: str
+                prefixes: tuple[str, ...]
+                if line.startswith("using "):
+                    assert ":" in line
+                    assert ";" in line
+                    unit_symbol = line[line.rindex(":") + 1 : line.rindex(";")]
+                    prefixes = ("",)
+                elif (m := re.match(r"ADD_METRIC_UNIT_SYMBOLS\(\w+, (\w+)\)$", line)):
+                    unit_symbol = m.group(1)
+                    prefixes = ("n", "u", "m", "", "k")
+                elif (m := re.match(r"ADD_METRIC_UNIT_SYMBOLS_NO_MICRO\(\w+, (\w+)\)$", line)):
+                    unit_symbol = m.group(1)
+                    prefixes = ("n", "m", "", "k")
+                else:
+                    continue
+
+                mp_type: str
+                if unit_symbol in ("deg_C", "K"):
+                    mp_type = "quantity_point"
+                else:
+                    mp_type = "quantity"
+
+                units.extend((f"{prefix}{unit_symbol}", mp_type) for prefix in prefixes)
+
+        out_name = f"units_{name}_type_caster.h"
+
+        if units:
             ofp = io.StringIO()
 
             ofp.write("#pragma once\n")
             ofp.write("\n")
-            ofp.write(f"#include <units/{f.name}>\n")
+            ofp.write(f"#include <wpi/{f.name}>\n")
             ofp.write("\n")
 
             ofp.write("\nnamespace pybind11 { namespace detail {\n")
 
-            for single, double in names:
+            for unit, mp_type in units:
                 ofp.write(
                     inspect.cleandoc(
                         f"""
-                
-                    template <> struct handle_type_name<units::{single}_t> {{
-                    static constexpr auto name = _("{double}");
-                    }};
 
-                    template <> struct handle_type_name<units::{double}> {{
-                    static constexpr auto name = _("{double}");
+                    template <> struct handle_type_name<mp::{mp_type}<mp::{unit}>> {{
+                    static constexpr auto name = _("{unit}");
                     }};
 
                 """
@@ -81,12 +92,22 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
 
             with open(out_name, "w+") as fp:
                 fp.write(content)
-        else:
-            out[out_name] = sorted(
-                [f"units::{single}_t" for single, _ in names]
-                + [f"units::{single}" for single, _ in names]
-                + [f"units::{double}" for _, double in names]
-            )
+
+            print(toml.dumps({
+                "tool.semiwrap.export_type_casters.wpimath-casters.headers": {
+                    "header": out_name,
+                    "types": sorted(
+                        [f"mp::{mp_type}<mp::{unit}>" for unit, mp_type in units]
+                    ),
+                    "default_arg_cast": True
+                }
+            }))
+            # out[out_name] = sorted(
+            #     [f"mp::{mp_type}<mp::{unit}>" for unit, mp_type in units]
+            # )
+
+    # print(toml.dumps(out))
 
 
-print(toml.dumps(dict(sup=out)))
+if __name__ == "__main__":
+    main()
