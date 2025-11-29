@@ -773,9 +773,11 @@ def translate_lines(
             while (scope_start := lines[i].find("::", scope_start + 1)) >= 0:
                 scope_end: int = scope_start + len("::")
                 pos: int = scope_end
-                while lines[i][pos].isalnum() or lines[i][pos] == "_":
+                while pos < len(lines[i]) and (
+                    lines[i][pos].isalnum() or lines[i][pos] == "_"
+                ):
                     pos += 1
-                if pos != scope_end and lines[i][pos] == "(":
+                if pos != scope_end and pos < len(lines[i]) and lines[i][pos] == "(":
                     line, _ = find_match(lines, i, pos)
                     last_function_header_line = line
             if last_function_header_line == -1:
