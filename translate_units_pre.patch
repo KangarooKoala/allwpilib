@@ -1855,6 +1855,30 @@ index 40aa51cde..c398dffd9 100644
    }
    return next;
  }
+diff --git a/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml b/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml
+index 585af5ea6..e161936a6 100644
+--- a/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml
++++ b/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml
+@@ -8,7 +8,6 @@ extra_includes:
+ classes:
+   wpi::math::TrajectoryGenerator:
+     force_type_casters:
+-    - wpi::units::unit_t
+     - wpi::units::curvature_t
+     methods:
+       GenerateTrajectory:
+diff --git a/wpimath/src/main/python/semiwrap/controls/TrajectoryParameterizer.yml b/wpimath/src/main/python/semiwrap/controls/TrajectoryParameterizer.yml
+index b102e527b..4c5bf580a 100644
+--- a/wpimath/src/main/python/semiwrap/controls/TrajectoryParameterizer.yml
++++ b/wpimath/src/main/python/semiwrap/controls/TrajectoryParameterizer.yml
+@@ -4,7 +4,6 @@ defaults:
+ classes:
+   wpi::math::TrajectoryParameterizer:
+     force_type_casters:
+-    - wpi::units::unit_t
+     - wpi::units::curvature_t
+     methods:
+       TimeParameterizeTrajectory:
 diff --git a/wpimath/src/test/native/cpp/DARETest.cpp b/wpimath/src/test/native/cpp/DARETest.cpp
 index 9ed2af0de..a53f3c8a9 100644
 --- a/wpimath/src/test/native/cpp/DARETest.cpp
