@@ -160,7 +160,7 @@ index 387443bc5..da3bd2025 100644
  }
  
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 00cada6e1..821e2e09e 100644
+index 9fadb8e4e..821e2e09e 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 @@ -38,9 +38,8 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
@@ -180,7 +180,7 @@ index 00cada6e1..821e2e09e 100644
  
    double kA = 1.0 / m_plant.B(1, 0);
 -  using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
--      mp::V, wpi::units::inverse<wpi::units::meters_per_second>>>;
+-      mp::V, wpi::units::inverse<mp::m / mp::s>>>;
 -  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
 +  using Kv_t = mp::quantity<mp::V / (mp::m / mp::s)>;
 +  Kv_t Kv = kA * m_plant.A(1, 1) * Kv_t::unit;
