@@ -1391,10 +1391,11 @@ def run_conversions(paths: list[Path]):
                         printer.run(lambda: print(f"non-yml semiwrap file {dp / f}"))
                         continue
                     files.append(dp / f)
-            elif fn and not any(d in dp.parts for d in ("native", "cpp", "include")):
-                files_str: str = "1 file" if len(fn) == 1 else f"{len(fn)} files"
-                printer.run(lambda: print(f"{files_str} in non-native directory {dp}"))
             else:
+                is_non_native_dir: bool = not any(
+                    d in dp.parts for d in ("native", "cpp", "include")
+                )
+                skipped_file_count: int = 0
                 for f in fn:
                     if f.startswith(".") or f in (
                         "units.hpp",
@@ -1406,9 +1407,21 @@ def run_conversions(paths: list[Path]):
                     if not any(
                         f.endswith(ext) for ext in (".h", ".cpp", ".inc", ".hpp", ".c")
                     ):
-                        printer.run(lambda: print(f"non-C++ file {dp / f}"))
+                        if is_non_native_dir:
+                            skipped_file_count += 1
+                        else:
+                            printer.run(lambda: print(f"non-C++ file {dp / f}"))
                         continue
                     files.append(dp / f)
+                if is_non_native_dir and skipped_file_count > 0:
+                    files_str: str = (
+                        "1 file"
+                        if skipped_file_count == 1
+                        else f"{skipped_file_count} files"
+                    )
+                    printer.run(
+                        lambda: print(f"{files_str} in non-native directory {dp}")
+                    )
             dn.sort()
             for bad_dir in (
                 "generate",
