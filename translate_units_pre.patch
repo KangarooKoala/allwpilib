@@ -1879,6 +1879,149 @@ index b102e527b..4c5bf580a 100644
      - wpi::units::curvature_t
      methods:
        TimeParameterizeTrajectory:
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
+index 149815bbd..0eba6dbaf 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
+@@ -47,9 +47,9 @@ inline_code: |
+       }
+     )
+     .def("__repr__", [](const Twist2d &tw) -> std::string {
+-      return "Twist2d(dx=" + std::to_string(tw.dx()) + ", "
+-                     "dy=" + std::to_string(tw.dy()) + ", "
+-                     "dtheta=" + std::to_string(tw.dtheta()) + ")";
++      return "Twist2d(dx=" + std::to_string(tw.dx.value()) + ", "
++                     "dy=" + std::to_string(tw.dy.value()) + ", "
++                     "dtheta=" + std::to_string(tw.dtheta.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
+index d2fece48e..d58dbf129 100644
+--- a/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
++++ b/wpimath/src/main/python/semiwrap/geometry/Twist3d.yml
+@@ -79,12 +79,12 @@ inline_code: |-
+       }
+     )
+     .def("__repr__", [](const Twist3d &tw) -> std::string {
+-      return "Twist3d(dx=" + std::to_string(tw.dx()) + ", "
+-                     "dy=" + std::to_string(tw.dy()) + ", "
+-                     "dz=" + std::to_string(tw.dz()) + ", "
+-                     "rx=" + std::to_string(tw.rx()) + ", "
+-                     "ry=" + std::to_string(tw.ry()) + ", "
+-                     "rz=" + std::to_string(tw.rz()) + ")";
++      return "Twist3d(dx=" + std::to_string(tw.dx.value()) + ", "
++                     "dy=" + std::to_string(tw.dy.value()) + ", "
++                     "dz=" + std::to_string(tw.dz.value()) + ", "
++                     "rx=" + std::to_string(tw.rx.value()) + ", "
++                     "ry=" + std::to_string(tw.ry.value()) + ", "
++                     "rz=" + std::to_string(tw.rz.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
+index beef1c644..4e261a38b 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
+@@ -65,19 +65,19 @@ inline_code: |
+     .def("__getitem__", [](const ChassisSpeeds &self, int index) {
+       switch (index) {
+         case 0:
+-          return self.vx();
++          return self.vx.value();
+         case 1:
+-          return self.vy();
++          return self.vy.value();
+         case 2:
+-          return self.omega();
++          return self.omega.value();
+         default:
+           throw std::out_of_range("ChassisSpeeds index out of range");
+       }
+     })
+     .def("__repr__", [](const ChassisSpeeds &cs) -> std::string {
+-      return "ChassisSpeeds(vx=" + std::to_string(cs.vx()) + ", "
+-                           "vy=" + std::to_string(cs.vy()) + ", "
+-                           "omega=" + std::to_string(cs.omega()) + ")";
++      return "ChassisSpeeds(vx=" + std::to_string(cs.vx.value()) + ", "
++                           "vy=" + std::to_string(cs.vy.value()) + ", "
++                           "omega=" + std::to_string(cs.omega.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/wpimath/geometry/include/rpy/geometryToString.h b/wpimath/src/main/python/wpimath/geometry/include/rpy/geometryToString.h
+index 7ef82e799..7ec26c485 100644
+--- a/wpimath/src/main/python/wpimath/geometry/include/rpy/geometryToString.h
++++ b/wpimath/src/main/python/wpimath/geometry/include/rpy/geometryToString.h
+@@ -12,40 +12,40 @@
+ namespace rpy {
+ 
+ inline std::string toString(const wpi::math::Rotation2d &self) {
+-  return "Rotation2d(" + std::to_string(self.Radians()()) + ")";
++  return "Rotation2d(" + std::to_string(self.Radians().value()) + ")";
+ }
+ 
+ inline std::string toString(const wpi::math::Rotation3d &self) {
+   return "Rotation3d("
+          "x=" +
+-         std::to_string(self.X()()) +
++         std::to_string(self.X().value()) +
+          ", "
+          "y=" +
+-         std::to_string(self.Y()()) +
++         std::to_string(self.Y().value()) +
+          ", "
+          "z=" +
+-         std::to_string(self.Z()()) + ")";
++         std::to_string(self.Z().value()) + ")";
+ }
+ 
+ inline std::string toString(const wpi::math::Translation2d &self) {
+   return "Translation2d("
+          "x=" +
+-         std::to_string(self.X()()) +
++         std::to_string(self.X().value()) +
+          ", "
+          "y=" +
+-         std::to_string(self.Y()()) + ")";
++         std::to_string(self.Y().value()) + ")";
+ }
+ 
+ inline std::string toString(const wpi::math::Translation3d &self) {
+   return "Translation3d("
+          "x=" +
+-         std::to_string(self.X()()) +
++         std::to_string(self.X().value()) +
+          ", "
+          "y=" +
+-         std::to_string(self.Y()()) +
++         std::to_string(self.Y().value()) +
+          ", "
+          "z=" +
+-         std::to_string(self.Z()()) + ")";
++         std::to_string(self.Z().value()) + ")";
+ }
+ 
+ inline std::string toString(const wpi::math::Quaternion &self) {
+@@ -85,14 +85,14 @@ inline std::string toString(const wpi::math::Pose3d &self) {
+ 
+ inline std::string toString(const wpi::math::Rectangle2d &self) {
+   return "Rectangle2d(center=" + rpy::toString(self.Center()) +
+-    ", xWidth=" + std::to_string(self.XWidth()()) +
+-    ", yWidth=" + std::to_string(self.YWidth()()) + ")";
++    ", xWidth=" + std::to_string(self.XWidth().value()) +
++    ", yWidth=" + std::to_string(self.YWidth().value()) + ")";
+ }
+ 
+ inline std::string toString(const wpi::math::Ellipse2d &self) {
+   return "Ellipse2d(center=" + rpy::toString(self.Center()) +
+-    ", xSemiAxis=" + std::to_string(self.XSemiAxis()()) +
+-    ", ySemiAxis=" + std::to_string(self.YSemiAxis()()) + ")";
++    ", xSemiAxis=" + std::to_string(self.XSemiAxis().value()) +
++    ", ySemiAxis=" + std::to_string(self.YSemiAxis().value()) + ")";
+ }
+ 
+ 
 diff --git a/wpimath/src/test/native/cpp/DARETest.cpp b/wpimath/src/test/native/cpp/DARETest.cpp
 index 9ed2af0de..a53f3c8a9 100644
 --- a/wpimath/src/test/native/cpp/DARETest.cpp
