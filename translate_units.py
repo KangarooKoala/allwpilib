@@ -43,6 +43,7 @@ UNIT_T_TO_UNIT: dict[str, dict[str, str]] = {
         "inch": "mp::in",
         "foot": "mp::ft",
         "feet_per_second": "mp::ft / mp::s",
+        "feet_per_second_squared": "mp::ft / mp::s2",
         "pounds_per_square_inch": "mp::lb / mp::in / mp::in",
     },
 }
@@ -544,6 +545,7 @@ def process_unit(lines: list[str], i: int):
     """Processes any unit type occurences in the specified line."""
     for nh_unit_sing, nh_unit_plural, mp_unit in (
         ("scalar", "scalar", "mp::one"),
+        ("dimensionless::scalar", "dimensionless::scalar", "mp::one"),
         ("meter", "meters", "mp::m"),
         ("centimeter", "centimeters", "mp::cm"),
         ("radian", "radians", "mp::rad"),
@@ -551,7 +553,10 @@ def process_unit(lines: list[str], i: int):
         ("second", "seconds", "mp::s"),
         ("volt", "volts", "mp::V"),
         ("ampere", "amperes", "mp::A"),
+        ("meters_per_second", "meters_per_second", "mp::m / mp::s"),
         ("radian_per_second", "radians_per_second", "mp::rad / mp::s"),
+        ("meters_per_second_squared", "meters_per_second_squared", "mp::m / mp::s2"),
+        ("radian_per_second_squared", "radians_per_second_squared", "mp::rad / mp::s2"),
     ):
         for nh_unit in (nh_unit_sing, nh_unit_plural):
             nh_unit = "wpi::units::" + nh_unit
