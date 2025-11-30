@@ -160,7 +160,7 @@ index 387443bc5..da3bd2025 100644
  }
  
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 9fadb8e4e..821e2e09e 100644
+index 42e143a31..e53121725 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 @@ -38,9 +38,8 @@ ElevatorSim::ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
@@ -181,9 +181,9 @@ index 9fadb8e4e..821e2e09e 100644
    double kA = 1.0 / m_plant.B(1, 0);
 -  using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
 -      mp::V, wpi::units::inverse<mp::m / mp::s>>>;
--  Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+-  Kv_t Kv = Kv_t{-kA * m_plant.A(1, 1)};
 +  using Kv_t = mp::quantity<mp::V / (mp::m / mp::s)>;
-+  Kv_t Kv = kA * m_plant.A(1, 1) * Kv_t::unit;
++  Kv_t Kv = -kA * m_plant.A(1, 1) * Kv_t::unit;
    mp::quantity<mp::m / mp::s> velocity =
        m_x(1) * mp::m / mp::s;
    mp::quantity<mp::rad / mp::s> motorVelocity = velocity * Kv * m_gearbox.Kv;
@@ -545,10 +545,10 @@ index 6029e35a1..41ef42035 100644
  class AutonomousDistance
      : public wpi::cmd::CommandHelper<wpi::cmd::SequentialCommandGroup,
 diff --git a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
-index cc3970a0a..5f96ab65b 100644
+index 2a7eada5b..a7dbdada8 100644
 --- a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
 +++ b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
-@@ -144,5 +144,5 @@ INSTANTIATE_TEST_SUITE_P(
+@@ -145,5 +145,5 @@ INSTANTIATE_TEST_SUITE_P(
      testing::Values(kDefaultArmSetpoint, 25.0 * mp::deg, 50.0 * mp::deg),
      [](const testing::TestParamInfo<mp::quantity<mp::deg>>& info) {
        return testing::PrintToString(mp::value(info.param))
@@ -556,21 +556,22 @@ index cc3970a0a..5f96ab65b 100644
 +          .append(mp::portable_unit_name(info.param));
      });
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
-index df17a3be9..293b06ead 100644
+index 22fdc61ac..2d4ba4ae8 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ArmFeedforward.hpp
-@@ -18,14 +18,11 @@ namespace wpi::math {
+@@ -18,15 +18,11 @@ namespace wpi::math {
   */
  class WPILIB_DLLEXPORT ArmFeedforward {
   public:
 -  using Angle = mp::rad;
 -  using Velocity = mp::rad / mp::s;
 -  using Acceleration =
--      wpi::units::compound_unit<mp::rad / mp::s, wpi::units::inverse<mp::s>>;
--  using kv_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::rad / mp::s>>;
--  using ka_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<Acceleration>>;
+-      wpi::units::compound_unit<mp::rad / mp::s,
+-                                wpi::units::inverse<mp::s>>;
+-  using kv_unit = wpi::units::compound_unit<
+-      mp::V, wpi::units::inverse<mp::rad / mp::s>>;
+-  using ka_unit = wpi::units::compound_unit<mp::V,
+-                                            wpi::units::inverse<Acceleration>>;
 +  static constexpr auto Angle = mp::rad;
 +  static constexpr auto Velocity = mp::rad / mp::s;
 +  static constexpr auto Acceleration = mp::rad / mp::s / mp::s;
@@ -580,22 +581,24 @@ index df17a3be9..293b06ead 100644
    /**
     * Creates a new ArmFeedforward with the specified gains.
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
-index 7f4e7994a..3d46fd1e3 100644
+index 093676322..3ee3a53c8 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ElevatorFeedforward.hpp
-@@ -18,15 +18,11 @@ namespace wpi::math {
+@@ -18,17 +18,11 @@ namespace wpi::math {
   */
  class ElevatorFeedforward {
   public:
 -  using Distance = mp::m;
 -  using Velocity =
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>;
 -  using Acceleration =
--      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
--  using kv_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<Velocity>>;
--  using ka_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<Acceleration>>;
+-      wpi::units::compound_unit<Velocity,
+-                                wpi::units::inverse<mp::s>>;
+-  using kv_unit = wpi::units::compound_unit<mp::V,
+-                                            wpi::units::inverse<Velocity>>;
+-  using ka_unit = wpi::units::compound_unit<mp::V,
+-                                            wpi::units::inverse<Acceleration>>;
 +  static constexpr auto Distance = mp::m;
 +  static constexpr auto Velocity = Distance / mp::s;
 +  static constexpr auto Acceleration = Velocity / mp::s;
@@ -604,7 +607,7 @@ index 7f4e7994a..3d46fd1e3 100644
  
    /**
     * Creates a new ElevatorFeedforward with the specified gains.
-@@ -132,7 +128,7 @@ class ElevatorFeedforward {
+@@ -135,7 +129,7 @@ class ElevatorFeedforward {
        mp::quantity<Velocity> currentVelocity,
        mp::quantity<Velocity> nextVelocity) const {
      // See wpimath/algorithms.md#Elevator_feedforward for derivation
@@ -614,10 +617,10 @@ index 7f4e7994a..3d46fd1e3 100644
      } else {
        double A = -mp::value(kV) / mp::value(kA);
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
-index 42948aa07..446fa8336 100644
+index 426db9847..4504b5428 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
-@@ -27,17 +27,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
+@@ -27,19 +27,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
   * Implements a PID control loop whose setpoint is constrained by a trapezoid
   * profile.
   */
@@ -630,16 +633,18 @@ index 42948aa07..446fa8336 100644
   public:
    using Distance_t = mp::quantity<Distance>;
 -  using Velocity =
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Velocity = Distance / mp::s;
    using Velocity_t = mp::quantity<Velocity>;
 -  using Acceleration =
--      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Velocity,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Acceleration = Velocity / mp::s;
    using Acceleration_t = mp::quantity<Acceleration>;
    using State = typename TrapezoidProfile<Distance>::State;
    using Constraints = typename TrapezoidProfile<Distance>::Constraints;
-@@ -201,7 +200,7 @@ class ProfiledPIDController
+@@ -203,7 +200,7 @@ class ProfiledPIDController
     *
     * @param goal The desired unprofiled setpoint.
     */
@@ -648,7 +653,7 @@ index 42948aa07..446fa8336 100644
  
    /**
     * Gets the goal for the ProfiledPIDController.
-@@ -411,7 +410,7 @@ class ProfiledPIDController
+@@ -413,7 +410,7 @@ class ProfiledPIDController
     * velocity is assumed to be zero.
     */
    constexpr void Reset(Distance_t measuredPosition) {
@@ -657,8 +662,8 @@ index 42948aa07..446fa8336 100644
    }
  
    void InitSendable(wpi::util::SendableBuilder& builder) override {
-@@ -430,24 +429,24 @@ class ProfiledPIDController
-         [this] { return mp::value(GetConstraints().maxVelocity); },
+@@ -431,24 +428,24 @@ class ProfiledPIDController
+         "maxVelocity", [this] { return mp::value(GetConstraints().maxVelocity); },
          [this](double value) {
            SetConstraints(
 -              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
@@ -688,10 +693,10 @@ index 42948aa07..446fa8336 100644
    typename wpi::math::TrapezoidProfile<Distance>::Constraints m_constraints;
    TrapezoidProfile<Distance> m_profile;
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp b/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
-index 721de32c6..c3d4290fa 100644
+index 11365a931..e69058d6e 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/SimpleMotorFeedforward.hpp
-@@ -16,18 +16,15 @@ namespace wpi::math {
+@@ -16,20 +16,15 @@ namespace wpi::math {
   * A helper class that computes feedforward voltages for a simple
   * permanent-magnet DC motor.
   */
@@ -703,13 +708,15 @@ index 721de32c6..c3d4290fa 100644
  class SimpleMotorFeedforward {
   public:
 -  using Velocity =
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>;
 -  using Acceleration =
--      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
--  using kv_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<Velocity>>;
--  using ka_unit =
--      wpi::units::compound_unit<mp::V, wpi::units::inverse<Acceleration>>;
+-      wpi::units::compound_unit<Velocity,
+-                                wpi::units::inverse<mp::s>>;
+-  using kv_unit = wpi::units::compound_unit<mp::V,
+-                                            wpi::units::inverse<Velocity>>;
+-  using ka_unit = wpi::units::compound_unit<mp::V,
+-                                            wpi::units::inverse<Acceleration>>;
 +  static constexpr auto Velocity = Distance / mp::s;
 +  static constexpr auto Acceleration = Velocity / mp::s;
 +  static constexpr auto kv_unit = mp::V / Velocity;
@@ -717,7 +724,7 @@ index 721de32c6..c3d4290fa 100644
  
    /**
     * Creates a new SimpleMotorFeedforward with the specified gains.
-@@ -92,7 +89,7 @@ class SimpleMotorFeedforward {
+@@ -94,7 +89,7 @@ class SimpleMotorFeedforward {
        mp::quantity<Velocity> currentVelocity,
        mp::quantity<Velocity> nextVelocity) const {
      // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
@@ -727,7 +734,7 @@ index 721de32c6..c3d4290fa 100644
      } else {
        double A = -mp::value(kV) / mp::value(kA);
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp b/wpimath/src/main/native/include/wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp
-index 9d2596b77..2f6424fe7 100644
+index 94957d4fa..11aec69dc 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/proto/SimpleMotorFeedforwardProto.hpp
 @@ -14,9 +14,14 @@
@@ -772,9 +779,9 @@ index 9d2596b77..2f6424fe7 100644
 +        wpi::math::SimpleMotorFeedforward<mp::get_base_unit(Distance)>;
      wpi_proto_ProtobufSimpleMotorFeedforward msg{
          .ks = mp::value(value.GetKs()),
-         .kv = mp::value(value.GetKv().in(BaseFeedforward::kv_unit)),
+         .kv =
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp b/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
-index 0125dbb90..10e45c563 100644
+index 91e73811f..da1af9e46 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp
 @@ -12,8 +12,9 @@
@@ -802,7 +809,7 @@ index 0125dbb90..10e45c563 100644
      constexpr size_t kKsOff = 0;
      constexpr size_t kKvOff = kKsOff + 8;
      constexpr size_t kKaOff = kKvOff + 8;
-@@ -43,10 +42,8 @@ struct wpi::util::Struct<wpi::math::SimpleMotorFeedforward<Distance>> {
+@@ -42,10 +41,8 @@ struct wpi::util::Struct<wpi::math::SimpleMotorFeedforward<Distance>> {
  
    static void Pack(std::span<uint8_t> data,
                     const wpi::math::SimpleMotorFeedforward<Distance>& value) {
@@ -866,10 +873,10 @@ index 5c13e88a8..faf1a21f3 100644
  
  }  // namespace wpi::math
 diff --git a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
-index b16771ff8..c953d5dab 100644
+index d89f21d22..c953d5dab 100644
 --- a/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/filter/SlewRateLimiter.hpp
-@@ -20,11 +20,12 @@ namespace wpi::math {
+@@ -20,12 +20,12 @@ namespace wpi::math {
   *
   * @see TrapezoidProfile
   */
@@ -879,12 +886,13 @@ index b16771ff8..c953d5dab 100644
  class SlewRateLimiter {
   public:
    using Unit_t = mp::quantity<Unit>;
--  using Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<mp::s>>;
+-  using Rate =
+-      wpi::units::compound_unit<Unit, wpi::units::inverse<mp::s>>;
 +  static constexpr auto Rate = Unit / mp::s;
    using Rate_t = mp::quantity<Rate>;
  
    /**
-@@ -40,7 +41,7 @@ class SlewRateLimiter {
+@@ -41,7 +41,7 @@ class SlewRateLimiter {
     * @param initialValue The initial value of the input.
     */
    SlewRateLimiter(Rate_t positiveRateLimit, Rate_t negativeRateLimit,
@@ -894,52 +902,55 @@ index b16771ff8..c953d5dab 100644
          m_negativeRateLimit{negativeRateLimit},
          m_prevVal{initialValue},
 diff --git a/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp b/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
-index aec4f4820..917075243 100644
+index 394c7cce7..7eec3fa4a 100644
 --- a/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/system/plant/DCMotor.hpp
-@@ -14,11 +14,8 @@ namespace wpi::math {
+@@ -14,12 +14,8 @@ namespace wpi::math {
   */
  class WPILIB_DLLEXPORT DCMotor {
   public:
 -  using radians_per_second_per_volt_t = wpi::units::unit_t<
--      wpi::units::compound_unit<mp::rad / mp::s, wpi::units::inverse<mp::V>>>;
+-      wpi::units::compound_unit<mp::rad / mp::s,
+-                                wpi::units::inverse<mp::V>>>;
 -  using newton_meters_per_ampere_t =
--      wpi::units::unit_t<wpi::units::compound_unit<wpi::units::newton_meters,
--                                                   wpi::units::inverse<mp::A>>>;
+-      wpi::units::unit_t<wpi::units::compound_unit<
+-          wpi::units::newton_meters, wpi::units::inverse<mp::A>>>;
 +  using radians_per_second_per_volt_t = mp::quantity<mp::rad / mp::s / mp::V>;
 +  using newton_meters_per_ampere_t = mp::quantity<mp::N * mp::m / mp::A>;
  
    /// Voltage at which the motor constants were measured.
    mp::quantity<mp::V> nominalVoltage;
 diff --git a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
-index bd3c8088a..da91ef0d7 100644
+index 47604bd04..7a4013a1f 100644
 --- a/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/system/plant/LinearSystemId.hpp
-@@ -20,14 +20,11 @@ namespace wpi::math {
+@@ -20,15 +20,11 @@ namespace wpi::math {
   */
  class WPILIB_DLLEXPORT LinearSystemId {
   public:
 -  template <typename Distance>
--  using Velocity_t = wpi::units::unit_t<
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>>;
+-  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
+-      Distance, wpi::units::inverse<mp::s>>>;
 +  template <auto Distance>
 +  using Velocity_t = mp::quantity<Distance / mp::s>;
  
 -  template <typename Distance>
 -  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>,
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>,
 -      wpi::units::inverse<mp::s>>>;
 +  template <auto Distance>
 +  using Acceleration_t = mp::quantity<Distance / mp::s2>;
  
    /**
     * Create a state-space model of the elevator system. The states of the system
-@@ -115,15 +112,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+@@ -118,16 +114,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
     * @see <a
     * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
     */
 -  template <typename Distance>
--    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
+-    requires std::same_as<mp::m, Distance> ||
+-             std::same_as<mp::rad, Distance>
 +  template <auto Distance>
 +    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<1, 1, 1> IdentifyVelocitySystem(
@@ -956,12 +967,13 @@ index bd3c8088a..da91ef0d7 100644
        throw std::domain_error("Ka must be greater than zero.");
      }
  
-@@ -157,15 +154,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+@@ -161,16 +156,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
     * @see <a
     * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
     */
 -  template <typename Distance>
--    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
+-    requires std::same_as<mp::m, Distance> ||
+-             std::same_as<mp::rad, Distance>
 +  template <auto Distance>
 +    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
@@ -978,10 +990,10 @@ index bd3c8088a..da91ef0d7 100644
        throw std::domain_error("Ka must be greater than zero.");
      }
  
-@@ -204,16 +201,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
-       mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
-       mp::quantity<mp::V / (mp::m / mp::s)> kVAngular,
-       mp::quantity<mp::V / (mp::m / mp::s2)> kAAngular) {
+@@ -207,16 +201,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
+   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
+       mp::quantity<mp::V / (mp::m / mp::s)> kVLinear, mp::quantity<mp::V / (mp::m / mp::s2)> kALinear,
+       mp::quantity<mp::V / (mp::m / mp::s)> kVAngular, mp::quantity<mp::V / (mp::m / mp::s2)> kAAngular) {
 -    if (kVLinear <= decltype(kVLinear){0}) {
 +    if (kVLinear <= 0.0 * decltype(kVLinear)::unit) {
        throw std::domain_error("Kv,linear must be greater than zero.");
@@ -999,7 +1011,7 @@ index bd3c8088a..da91ef0d7 100644
        throw std::domain_error("Ka,angular must be greater than zero.");
      }
  
-@@ -268,16 +265,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
+@@ -270,16 +264,16 @@ class WPILIB_DLLEXPORT LinearSystemId {
        mp::quantity<mp::V / (mp::rad / mp::s)> kVAngular,
        mp::quantity<mp::V / (mp::rad / mp::s2)> kAAngular,
        mp::quantity<mp::m> trackwidth) {
@@ -1020,12 +1032,13 @@ index bd3c8088a..da91ef0d7 100644
        throw std::domain_error("Ka,angular must be greater than zero.");
      }
      if (trackwidth <= 0.0 * mp::m) {
-@@ -380,15 +377,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
+@@ -384,16 +378,15 @@ class WPILIB_DLLEXPORT LinearSystemId {
     *
     * @throws std::domain_error if kV < 0 or kA <= 0.
     */
 -  template <typename Distance>
--    requires std::same_as<mp::m, Distance> || std::same_as<mp::rad, Distance>
+-    requires std::same_as<mp::m, Distance> ||
+-             std::same_as<mp::rad, Distance>
 +  template <auto Distance>
 +    requires(mp::m == Distance || mp::rad == Distance)
    static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
@@ -1043,10 +1056,10 @@ index bd3c8088a..da91ef0d7 100644
      }
  
 diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-index 80c61104f..892a55fcc 100644
+index 0cabe9fbb..2d9159886 100644
 --- a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
-@@ -36,23 +36,20 @@ namespace wpi::math {
+@@ -36,25 +36,20 @@ namespace wpi::math {
   * `Calculate()` and to determine when the profile has completed via
   * `IsFinished()`.
   */
@@ -1057,11 +1070,13 @@ index 80c61104f..892a55fcc 100644
   public:
    using Distance_t = mp::quantity<Distance>;
 -  using Velocity =
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Velocity = Distance / mp::s;
    using Velocity_t = mp::quantity<Velocity>;
 -  using Acceleration =
--      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Velocity,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Acceleration = Velocity / mp::s;
    using Input_t = mp::quantity<Input>;
 -  using A_t = mp::quantity<wpi::units::inverse<mp::s>>;
@@ -1078,7 +1093,7 @@ index 80c61104f..892a55fcc 100644
    using kA_t = mp::quantity<KA>;
  
    /**
-@@ -113,20 +110,20 @@ class ExponentialProfile {
+@@ -115,20 +110,20 @@ class ExponentialProfile {
      Input_t maxInput{0};
  
      /// The State-Space 1x1 system matrix.
@@ -1103,16 +1118,16 @@ index 80c61104f..892a55fcc 100644
  
      constexpr bool operator==(const State&) const = default;
    };
-@@ -280,7 +277,7 @@ class ExponentialProfile {
+@@ -282,7 +277,7 @@ class ExponentialProfile {
      // For cases 1 and 3, we want to subtract epsilon from the inflection point
      // velocity For cases 2 and 4, we want to add epsilon to the inflection
      // point velocity. For case 5, we have reached inflection point velocity.
 -    auto epsilon = Velocity_t(1e-9);
 +    auto epsilon = 1e-9 * Velocity;
      if (mp::abs(u_dir * m_constraints.MaxVelocity() -
-                 inflectionPoint.velocity) < epsilon) {
+                               inflectionPoint.velocity) < epsilon) {
        auto solvableV = inflectionPoint.velocity;
-@@ -431,7 +428,7 @@ class ExponentialProfile {
+@@ -440,7 +435,7 @@ class ExponentialProfile {
      if (-1e-9 < mp::value(c) && mp::value(c) < 0) {
        // numeric instability - the heuristic gets it right but c is around
        // -1e-13
@@ -1121,7 +1136,7 @@ index 80c61104f..892a55fcc 100644
      }
  
      return u_dir * mp::sqrt(-c / a);
-@@ -465,8 +462,8 @@ class ExponentialProfile {
+@@ -474,8 +469,8 @@ class ExponentialProfile {
        return xf < x_forward;
      }
  
@@ -1133,10 +1148,10 @@ index 80c61104f..892a55fcc 100644
      auto d = xf >= x_reverse;
  
 diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
-index 81e727192..d8aba361e 100644
+index 96d18b002..a9b649180 100644
 --- a/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/trajectory/TrapezoidProfile.hpp
-@@ -42,15 +42,14 @@ namespace wpi::math {
+@@ -42,17 +42,14 @@ namespace wpi::math {
   * `Calculate()` and to determine when the profile has completed via
   * `IsFinished()`.
   */
@@ -1147,16 +1162,18 @@ index 81e727192..d8aba361e 100644
   public:
    using Distance_t = mp::quantity<Distance>;
 -  using Velocity =
--      wpi::units::compound_unit<Distance, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Distance,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Velocity = Distance / mp::s;
    using Velocity_t = mp::quantity<Velocity>;
 -  using Acceleration =
--      wpi::units::compound_unit<Velocity, wpi::units::inverse<mp::s>>;
+-      wpi::units::compound_unit<Velocity,
+-                                wpi::units::inverse<mp::s>>;
 +  static constexpr auto Acceleration = Velocity / mp::s;
    using Acceleration_t = mp::quantity<Acceleration>;
  
    /**
-@@ -86,7 +85,7 @@ class TrapezoidProfile {
+@@ -88,7 +85,7 @@ class TrapezoidProfile {
          wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
        }
  
@@ -1165,7 +1182,7 @@ index 81e727192..d8aba361e 100644
          throw std::domain_error("Constraints must be non-negative");
        }
      }
-@@ -98,10 +97,10 @@ class TrapezoidProfile {
+@@ -100,10 +97,10 @@ class TrapezoidProfile {
    class State {
     public:
      /// The position at this state.
@@ -1178,20 +1195,20 @@ index 81e727192..d8aba361e 100644
  
      constexpr bool operator==(const State&) const = default;
    };
-@@ -164,10 +163,10 @@ class TrapezoidProfile {
+@@ -166,10 +163,10 @@ class TrapezoidProfile {
          accelerationTime * accelerationTime * m_constraints.maxAcceleration;
  
      // Handle the case where the profile never reaches full speed
 -    if (fullSpeedDist < Distance_t{0}) {
 +    if (fullSpeedDist < 0.0 * Distance) {
-       accelerationTime =
-           mp::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
+       accelerationTime = mp::sqrt(fullTrapezoidDist /
+                                                 m_constraints.maxAcceleration);
 -      fullSpeedDist = Distance_t{0};
 +      fullSpeedDist = 0.0 * Distance;
      }
  
      m_endAccel = accelerationTime - cutoffBegin;
-@@ -228,7 +227,7 @@ class TrapezoidProfile {
+@@ -230,7 +227,7 @@ class TrapezoidProfile {
  
      Distance_t distToTarget = mp::abs(target - position);
  
@@ -1200,7 +1217,7 @@ index 81e727192..d8aba361e 100644
        return 0.0 * mp::s;
      }
  
-@@ -248,11 +247,11 @@ class TrapezoidProfile {
+@@ -250,11 +247,11 @@ class TrapezoidProfile {
  
      if (accelDist > distToTarget) {
        accelDist = distToTarget;
@@ -1216,7 +1233,7 @@ index 81e727192..d8aba361e 100644
        decelDist = distToTarget - fullSpeedDist - accelDist;
      }
 diff --git a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
-index f89f2a0d9..ef86a7a3c 100644
+index d460757a9..5b7695f4d 100644
 --- a/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/util/MathUtil.hpp
 @@ -17,6 +17,20 @@
@@ -1302,7 +1319,7 @@ index f89f2a0d9..ef86a7a3c 100644
    if constexpr (std::is_arithmetic_v<T>) {
      return gcem::copysign(
          gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
-@@ -172,8 +195,9 @@ constexpr T CopyDirectionPow(T value, double exponent,
+@@ -173,8 +196,9 @@ constexpr T CopyDirectionPow(T value, double exponent,
   */
  template <typename T, int N>
    requires std::is_arithmetic_v<T> || mp::Quantity<T>
@@ -1314,7 +1331,7 @@ index f89f2a0d9..ef86a7a3c 100644
    if constexpr (std::is_arithmetic_v<T>) {
      if (value.norm() < T{1e-9}) {
        return Eigen::Vector<T, N>::Zero();
-@@ -181,10 +205,18 @@ Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
+@@ -182,10 +206,18 @@ Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
      return value.normalized() *
             CopyDirectionPow(value.norm(), exponent, maxMagnitude);
    } else {
@@ -1347,7 +1364,7 @@ index fdeb651b6..c7aa4ea51 100644
 +  EXPECT_EQ("4 m/s", fmt::format("{}", 4.0 * mp::m / mp::s));
  }
 diff --git a/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp b/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
-index 7ebf2e3ac..023321174 100644
+index b37b35db2..8c2ffcf2d 100644
 --- a/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
 +++ b/wpimath/src/test/native/cpp/controller/DifferentialDriveAccelerationLimiterTest.cpp
 @@ -17,10 +17,10 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
@@ -1365,7 +1382,7 @@ index 7ebf2e3ac..023321174 100644
  
    DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, maxA,
                                                      maxAlpha};
-@@ -112,11 +112,11 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
+@@ -116,11 +116,11 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
    constexpr auto trackwidth = 0.9 * mp::m;
    constexpr mp::quantity<mp::s> dt = 5.0 * mp::ms;
  
@@ -1381,7 +1398,7 @@ index 7ebf2e3ac..023321174 100644
  
    // Limits are so high, they don't get hit, so states of constrained and
    // unconstrained systems should match
-@@ -180,10 +180,10 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
+@@ -187,10 +187,10 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
    constexpr auto maxA = 2.0 * mp::m / mp::s2;
    constexpr auto maxAlpha = 2.0 * mp::rad / mp::s2;
  
@@ -1396,7 +1413,7 @@ index 7ebf2e3ac..023321174 100644
  
    DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, minA,
                                                      maxA, maxAlpha};
-@@ -242,10 +242,10 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
+@@ -249,10 +249,10 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
  }
  
  TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
@@ -1409,8 +1426,8 @@ index 7ebf2e3ac..023321174 100644
 +  auto plant = LinearSystemId::IdentifyDrivetrainSystem(
 +      1.0 * Kv_unit, 1.0 * Ka_unit, 1.0 * Kv_unit, 1.0 * Ka_unit);
    EXPECT_NO_THROW({
-     DifferentialDriveAccelerationLimiter accelLimiter(
-         plant, 1.0 * mp::m, 1.0 * mp::m / mp::s2, 1.0 * mp::rad / mp::s2);
+     DifferentialDriveAccelerationLimiter accelLimiter(plant, 1.0 * mp::m, 1.0 * mp::m / mp::s2,
+                                                       1.0 * mp::rad / mp::s2);
 diff --git a/wpimath/src/test/native/cpp/controller/ImplicitModelFollowerTest.cpp b/wpimath/src/test/native/cpp/controller/ImplicitModelFollowerTest.cpp
 index 0b9f1b754..c3946e14e 100644
 --- a/wpimath/src/test/native/cpp/controller/ImplicitModelFollowerTest.cpp
@@ -1452,7 +1469,7 @@ index 0b9f1b754..c3946e14e 100644
    ImplicitModelFollower<2, 2> imf{plant, plantRef};
  
 diff --git a/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp b/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
-index e97dfb7e8..cc4d3361b 100644
+index 906fbeb6c..d4f5e8615 100644
 --- a/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
 +++ b/wpimath/src/test/native/cpp/controller/proto/SimpleMotorFeedforwardProtoTest.cpp
 @@ -12,7 +12,7 @@
@@ -1465,7 +1482,7 @@ index e97dfb7e8..cc4d3361b 100644
    using Type = SimpleMotorFeedforward<T>;
  
 diff --git a/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp b/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
-index 218dfe61d..2e2bf1221 100644
+index 3ad1d4097..3ea07c9db 100644
 --- a/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
 +++ b/wpimath/src/test/native/cpp/controller/struct/SimpleMotorFeedforwardStructTest.cpp
 @@ -12,7 +12,7 @@
@@ -1478,7 +1495,7 @@ index 218dfe61d..2e2bf1221 100644
    using Type = SimpleMotorFeedforward<T>;
  
 diff --git a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
-index c00003691..42def2050 100644
+index 21b8ac47e..8b434b8f7 100644
 --- a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
 +++ b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
 @@ -98,7 +98,7 @@ TEST(S3UKFTest, DriveInit) {
@@ -1491,7 +1508,7 @@ index c00003691..42def2050 100644
  
    wpi::math::S3UKF<5, 2, 3> observer{DriveDynamics,
 diff --git a/wpimath/src/test/native/cpp/geometry/Pose2dTest.cpp b/wpimath/src/test/native/cpp/geometry/Pose2dTest.cpp
-index b4aa56ded..92a15b8ee 100644
+index 004885966..dad6f3545 100644
 --- a/wpimath/src/test/native/cpp/geometry/Pose2dTest.cpp
 +++ b/wpimath/src/test/native/cpp/geometry/Pose2dTest.cpp
 @@ -9,6 +9,8 @@
@@ -1504,7 +1521,7 @@ index b4aa56ded..92a15b8ee 100644
  
  TEST(Pose2dTest, RotateBy) {
 diff --git a/wpimath/src/test/native/cpp/geometry/Pose3dTest.cpp b/wpimath/src/test/native/cpp/geometry/Pose3dTest.cpp
-index 8a1f93113..9937a8644 100644
+index 1093d0a35..34fcebc2c 100644
 --- a/wpimath/src/test/native/cpp/geometry/Pose3dTest.cpp
 +++ b/wpimath/src/test/native/cpp/geometry/Pose3dTest.cpp
 @@ -8,6 +8,7 @@

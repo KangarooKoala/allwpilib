@@ -620,7 +620,7 @@ index 3485487e6..7e520d322 100644
  
  void DCMotorSim::SetAngle(wpi::units::radian_t angularPosition) {
 diff --git a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
-index 614f0abd3..02b8433c4 100644
+index 07e66e286..c09f0b441 100644
 --- a/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 +++ b/wpilibc/src/main/native/cpp/simulation/ElevatorSim.cpp
 @@ -54,8 +54,9 @@ ElevatorSim::ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
@@ -638,7 +638,7 @@ index 614f0abd3..02b8433c4 100644
 @@ -91,7 +92,8 @@ wpi::units::ampere_t ElevatorSim::GetCurrentDraw() const {
    using Kv_t = wpi::units::unit_t<wpi::units::compound_unit<
        wpi::units::volt, wpi::units::inverse<wpi::units::meters_per_second>>>;
-   Kv_t Kv = Kv_t{kA * m_plant.A(1, 1)};
+   Kv_t Kv = Kv_t{-kA * m_plant.A(1, 1)};
 -  wpi::units::meters_per_second_t velocity{m_x(1)};
 +  wpi::units::meters_per_second_t velocity =
 +      wpi::units::meters_per_second_t{m_x(1)};
@@ -687,23 +687,32 @@ index d22ba2dac..3a45dadb0 100644
           wpi::util::sgn(m_u(0));
  }
 diff --git a/wpilibc/src/main/native/cpp/system/Notifier.cpp b/wpilibc/src/main/native/cpp/system/Notifier.cpp
-index 08aa2e066..2d1b4d88c 100644
+index 4ceba5d62..4679e1ef0 100644
 --- a/wpilibc/src/main/native/cpp/system/Notifier.cpp
 +++ b/wpilibc/src/main/native/cpp/system/Notifier.cpp
-@@ -205,7 +205,7 @@ void Notifier::UpdateAlarm(uint64_t triggerTime) {
+@@ -143,14 +143,14 @@ void Notifier::SetCallback(std::function<void()> callback) {
+ 
+ void Notifier::StartSingle(wpi::units::second_t delay) {
+   int32_t status = 0;
+-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
++  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay.value() * 1e6), 0, false,
+                        &status);
  }
  
- void Notifier::UpdateAlarm() {
--  UpdateAlarm(static_cast<uint64_t>(m_expirationTime * 1e6));
-+  UpdateAlarm(static_cast<uint64_t>(m_expirationTime.value() * 1e6));
+ void Notifier::StartPeriodic(wpi::units::second_t period) {
+   int32_t status = 0;
+-  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
+-                       static_cast<uint64_t>(period * 1e6), false, &status);
++  HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period.value() * 1e6),
++                       static_cast<uint64_t>(period.value() * 1e6), false, &status);
  }
  
- bool Notifier::SetHALThreadPriority(bool realTime, int32_t priority) {
+ void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
 diff --git a/wpilibc/src/main/native/cpp/system/Watchdog.cpp b/wpilibc/src/main/native/cpp/system/Watchdog.cpp
-index 73a6fc535..70b2f3cfd 100644
+index 9637669a9..bc3614a8c 100644
 --- a/wpilibc/src/main/native/cpp/system/Watchdog.cpp
 +++ b/wpilibc/src/main/native/cpp/system/Watchdog.cpp
-@@ -110,7 +110,7 @@ void Watchdog::Impl::Main() {
+@@ -107,7 +107,7 @@ void Watchdog::Impl::Main() {
      // has occurred, so call its timeout function.
      auto watchdog = m_watchdogs.pop();
  
@@ -1116,10 +1125,10 @@ index 82be3ea94..ad9dea05c 100644
    }
  }
  
-diff --git a/wpilibcExamples/src/main/cpp/templates/commandbased/cpp/Robot.cpp b/wpilibcExamples/src/main/cpp/templates/commandbased/cpp/Robot.cpp
+diff --git a/wpilibcExamples/src/main/cpp/templates/commandv2/cpp/Robot.cpp b/wpilibcExamples/src/main/cpp/templates/commandv2/cpp/Robot.cpp
 index 044ead3a3..cff6d5504 100644
---- a/wpilibcExamples/src/main/cpp/templates/commandbased/cpp/Robot.cpp
-+++ b/wpilibcExamples/src/main/cpp/templates/commandbased/cpp/Robot.cpp
+--- a/wpilibcExamples/src/main/cpp/templates/commandv2/cpp/Robot.cpp
++++ b/wpilibcExamples/src/main/cpp/templates/commandv2/cpp/Robot.cpp
 @@ -38,7 +38,7 @@ void Robot::AutonomousInit() {
  
    if (m_autonomousCommand) {
@@ -1129,10 +1138,10 @@ index 044ead3a3..cff6d5504 100644
    }
  }
  
-diff --git a/wpilibcExamples/src/main/cpp/templates/commandbasedskeleton/cpp/Robot.cpp b/wpilibcExamples/src/main/cpp/templates/commandbasedskeleton/cpp/Robot.cpp
+diff --git a/wpilibcExamples/src/main/cpp/templates/commandv2skeleton/cpp/Robot.cpp b/wpilibcExamples/src/main/cpp/templates/commandv2skeleton/cpp/Robot.cpp
 index 82be3ea94..ad9dea05c 100644
---- a/wpilibcExamples/src/main/cpp/templates/commandbasedskeleton/cpp/Robot.cpp
-+++ b/wpilibcExamples/src/main/cpp/templates/commandbasedskeleton/cpp/Robot.cpp
+--- a/wpilibcExamples/src/main/cpp/templates/commandv2skeleton/cpp/Robot.cpp
++++ b/wpilibcExamples/src/main/cpp/templates/commandv2skeleton/cpp/Robot.cpp
 @@ -23,7 +23,7 @@ void Robot::AutonomousInit() {
  
    if (m_autonomousCommand) {
@@ -1143,10 +1152,10 @@ index 82be3ea94..ad9dea05c 100644
  }
  
 diff --git a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
-index c91804658..c1ff46c43 100644
+index f9d8a6948..651e9a035 100644
 --- a/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
 +++ b/wpilibcExamples/src/test/cpp/examples/ArmSimulation/cpp/ArmSimulationTest.cpp
-@@ -77,20 +77,20 @@ TEST_P(ArmSimulationTest, Teleop) {
+@@ -78,20 +78,20 @@ TEST_P(ArmSimulationTest, Teleop) {
  
      wpi::sim::StepTiming(1.5_s);
  
@@ -1177,7 +1186,7 @@ index c91804658..c1ff46c43 100644
    }
  
    {
-@@ -111,20 +111,20 @@ TEST_P(ArmSimulationTest, Teleop) {
+@@ -112,20 +112,20 @@ TEST_P(ArmSimulationTest, Teleop) {
      // advance 75 timesteps
      wpi::sim::StepTiming(1.5_s);
  
@@ -1422,7 +1431,7 @@ index bcc088f80..b7f615137 100644
    }
  }
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
-index 2f53b06cd..b8103daea 100644
+index 5a849cfd1..8bac24f23 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/LinearQuadraticRegulator.hpp
 @@ -105,8 +105,9 @@ class LinearQuadraticRegulator {
@@ -1469,10 +1478,10 @@ index c43e0300c..851a66d13 100644
  static_assert(wpi::util::StructSerializable<
                wpi::math::SimpleMotorFeedforward<wpi::units::radians>>);
 diff --git a/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
-index 15a69198e..3aecf216f 100644
+index 3748cdad0..be7d5402a 100644
 --- a/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/estimator/ExtendedKalmanFilter.hpp
-@@ -104,7 +104,7 @@ class ExtendedKalmanFilter {
+@@ -105,7 +105,7 @@ class ExtendedKalmanFilter {
      if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
        if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
                                           discQ, discR)) {
@@ -1481,7 +1490,7 @@ index 15a69198e..3aecf216f 100644
        } else if (P.error() == DAREError::QNotSymmetric ||
                   P.error() == DAREError::QNotPositiveSemidefinite) {
          std::string msg =
-@@ -188,7 +188,7 @@ class ExtendedKalmanFilter {
+@@ -189,7 +189,7 @@ class ExtendedKalmanFilter {
      if (IsDetectable<States, Outputs>(discA, C) && Outputs <= States) {
        if (auto P = DARE<States, Outputs>(discA.transpose(), C.transpose(),
                                           discQ, discR)) {
@@ -1491,7 +1500,7 @@ index 15a69198e..3aecf216f 100644
                   P.error() == DAREError::QNotPositiveSemidefinite) {
          std::string msg =
 diff --git a/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
-index 94a1dbf70..c63e4bdff 100644
+index 9fac41cf6..7272a1dd8 100644
 --- a/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/estimator/KalmanFilter.hpp
 @@ -87,7 +87,7 @@ class KalmanFilter {
@@ -1528,7 +1537,7 @@ index 29bd3f3be..089718adb 100644
  
      // Step 5: We should not trust the transform entirely, so instead we scale
 diff --git a/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp b/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
-index d692ac8dd..c8bb3b58f 100644
+index c21cebba5..15aba020a 100644
 --- a/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/estimator/SteadyStateKalmanFilter.hpp
 @@ -100,6 +100,7 @@ class SteadyStateKalmanFilter {
@@ -2476,7 +2485,7 @@ index 41395d0c6..bd4efac35 100644
      SimpleMotorFeedforwardRadians, StructTest,
      SimpleMotorFeedforwardStructTestData<wpi::units::radians>);
 diff --git a/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp b/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
-index 85b2e20cc..625482779 100644
+index 623a8b2a9..4e60ba188 100644
 --- a/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
 +++ b/wpimath/src/test/native/cpp/estimator/ExtendedKalmanFilterTest.cpp
 @@ -36,10 +36,10 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
@@ -2495,7 +2504,7 @@ index 85b2e20cc..625482779 100644
    auto v = 0.5 * (vl + vr);
    return wpi::math::Vectord<5>{
 diff --git a/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp b/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
-index b61c147aa..0cd4b26c4 100644
+index 99718c1a0..c7e855c7c 100644
 --- a/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
 +++ b/wpimath/src/test/native/cpp/estimator/MerweUKFTest.cpp
 @@ -43,10 +43,10 @@ wpi::math::Vectord<5> DriveDynamics(const wpi::math::Vectord<5>& x,
@@ -2514,7 +2523,7 @@ index b61c147aa..0cd4b26c4 100644
    auto v = 0.5 * (vl + vr);
    return wpi::math::Vectord<5>{
 diff --git a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
-index c03fb1007..6b1125596 100644
+index 2ae02dced..cd52cbfba 100644
 --- a/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
 +++ b/wpimath/src/test/native/cpp/estimator/S3UKFTest.cpp
 @@ -43,10 +43,10 @@ wpi::math::Vectord<5> DriveDynamics(const wpi::math::Vectord<5>& x,
