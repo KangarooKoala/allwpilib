@@ -1864,6 +1864,40 @@ index 40aa51cde..c398dffd9 100644
    }
    return next;
  }
+diff --git a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveWheelVoltages.yml b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveWheelVoltages.yml
+index f2c0f5c4d..3a192bf9a 100644
+--- a/wpimath/src/main/python/semiwrap/controls/DifferentialDriveWheelVoltages.yml
++++ b/wpimath/src/main/python/semiwrap/controls/DifferentialDriveWheelVoltages.yml
+@@ -18,8 +18,8 @@ inline_code: |
+       py::arg("left") = 0, py::arg("right") = 0)
+     .def("__repr__", [](const DifferentialDriveWheelVoltages *self) {
+       return "DifferentialDriveWheelVoltages("
+-        "left=" + std::to_string(self->left()) + ","
+-        "right=" + std::to_string(self->right()) + ")";
++        "left=" + std::to_string(self->left.value()) + ","
++        "right=" + std::to_string(self->right.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
+index 30e2debe2..a3715a026 100644
+--- a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
++++ b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
+@@ -62,10 +62,10 @@ inline_code: |
+     })
+     .def("__repr__", [](wpi::math::Trajectory::State *self) {
+       return "Trajectory.State("
+-        "t=" + std::to_string(self->t()) + ", "
+-        "velocity=" + std::to_string(self->velocity()) + ", "
+-        "acceleration=" + std::to_string(self->acceleration()) + ", "
++        "t=" + std::to_string(self->t.value()) + ", "
++        "velocity=" + std::to_string(self->velocity.value()) + ", "
++        "acceleration=" + std::to_string(self->acceleration.value()) + ", "
+         "pose=" + rpy::toString(self->pose) + ", "
+-        "curvature=" + std::to_string(self->curvature()) + ")";
++        "curvature=" + std::to_string(self->curvature.value()) + ")";
+     })
+     .def_readwrite("curvature", &wpi::math::Trajectory::State::curvature);
 diff --git a/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml b/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml
 index 585af5ea6..e161936a6 100644
 --- a/wpimath/src/main/python/semiwrap/controls/TrajectoryGenerator.yml
@@ -1888,6 +1922,32 @@ index b102e527b..4c5bf580a 100644
      - wpi::units::curvature_t
      methods:
        TimeParameterizeTrajectory:
+diff --git a/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml b/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
+index 8eea00a1a..eda3abc13 100644
+--- a/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
++++ b/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
+@@ -54,8 +54,8 @@ classes:
+       cls_Constraints
+         .def("__repr__", [clsNameCopy](const Constraints &self) {
+           return clsNameCopy + ".Constraints("
+-            "maxVelocity=" + std::to_string(self.maxVelocity()) + ", "
+-            "maxAcceleration=" + std::to_string(self.maxAcceleration()) + ")";
++            "maxVelocity=" + std::to_string(self.maxVelocity.value()) + ", "
++            "maxAcceleration=" + std::to_string(self.maxAcceleration.value()) + ")";
+         });
+ 
+       cls_State
+@@ -66,8 +66,8 @@ classes:
+         )
+         .def("__repr__", [clsNameCopy](const State &self) {
+           return clsNameCopy + ".State("
+-            "position=" + std::to_string(self.position()) + ", "
+-            "velocity=" + std::to_string(self.velocity()) + ")";
++            "position=" + std::to_string(self.position.value()) + ", "
++            "velocity=" + std::to_string(self.velocity.value()) + ")";
+         });
+       }
+   wpi::math::TrapezoidProfile::Constraints:
 diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
 index 149815bbd..0eba6dbaf 100644
 --- a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
@@ -1955,6 +2015,70 @@ index beef1c644..4e261a38b 100644
 +      return "ChassisSpeeds(vx=" + std::to_string(cs.vx.value()) + ", "
 +                           "vy=" + std::to_string(cs.vy.value()) + ", "
 +                           "omega=" + std::to_string(cs.omega.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
+index cfb96dd9b..c0cdd06ce 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
+@@ -44,8 +44,8 @@ inline_code: |
+       }
+     )
+     .def("__repr__", [](const DifferentialDriveWheelSpeeds &dds) -> std::string {
+-      return "DifferentialDriveWheelSpeeds(left=" + std::to_string(dds.left()) + ", "
+-                                          "right=" + std::to_string(dds.right()) + ")";
++      return "DifferentialDriveWheelSpeeds(left=" + std::to_string(dds.left.value()) + ", "
++                                          "right=" + std::to_string(dds.right.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
+index 1e90ba340..581d56821 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
+@@ -71,10 +71,10 @@ inline_code: |
+       }
+     )
+     .def("__repr__", [](const MecanumDriveWheelSpeeds &ms) -> std::string {
+-      return "MecanumDriveWheelSpeeds(frontLeft=" + std::to_string(ms.frontLeft()) + ", "
+-                                     "frontRight=" + std::to_string(ms.frontRight()) + ", "
+-                                     "rearLeft=" + std::to_string(ms.rearLeft()) + ", "
+-                                     "rearRight=" + std::to_string(ms.rearRight()) + ")";
++      return "MecanumDriveWheelSpeeds(frontLeft=" + std::to_string(ms.frontLeft.value()) + ", "
++                                     "frontRight=" + std::to_string(ms.frontRight.value()) + ", "
++                                     "rearLeft=" + std::to_string(ms.rearLeft.value()) + ", "
++                                     "rearRight=" + std::to_string(ms.rearRight.value()) + ")";
+     })
+   ;
+ 
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
+index 637475a57..bc077000c 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
+@@ -26,8 +26,8 @@ classes:
+         }
+       )
+       .def("__repr__", [](const SwerveModulePosition &ss) -> std::string {
+-        return "SwerveModulePosition(distance=" + std::to_string(ss.distance()) + ", "
+-                                    "angle=" + std::to_string(ss.angle.Radians()()) + ")";
++        return "SwerveModulePosition(distance=" + std::to_string(ss.distance.value()) + ", "
++                                    "angle=" + std::to_string(ss.angle.Radians().value()) + ")";
+       })
+ 
+ inline_code: |
+diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
+index 70b647826..f0690c908 100644
+--- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
++++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
+@@ -33,8 +33,8 @@ inline_code: |
+       }
+     )
+     .def("__repr__", [](const SwerveModuleState &ss) -> std::string {
+-      return "SwerveModuleState(speed=" + std::to_string(ss.speed()) + ", "
+-                               "angle=" + std::to_string(ss.angle.Radians()()) + ")";
++      return "SwerveModuleState(speed=" + std::to_string(ss.speed.value()) + ", "
++                               "angle=" + std::to_string(ss.angle.Radians().value()) + ")";
      })
    ;
  

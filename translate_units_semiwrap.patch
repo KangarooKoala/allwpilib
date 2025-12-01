@@ -7,6 +7,21 @@ index 9d1bfef23..0319ba8ce 100644
          ignore: true
    MakeValue:
 +    ignore: true
+diff --git a/wpimath/src/main/python/semiwrap/controls/ArmFeedforward.yml b/wpimath/src/main/python/semiwrap/controls/ArmFeedforward.yml
+index d35a4ef8d..08344077b 100644
+--- a/wpimath/src/main/python/semiwrap/controls/ArmFeedforward.yml
++++ b/wpimath/src/main/python/semiwrap/controls/ArmFeedforward.yml
+@@ -5,10 +5,6 @@ classes:
+   wpi::math::ArmFeedforward:
+     force_type_casters:
+     - mp::rad / mp::s2
+-    typealias:
+-    - wpi::math::ArmFeedforward::Acceleration
+-    - wpi::math::ArmFeedforward::kv_unit
+-    - wpi::math::ArmFeedforward::ka_unit
+     methods:
+       ArmFeedforward:
+         overloads:
 diff --git a/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml b/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml
 index 3d7202678..1e0897a21 100644
 --- a/wpimath/src/main/python/semiwrap/controls/CentripetalAccelerationConstraint.yml
@@ -47,10 +62,40 @@ index 613f001fd..330cc43a9 100644
  
  classes:
    wpi::math::EllipticalRegionConstraint:
+diff --git a/wpimath/src/main/python/semiwrap/controls/ExponentialProfile.yml b/wpimath/src/main/python/semiwrap/controls/ExponentialProfile.yml
+index 3ab0c8569..1efcf8983 100644
+--- a/wpimath/src/main/python/semiwrap/controls/ExponentialProfile.yml
++++ b/wpimath/src/main/python/semiwrap/controls/ExponentialProfile.yml
+@@ -6,8 +6,8 @@ classes:
+     force_type_casters:
+     - mp::quantity<mp::m / mp::s>
+     template_params:
+-    - Distance
+-    - Input
++    - auto Distance
++    - auto Input
+     methods:
+       ExponentialProfile:
+       Calculate:
 diff --git a/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml b/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
-index cadfb8fb7..6a9370252 100644
+index cadfb8fb7..7e9f6762d 100644
 --- a/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
 +++ b/wpimath/src/main/python/semiwrap/controls/LinearSystemId.yml
+@@ -4,10 +4,10 @@ defaults:
+ classes:
+   wpi::math::LinearSystemId:
+     typealias:
+-    - kv_meters = mp::quantity<wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::m / mp::s>>>
+-    - kv_radians = mp::quantity<wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::rad / mp::s>>>
+-    - ka_meters = mp::quantity<wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::m / mp::s2>>>
+-    - ka_radians = mp::quantity<wpi::units::compound_unit<mp::V, wpi::units::inverse<mp::rad / mp::s2>>>
++    - kv_meters = mp::quantity<mp::V / (mp::m / mp::s)>
++    - kv_radians = mp::quantity<mp::V / (mp::rad / mp::s)>
++    - ka_meters = mp::quantity<mp::V / (mp::m / mp::s2)>
++    - ka_radians = mp::quantity<mp::V / (mp::rad / mp::s2)>
+     methods:
+       ElevatorSystem:
+       SingleJointedArmSystem:
 @@ -25,15 +25,25 @@ classes:
            }
        IdentifyDrivetrainSystem:
@@ -66,7 +111,7 @@ index cadfb8fb7..6a9370252 100644
 +              }
 +          mp::quantity<mp::V/(mp::m/mp::s)>, mp::quantity<mp::V/(mp::m/mp::s2)>, mp::quantity<mp::V/(mp::rad/mp::s)>, mp::quantity<mp::V/(mp::rad/mp::s2)>, mp::quantity<mp::m>:
 +            cpp_code: |
-+              [](kv_meters kVlinear, ka_meters kAlinear, kv_radians kVangular, ka_radians kAangular, wpi::units::meter_t trackWidth) {
++              [](kv_meters kVlinear, ka_meters kAlinear, kv_radians kVangular, ka_radians kAangular, mp::quantity<mp::m> trackWidth) {
 +                return wpi::math::LinearSystemId::IdentifyDrivetrainSystem(kVlinear, kAlinear, kVangular, kAangular, trackWidth);
 +              }
        FlywheelSystem:
@@ -109,6 +154,52 @@ index cb4564482..e25d606fe 100644
  classes:
    wpi::math::MecanumDriveKinematicsConstraint:
      typealias:
+diff --git a/wpimath/src/main/python/semiwrap/controls/ProfiledPIDController.yml b/wpimath/src/main/python/semiwrap/controls/ProfiledPIDController.yml
+index 63f82032c..ced5bdf25 100644
+--- a/wpimath/src/main/python/semiwrap/controls/ProfiledPIDController.yml
++++ b/wpimath/src/main/python/semiwrap/controls/ProfiledPIDController.yml
+@@ -9,11 +9,10 @@ classes:
+     force_type_casters:
+     - mp::rad / mp::s
+     template_params:
+-    - Distance
++    - auto Distance
+     ignored_bases:
+     - wpi::util::SendableHelper<ProfiledPIDController<Distance>>
+     typealias:
+-    - typename wpi::math::ProfiledPIDController<Distance>::Velocity
+     - typename wpi::math::ProfiledPIDController<Distance>::Velocity_t
+     methods:
+       ProfiledPIDController:
+diff --git a/wpimath/src/main/python/semiwrap/controls/SimpleMotorFeedforward.yml b/wpimath/src/main/python/semiwrap/controls/SimpleMotorFeedforward.yml
+index 576bc7582..9f2f7d818 100644
+--- a/wpimath/src/main/python/semiwrap/controls/SimpleMotorFeedforward.yml
++++ b/wpimath/src/main/python/semiwrap/controls/SimpleMotorFeedforward.yml
+@@ -1,9 +1,6 @@
+ defaults:
+   subpackage: controller
+ 
+-extra_includes:
+-- wpi/units/dimensionless.hpp
+-
+ classes:
+   wpi::math::SimpleMotorFeedforward:
+     force_type_casters:
+@@ -11,13 +8,8 @@ classes:
+     - mp::m / mp::s2
+     - mp::rad / mp::s
+     - mp::rad / mp::s2
+-    typealias:
+-    - typename wpi::math::SimpleMotorFeedforward<Distance>::Velocity
+-    - typename wpi::math::SimpleMotorFeedforward<Distance>::Acceleration
+-    - typename wpi::math::SimpleMotorFeedforward<Distance>::kv_unit
+-    - typename wpi::math::SimpleMotorFeedforward<Distance>::ka_unit
+     template_params:
+-    - Distance
++    - auto Distance
+     methods:
+       SimpleMotorFeedforward:
+         overloads:
 diff --git a/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml b/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml
 index 264d73f7b..375014e8d 100644
 --- a/wpimath/src/main/python/semiwrap/controls/SwerveDriveKinematicsConstraint.yml
@@ -124,7 +215,7 @@ index 264d73f7b..375014e8d 100644
    wpi::math::SwerveDriveKinematicsConstraint:
      template_params:
 diff --git a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
-index d5e7873c3..6bbead992 100644
+index 3deec2b54..36a3850ac 100644
 --- a/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
 +++ b/wpimath/src/main/python/semiwrap/controls/Trajectory.yml
 @@ -3,6 +3,7 @@ defaults:
@@ -147,6 +238,19 @@ index 0b3bd6d45..01d2218f4 100644
  
  classes:
    wpi::math::TrajectoryConfig:
+diff --git a/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml b/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
+index c62e7951c..f25e7aa52 100644
+--- a/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
++++ b/wpimath/src/main/python/semiwrap/controls/TrapezoidProfile.yml
+@@ -8,7 +8,7 @@ classes:
+     - mp::rad / mp::s
+     - mp::rad / mp::s2
+     template_params:
+-    - Distance
++    - auto Distance
+     doc: |
+       A trapezoid-shaped velocity profile.
+ 
 diff --git a/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml b/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml
 index ed0c94637..0e61a0c6c 100644
 --- a/wpimath/src/main/python/semiwrap/filter/SlewRateLimiter.yml
@@ -253,7 +357,7 @@ index 24ad6da81..9e8412a19 100644
  - pybind11/eigen.h
  
 diff --git a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
-index 56969c7e5..5f871a5b7 100644
+index 33fd6dd1f..558fb283b 100644
 --- a/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
 +++ b/wpimath/src/main/python/semiwrap/geometry/Twist2d.yml
 @@ -1,4 +1,5 @@
@@ -273,7 +377,7 @@ index 4dea83991..414a580d9 100644
  
  classes:
 diff --git a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
-index 089d90115..b9d18821b 100644
+index 636ff999c..10e8930c3 100644
 --- a/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
 +++ b/wpimath/src/main/python/semiwrap/kinematics/ChassisSpeeds.yml
 @@ -1,4 +1,5 @@
@@ -283,7 +387,7 @@ index 089d90115..b9d18821b 100644
  
  classes:
 diff --git a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
-index d51faf8af..439df630d 100644
+index 5ca7ec461..12c214c0e 100644
 --- a/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
 +++ b/wpimath/src/main/python/semiwrap/kinematics/DifferentialDriveWheelSpeeds.yml
 @@ -1,4 +1,5 @@
@@ -293,7 +397,7 @@ index d51faf8af..439df630d 100644
  
  classes:
 diff --git a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
-index 742186afb..4373d7b96 100644
+index d6e90bd05..1377f5795 100644
 --- a/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
 +++ b/wpimath/src/main/python/semiwrap/kinematics/MecanumDriveWheelSpeeds.yml
 @@ -1,4 +1,5 @@
@@ -303,7 +407,7 @@ index 742186afb..4373d7b96 100644
  
  classes:
 diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
-index 8be5854d4..db1b9d745 100644
+index 1c0b23b99..b4cebe88f 100644
 --- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
 +++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModulePosition.yml
 @@ -1,4 +1,5 @@
@@ -313,7 +417,7 @@ index 8be5854d4..db1b9d745 100644
  
  classes:
 diff --git a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
-index 3e5e041cc..c42fc521a 100644
+index 3de135c87..cda5f036a 100644
 --- a/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
 +++ b/wpimath/src/main/python/semiwrap/kinematics/SwerveModuleState.yml
 @@ -1,4 +1,5 @@

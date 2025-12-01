@@ -617,7 +617,7 @@ index 093676322..3ee3a53c8 100644
      } else {
        double A = -mp::value(kV) / mp::value(kA);
 diff --git a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
-index 426db9847..4504b5428 100644
+index 426db9847..a9a5ecc05 100644
 --- a/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
 +++ b/wpimath/src/main/native/include/wpi/math/controller/ProfiledPIDController.hpp
 @@ -27,19 +27,16 @@ int IncrementAndGetProfiledPIDControllerInstances();
@@ -653,6 +653,34 @@ index 426db9847..4504b5428 100644
  
    /**
     * Gets the goal for the ProfiledPIDController.
+@@ -299,8 +296,8 @@ class ProfiledPIDController
+    * @param velocityTolerance Velocity error which is tolerable.
+    */
+   constexpr void SetTolerance(Distance_t positionTolerance,
+-                              Velocity_t velocityTolerance = Velocity_t{
+-                                  std::numeric_limits<double>::infinity()}) {
++                              Velocity_t velocityTolerance =
++                                  std::numeric_limits<double>::infinity() * Velocity) {
+     m_controller.SetTolerance(mp::value(positionTolerance),
+                               mp::value(velocityTolerance));
+   }
+@@ -311,14 +308,14 @@ class ProfiledPIDController
+    * @return The error.
+    */
+   constexpr Distance_t GetPositionError() const {
+-    return Distance_t{m_controller.GetError()};
++    return m_controller.GetError() * Distance;
+   }
+ 
+   /**
+    * Returns the change in error per second.
+    */
+   constexpr Velocity_t GetVelocityError() const {
+-    return Velocity_t{m_controller.GetErrorDerivative()};
++    return m_controller.GetErrorDerivative() * Velocity;
+   }
+ 
+   /**
 @@ -413,7 +410,7 @@ class ProfiledPIDController
     * velocity is assumed to be zero.
     */
