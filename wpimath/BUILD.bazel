@@ -22,6 +22,7 @@ filegroup(
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/gcem/include/**/*",
         "src/main/native/thirdparty/sleipnir/include/**/*",
+        "src/main/native/thirdparty/units/include/**/*",
     ]),
     visibility = ["//visibility:public"],
 )
@@ -126,6 +127,11 @@ third_party_cc_lib_helper(
     src_root = "src/main/native/thirdparty/sleipnir/src",
 )
 
+third_party_cc_lib_helper(
+    name = "units",
+    include_root = "src/main/native/thirdparty/units/include",
+)
+
 cc_library(
     name = "nanopb-generated-headers",
     hdrs = glob(["src/generated/main/native/cpp/**/*.h"]),
@@ -165,6 +171,7 @@ wpilib_cc_library(
     third_party_header_only_libraries = [
         ":eigen",
         ":gcem",
+        ":units",
     ],
     third_party_libraries = [
         ":sleipnir",
@@ -331,6 +338,7 @@ generate_robotpy_native_wrapper_build_info(
     third_party_dirs = [
         "gcem",
         "sleipnir",
+        "units",
     ],
 )
 

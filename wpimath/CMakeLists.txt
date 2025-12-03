@@ -177,7 +177,10 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/sleipnir/include/
+    DIRECTORY
+        src/main/native/thirdparty/gcem/include/
+        src/main/native/thirdparty/sleipnir/include/
+        src/main/native/thirdparty/units/include/
     DESTINATION "${include_dest}/wpimath"
 )
 target_include_directories(
@@ -187,6 +190,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/sleipnir/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/units/include>
 )
 
 install(
