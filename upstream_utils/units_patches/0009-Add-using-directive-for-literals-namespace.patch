@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 17 Dec 2025 17:27:13 -0800
+Subject: [PATCH 09/10] Add using-directive for literals namespace
+
+---
+ include/units/core.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index a211ef036e980497b78fe3a31b51c79760253b44..dff0acc1c0e513186707b0639cff81a8c094cd93 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -4381,4 +4381,9 @@ namespace units
+ #endif
+ #endif
+ 
++#ifndef UNIT_NO_LITERAL_SUPPORT
++namespace units::literals {}
++using namespace units::literals;
++#endif
++
+ #endif // UNIT_CORE_H

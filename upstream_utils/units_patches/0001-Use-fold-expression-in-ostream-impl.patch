@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Mon, 15 Dec 2025 12:07:56 -0800
+Subject: [PATCH 01/10] Use fold expression in ostream impl
+
+Merged into upstream
+---
+ include/units/core.h | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index b71b290d186e7f08f017ce8df749368ddfc4d144..7bd2fa2beefe9cb1a9f67f5006c8817e6c252736 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -2604,16 +2604,10 @@ namespace units
+ 		return os;
+ 	}
+ 
+-	inline std::ostream& operator<<(std::ostream& os, const dimension_t<>&)
++	template<class... Dims>
++	std::ostream& operator<<(std::ostream& os, const dimension_t<Dims...>&)
+ 	{
+-		return os;
+-	}
+-
+-	template<class Dim, class... Dims>
+-	std::ostream& operator<<(std::ostream& os, const dimension_t<Dim, Dims...>&)
+-	{
+-		os << Dim{};
+-		os << dimension_t<Dims...>{};
++		((os << Dims{}), ...);
+ 		return os;
+ 	}
+ 
