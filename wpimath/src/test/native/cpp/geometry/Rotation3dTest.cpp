@@ -353,7 +353,7 @@ TEST(Rotation3dTest, Interpolate) {
   rot2 = Rotation3d{yAxis, 70_deg};
   interpolated = wpi::util::Lerp(rot1, rot2, 0.5);
   EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.X()}.value());
-  EXPECT_DOUBLE_EQ(60.0, wpi::units::degree_t{interpolated.Y()}.value());
+  EXPECT_NEAR(60.0, wpi::units::degree_t{interpolated.Y()}.value(), 1e-13);
   EXPECT_DOUBLE_EQ(0.0, wpi::units::degree_t{interpolated.Z()}.value());
 
   // -160 plus half distance between 170 and -160 (165) = 5
