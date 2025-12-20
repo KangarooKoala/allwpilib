@@ -33,8 +33,8 @@ inline_code: |
       }
     )
     .def("__repr__", [](const SwerveModuleState &ss) -> std::string {
-      return "SwerveModuleState(speed=" + std::to_string(ss.speed()) + ", "
-                               "angle=" + std::to_string(ss.angle.Radians()()) + ")";
+      return "SwerveModuleState(speed=" + std::to_string(ss.speed.value()) + ", "
+                               "angle=" + std::to_string(ss.angle.Radians().value()) + ")";
     })
   ;
 

@@ -59,10 +59,10 @@ inline_code: |
     })
     .def("__repr__", [](wpi::math::Trajectory::State *self) {
       return "Trajectory.State("
-        "t=" + std::to_string(self->t()) + ", "
-        "velocity=" + std::to_string(self->velocity()) + ", "
-        "acceleration=" + std::to_string(self->acceleration()) + ", "
+        "t=" + std::to_string(self->t.value()) + ", "
+        "velocity=" + std::to_string(self->velocity.value()) + ", "
+        "acceleration=" + std::to_string(self->acceleration.value()) + ", "
         "pose=" + rpy::toString(self->pose) + ", "
-        "curvature=" + std::to_string(self->curvature()) + ")";
+        "curvature=" + std::to_string(self->curvature.value()) + ")";
     })
     .def_readwrite("curvature", &wpi::math::Trajectory::State::curvature);
