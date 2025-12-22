@@ -1,3 +1,39 @@
+diff --git a/wpimath/src/main/python/pyproject.toml b/wpimath/src/main/python/pyproject.toml
+index 955c6dde51..89948196bc 100644
+--- a/wpimath/src/main/python/pyproject.toml
++++ b/wpimath/src/main/python/pyproject.toml
+@@ -1463,7 +1463,7 @@ default_arg_cast = true
+ [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+ header = "units_compound_type_caster.h"
+ types = [
+-    "wpi::units::compound_unit",
++    "wpi::units::compound_conversion_factor",
+     "wpi::units::inverse",
+ ]
+ default_arg_cast = false
+@@ -1471,20 +1471,14 @@ default_arg_cast = false
+ [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+ header = "units_misc_type_caster.h"
+ types = [
+-    "wpi::units::dimensionless_t",
+-    "wpi::units::dimensionless::dimensionless_t",
+-    "wpi::units::scalar_t",
+-    "wpi::units::dimensionless::scalar_t",
++    "wpi::units::dimensionless",
+ ]
+ default_arg_cast = true
+ 
+ [[tool.semiwrap.export_type_casters.wpimath-casters.headers]]
+ header = "units_misc_type_caster.h"
+ types = [
+-    "wpi::units::dimensionless",
+-    "wpi::units::dimensionless::dimensionless",
+-    "wpi::units::scalar",
+-    "wpi::units::dimensionless::scalar",
++    "wpi::units::dimensionless_",
+ ]
+ default_arg_cast = false
+ 
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
 index 9566128b1b..3481866255 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
