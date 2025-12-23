@@ -145,7 +145,7 @@ index e154cd924e..91a314fe2d 100644
  };
  
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
-index a770424872..dafe4a999a 100644
+index 511df827d2..dafe4a999a 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
 +++ b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
 @@ -1,6 +1,6 @@
@@ -160,7 +160,7 @@ index a770424872..dafe4a999a 100644
    static constexpr auto name = _("float");
  };
  
--// template <> struct handle_type_name<wpi::units::dimensionless_<>> {
+-// template <> struct handle_type_name<wpi::units::dimensionless<>> {
 -//   static constexpr auto name = _("float");
 -// };
 -
