@@ -9,7 +9,8 @@ classes:
       PIDController:
         param_override:
           period:
-            default: 0.020_s
+            default: (wpi::units::second_t) 0.020_s
+            disable_type_caster_default_cast: true
       SetPID:
       SetP:
       SetI:

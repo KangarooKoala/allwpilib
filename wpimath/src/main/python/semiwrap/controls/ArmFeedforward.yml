@@ -13,7 +13,11 @@ classes:
       ArmFeedforward:
         overloads:
           '':
-          wpi::units::volt_t, wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>:
+          wpi::units::volt_t, wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>, wpi::units::second_t:
+            param_override:
+              dt:
+                default: (wpi::units::second_t) 20_ms
+                disable_type_caster_default_cast: true
       Calculate:
         overloads:
           wpi::units::unit_t<Angle>, wpi::units::unit_t<Velocity>, wpi::units::unit_t<Acceleration> [const]:

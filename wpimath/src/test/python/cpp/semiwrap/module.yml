@@ -10,13 +10,23 @@ classes:
       checkDefaultByNum1:
         param_override:
           period:
-            default: 50_ms
+            default: (wpi::units::second_t) 50_ms
+            disable_type_caster_default_cast: true
       checkDefaultByNum2:
         param_override:
           period:
-            default: 0.050_s
+            default: (wpi::units::second_t) 0.050_s
+            disable_type_caster_default_cast: true
       ms2s:
       ft2m:
       checkDefaultByName1:
+        param_override:
+          period:
+            default: (wpi::units::second_t) ::SomeClass::ms_constant1
+            disable_type_caster_default_cast: true
       checkDefaultByName2:
+        param_override:
+          period:
+            default: (wpi::units::second_t) ::SomeClass::ms_constant2
+            disable_type_caster_default_cast: true
       s2ms:
