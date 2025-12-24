@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/raw_ostream.hpp"
@@ -29,14 +29,14 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::string_view path) {
     m_apriltags[tag.ID] = tag;
   }
   m_fieldWidth =
-      wpi::units::meter_t{json.at("field").at("width").get<double>()};
+      wpi::units::meters<>{json.at("field").at("width").get<double>()};
   m_fieldLength =
-      wpi::units::meter_t{json.at("field").at("length").get<double>()};
+      wpi::units::meters<>{json.at("field").at("length").get<double>()};
 }
 
 AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
-                                         wpi::units::meter_t fieldLength,
-                                         wpi::units::meter_t fieldWidth)
+                                         wpi::units::meters<> fieldLength,
+                                         wpi::units::meters<> fieldWidth)
     : m_fieldLength(std::move(fieldLength)),
       m_fieldWidth(std::move(fieldWidth)) {
   for (const auto& tag : apriltags) {
@@ -44,11 +44,11 @@ AprilTagFieldLayout::AprilTagFieldLayout(std::vector<AprilTag> apriltags,
   }
 }
 
-wpi::units::meter_t AprilTagFieldLayout::GetFieldLength() const {
+wpi::units::meters<> AprilTagFieldLayout::GetFieldLength() const {
   return m_fieldLength;
 }
 
-wpi::units::meter_t AprilTagFieldLayout::GetFieldWidth() const {
+wpi::units::meters<> AprilTagFieldLayout::GetFieldWidth() const {
   return m_fieldWidth;
 }
 
@@ -127,9 +127,9 @@ void wpi::apriltag::from_json(const wpi::util::json& json,
   }
 
   layout.m_fieldLength =
-      wpi::units::meter_t{json.at("field").at("length").get<double>()};
+      wpi::units::meters<>{json.at("field").at("length").get<double>()};
   layout.m_fieldWidth =
-      wpi::units::meter_t{json.at("field").at("width").get<double>()};
+      wpi::units::meters<>{json.at("field").at("width").get<double>()};
 }
 
 // Use namespace declaration for forward declaration

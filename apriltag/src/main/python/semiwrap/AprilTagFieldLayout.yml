@@ -14,7 +14,7 @@ classes:
         overloads:
           '':
           std::string_view:
-          std::vector<AprilTag>, wpi::units::meter_t, wpi::units::meter_t:
+          std::vector<AprilTag>, wpi::units::meters<>, wpi::units::meters<>:
       LoadField:
       GetFieldLength:
       GetFieldWidth:

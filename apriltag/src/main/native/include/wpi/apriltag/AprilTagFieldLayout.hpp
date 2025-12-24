@@ -12,7 +12,7 @@
 #include "wpi/apriltag/AprilTag.hpp"
 #include "wpi/apriltag/AprilTagFields.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -73,20 +73,20 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
    * @param fieldWidth Width of field the layout is representing.
    */
   AprilTagFieldLayout(std::vector<AprilTag> apriltags,
-                      wpi::units::meter_t fieldLength,
-                      wpi::units::meter_t fieldWidth);
+                      wpi::units::meters<> fieldLength,
+                      wpi::units::meters<> fieldWidth);
 
   /**
    * Returns the length of the field the layout is representing.
    * @return length
    */
-  wpi::units::meter_t GetFieldLength() const;
+  wpi::units::meters<> GetFieldLength() const;
 
   /**
    * Returns the length of the field the layout is representing.
    * @return width
    */
-  wpi::units::meter_t GetFieldWidth() const;
+  wpi::units::meters<> GetFieldWidth() const;
 
   /**
    * Returns a vector of all the april tags used in this layout.
@@ -144,8 +144,8 @@ class WPILIB_DLLEXPORT AprilTagFieldLayout {
 
  private:
   std::unordered_map<int, AprilTag> m_apriltags;
-  wpi::units::meter_t m_fieldLength;
-  wpi::units::meter_t m_fieldWidth;
+  wpi::units::meters<> m_fieldLength;
+  wpi::units::meters<> m_fieldWidth;
   wpi::math::Pose3d m_origin;
 
   friend WPILIB_DLLEXPORT void to_json(wpi::util::json& json,
