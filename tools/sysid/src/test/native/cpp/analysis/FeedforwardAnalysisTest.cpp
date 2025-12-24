@@ -17,8 +17,8 @@
 #include "wpi/sysid/analysis/ArmSim.hpp"
 #include "wpi/sysid/analysis/ElevatorSim.hpp"
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 
 namespace {
 
@@ -41,9 +41,9 @@ inline constexpr int kMovementCombinations = 16;
 template <typename Model>
 sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
   constexpr auto kUstep = 0.25_V / 1_s;
-  constexpr wpi::units::volt_t kUmax = 7_V;
-  constexpr wpi::units::second_t T = 5_ms;
-  constexpr wpi::units::second_t kTestDuration = 5_s;
+  constexpr wpi::units::volts<> kUmax = 7_V;
+  constexpr wpi::units::seconds<> T = 5_ms;
+  constexpr wpi::units::seconds<> kTestDuration = 5_s;
 
   sysid::Storage storage;
   auto& [slowForward, slowBackward, fastForward, fastBackward] = storage;

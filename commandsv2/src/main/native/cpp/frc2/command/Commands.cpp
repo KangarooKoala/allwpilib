@@ -90,7 +90,7 @@ CommandPtr cmd::DeferredProxy(
                {});
 }
 
-CommandPtr cmd::Wait(wpi::units::second_t duration) {
+CommandPtr cmd::Wait(wpi::units::seconds<> duration) {
   return WaitCommand(duration).ToPtr();
 }
 

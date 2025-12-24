@@ -13,14 +13,14 @@
 
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 
 using namespace sysid;
 
-static double Lerp(wpi::units::second_t time,
+static double Lerp(wpi::units::seconds<> time,
                    std::vector<MotorData::Run::Sample<double>>& data) {
   auto next = std::find_if(data.begin(), data.end(), [&](const auto& entry) {
     return entry.time > time;

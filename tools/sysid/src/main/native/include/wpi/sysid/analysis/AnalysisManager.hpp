@@ -18,7 +18,7 @@
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/sysid/analysis/OLS.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/json.hpp"
@@ -70,7 +70,7 @@ class AnalysisManager {
      * The duration of the dynamic test that should be considered. A value of
      * zero indicates it needs to be set to the default.
      */
-    wpi::units::second_t stepTestDuration = 0_s;
+    wpi::units::seconds<> stepTestDuration = 0_s;
   };
 
   struct FeedforwardGain {
@@ -281,7 +281,7 @@ class AnalysisManager {
    *
    * @return The minimum step test duration.
    */
-  wpi::units::second_t GetMinStepTime() const { return m_minStepTime; }
+  wpi::units::seconds<> GetMinStepTime() const { return m_minStepTime; }
 
   /**
    * Returns the maximum duration of the Step Voltage Test of the currently
@@ -289,7 +289,7 @@ class AnalysisManager {
    *
    * @return  Maximum step test duration
    */
-  wpi::units::second_t GetMaxStepTime() const { return m_maxStepTime; }
+  wpi::units::seconds<> GetMaxStepTime() const { return m_maxStepTime; }
 
   /**
    * Returns the estimated time delay of the measured position, including
@@ -297,7 +297,7 @@ class AnalysisManager {
    *
    * @return Position delay in milliseconds
    */
-  wpi::units::millisecond_t GetPositionDelay() const {
+  wpi::units::milliseconds<> GetPositionDelay() const {
     return std::accumulate(m_positionDelays.begin(), m_positionDelays.end(),
                            0_s) /
            m_positionDelays.size();
@@ -309,7 +309,7 @@ class AnalysisManager {
    *
    * @return Velocity delay in milliseconds
    */
-  wpi::units::millisecond_t GetVelocityDelay() const {
+  wpi::units::milliseconds<> GetVelocityDelay() const {
     return std::accumulate(m_velocityDelays.begin(), m_velocityDelays.end(),
                            0_s) /
            m_positionDelays.size();
@@ -320,7 +320,7 @@ class AnalysisManager {
    *
    * @return The start times for each test
    */
-  const std::array<wpi::units::second_t, 4>& GetStartTimes() const {
+  const std::array<wpi::units::seconds<>, 4>& GetStartTimes() const {
     return m_startTimes;
   }
 
@@ -334,16 +334,16 @@ class AnalysisManager {
   Storage m_filteredDataset;
 
   // Stores the various start times of the different tests.
-  std::array<wpi::units::second_t, 4> m_startTimes;
+  std::array<wpi::units::seconds<>, 4> m_startTimes;
 
   // The settings for this instance. This contains pointers to the feedback
   // controller preset, LQR parameters, acceleration window size, etc.
   Settings& m_settings;
 
-  wpi::units::second_t m_minStepTime{0};
-  wpi::units::second_t m_maxStepTime{std::numeric_limits<double>::infinity()};
-  std::vector<wpi::units::second_t> m_positionDelays;
-  std::vector<wpi::units::second_t> m_velocityDelays;
+  wpi::units::seconds<> m_minStepTime{0};
+  wpi::units::seconds<> m_maxStepTime{std::numeric_limits<double>::infinity()};
+  std::vector<wpi::units::seconds<>> m_positionDelays;
+  std::vector<wpi::units::seconds<>> m_velocityDelays;
 
   void PrepareGeneralData();
 };

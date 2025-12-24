@@ -12,10 +12,9 @@
 #include "wpi/commands2/Subsystem.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/system/Timer.hpp"
-#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::abs(val1 - val2), eps)
 
 enum StateTest {
   Invalid,
@@ -31,7 +30,7 @@ enum StateTest {
 class SysIdRoutineTest : public ::testing::Test {
  protected:
   std::vector<StateTest> currentStateList{};
-  std::vector<wpi::units::volt_t> sentVoltages{};
+  std::vector<wpi::units::volts<>> sentVoltages{};
   wpi::cmd::Subsystem m_subsystem{};
   wpi::cmd::sysid::SysIdRoutine m_sysidRoutine{
       wpi::cmd::sysid::Config{
@@ -56,7 +55,7 @@ class SysIdRoutineTest : public ::testing::Test {
             }
           }},
       wpi::cmd::sysid::Mechanism{
-          [this](wpi::units::volt_t driveVoltage) {
+          [this](wpi::units::volts<> driveVoltage) {
             sentVoltages.emplace_back(driveVoltage);
             currentStateList.emplace_back(StateTest::InDrive);
           },
@@ -78,7 +77,7 @@ class SysIdRoutineTest : public ::testing::Test {
   wpi::cmd::sysid::SysIdRoutine m_emptySysidRoutine{
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                               nullptr},
-      wpi::cmd::sysid::Mechanism{[](wpi::units::volt_t driveVoltage) {},
+      wpi::cmd::sysid::Mechanism{[](wpi::units::volts<> driveVoltage) {},
                                  nullptr, &m_subsystem}};
 
   wpi::cmd::CommandPtr m_emptyRoutineForward{
@@ -153,28 +152,28 @@ TEST_F(SysIdRoutineTest, DeclareCorrectState) {
 
 TEST_F(SysIdRoutineTest, OutputCorrectVoltage) {
   RunCommand(std::move(m_quasistaticForward));
-  std::vector<wpi::units::volt_t> expectedVoltages{1_V, 0_V};
+  std::vector<wpi::units::volts<>> expectedVoltages{1_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_quasistaticReverse));
-  expectedVoltages = std::vector<wpi::units::volt_t>{-1_V, 0_V};
+  expectedVoltages = std::vector<wpi::units::volts<>>{-1_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicForward));
-  expectedVoltages = std::vector<wpi::units::volt_t>{7_V, 0_V};
+  expectedVoltages = std::vector<wpi::units::volts<>>{7_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicReverse));
-  expectedVoltages = std::vector<wpi::units::volt_t>{-7_V, 0_V};
+  expectedVoltages = std::vector<wpi::units::volts<>>{-7_V, 0_V};
   EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();

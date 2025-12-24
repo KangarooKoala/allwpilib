@@ -27,8 +27,8 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -48,9 +48,9 @@ enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 // Per-frame field data (not persistent)
 struct FieldFrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+    return {wpi::units::meters<>{(std::clamp(cursor.x, min.x, max.x) - min.x) /
                                 scale},
-            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+            wpi::units::meters<>{(max.y - std::clamp(cursor.y, min.y, max.y)) /
                                 scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
@@ -72,7 +72,7 @@ struct SelectedTargetInfo {
   FieldObjectModel* objModel = nullptr;
   std::string name;
   size_t index;
-  wpi::units::radian_t rot;
+  wpi::units::radians<> rot;
   ImVec2 poseCenter;  // center of the pose (screen coordinates)
   ImVec2 center;      // center of the target (screen coordinates)
   float radius;       // target radius
@@ -84,7 +84,7 @@ struct SelectedTargetInfo {
 struct PoseDragState {
   SelectedTargetInfo target;
   ImVec2 initialOffset;
-  wpi::units::radian_t initialAngle = 0_rad;
+  wpi::units::radians<> initialAngle = 0_rad;
 };
 
 // Popup edit state
@@ -136,8 +136,8 @@ struct DisplayOptions {
   float weight = kDefaultWeight;
   int color = kDefaultColor;
 
-  wpi::units::meter_t width = kDefaultWidth;
-  wpi::units::meter_t length = kDefaultLength;
+  wpi::units::meters<> width = kDefaultWidth;
+  wpi::units::meters<> length = kDefaultLength;
 
   bool arrows = kDefaultArrows;
   int arrowSize = kDefaultArrowSize;
@@ -156,7 +156,7 @@ class PoseFrameData {
                          size_t index, const FieldFrameData& ffd,
                          const DisplayOptions& displayOptions);
   void SetPosition(const wpi::math::Translation2d& pos);
-  void SetRotation(wpi::units::radian_t rot);
+  void SetRotation(wpi::units::radians<> rot);
   const wpi::math::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
   const wpi::math::Pose2d& GetPose() const { return m_pose; }
   float GetHitRadius() const { return m_hitRadius; }
@@ -269,23 +269,23 @@ static PoseDragState gDragState;
 static PopupState gPopupState;
 static DisplayUnits gDisplayUnits = kDisplayMeters;
 
-static double ConvertDisplayLength(wpi::units::meter_t v) {
+static double ConvertDisplayLength(wpi::units::meters<> v) {
   switch (gDisplayUnits) {
     case kDisplayFeet:
-      return v.convert<wpi::units::feet>().value();
+      return v.convert<wpi::units::feet_>().value();
     case kDisplayInches:
-      return v.convert<wpi::units::inches>().value();
+      return v.convert<wpi::units::inches_>().value();
     case kDisplayMeters:
     default:
       return v.value();
   }
 }
 
-static double ConvertDisplayAngle(wpi::units::degree_t v) {
+static double ConvertDisplayAngle(wpi::units::degrees<> v) {
   return v.value();
 }
 
-static bool InputLength(const char* label, wpi::units::meter_t* v,
+static bool InputLength(const char* label, wpi::units::meters<>* v,
                         double step = 0.0, double step_fast = 0.0,
                         const char* format = "%.6f",
                         ImGuiInputTextFlags flags = 0) {
@@ -293,14 +293,14 @@ static bool InputLength(const char* label, wpi::units::meter_t* v,
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
       case kDisplayFeet:
-        *v = wpi::units::foot_t{dv};
+        *v = wpi::units::feet<>{dv};
         break;
       case kDisplayInches:
-        *v = wpi::units::inch_t{dv};
+        *v = wpi::units::inches<>{dv};
         break;
       case kDisplayMeters:
       default:
-        *v = wpi::units::meter_t{dv};
+        *v = wpi::units::meters<>{dv};
         break;
     }
     return true;
@@ -312,7 +312,7 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
                              double step_fast = 0.0,
                              const char* format = "%.3f",
                              ImGuiInputTextFlags flags = 0) {
-  wpi::units::meter_t uv{*v};
+  wpi::units::meters<> uv{*v};
   if (InputLength(label, &uv, step, step_fast, format, flags)) {
     *v = uv.to<float>();
     return true;
@@ -320,13 +320,13 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
   return false;
 }
 
-static bool InputAngle(const char* label, wpi::units::degree_t* v,
+static bool InputAngle(const char* label, wpi::units::degrees<>* v,
                        double step = 0.0, double step_fast = 0.0,
                        const char* format = "%.6f",
                        ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
-    *v = wpi::units::degree_t{dv};
+    *v = wpi::units::degrees<>{dv};
     return true;
   }
   return false;
@@ -512,8 +512,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
 
   // convert size units to meters
   if (unit == "foot" || unit == "feet") {
-    width = wpi::units::convert<wpi::units::feet, wpi::units::meters>(width);
-    height = wpi::units::convert<wpi::units::feet, wpi::units::meters>(height);
+    width = wpi::units::convert<wpi::units::feet_, wpi::units::meters_>(width);
+    height = wpi::units::convert<wpi::units::feet_, wpi::units::meters_>(height);
   }
 
   // check scaling
@@ -659,8 +659,8 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.style = static_cast<DisplayOptions::Style>(m_style.GetValue());
   rv.weight = m_weight;
   rv.color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
-  rv.width = wpi::units::meter_t{m_width};
-  rv.length = wpi::units::meter_t{m_length};
+  rv.width = wpi::units::meters<>{m_width};
+  rv.length = wpi::units::meters<>{m_length};
   rv.arrows = m_arrows;
   rv.arrowSize = m_arrowSize;
   rv.arrowWeight = m_arrowWeight;
@@ -800,7 +800,7 @@ void PoseFrameData::SetPosition(const wpi::math::Translation2d& pos) {
   m_model.SetPose(m_index, m_pose);
 }
 
-void PoseFrameData::SetRotation(wpi::units::radian_t rot) {
+void PoseFrameData::SetRotation(wpi::units::radians<> rot) {
   m_pose = wpi::math::Pose2d{m_pose.Translation(), rot};
   m_model.SetPose(m_index, m_pose);
 }
@@ -905,7 +905,7 @@ void PoseFrameData::HandleDrag(const ImVec2& cursor) {
   } else {
     ImVec2 off = cursor - m_center;
     SetRotation(gDragState.initialAngle -
-                wpi::units::radian_t{std::atan2(off.y, off.x)});
+                wpi::units::radians<>{std::atan2(off.y, off.x)});
     gDragState.target.center = m_corners[gDragState.target.corner - 2];
     gDragState.target.rot = GetRotation().Radians();
   }
@@ -1094,7 +1094,7 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       gDragState.initialOffset = m_mousePos - target->poseCenter;
       if (target->corner != 1) {
         gDragState.initialAngle =
-            wpi::units::radian_t{std::atan2(gDragState.initialOffset.y,
+            wpi::units::radians<>{std::atan2(gDragState.initialOffset.y,
                                             gDragState.initialOffset.x)} +
             target->rot;
       }
