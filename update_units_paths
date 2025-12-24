@@ -1,5 +1,6 @@
 apriltag/src
 benchmark/src
+commandsv2/src
 ntcore/src
 wpilibc/src
 wpilibc/src/main/python/wpilib/src/rpy/MotorControllerGroup.cpp
