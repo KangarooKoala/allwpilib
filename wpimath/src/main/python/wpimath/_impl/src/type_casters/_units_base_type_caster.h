@@ -26,7 +26,7 @@ namespace detail {
     foo(wpi::units::seconds<> tm = 10_ms);    // if not careful, pybind11 will 
                                         // store as 10 seconds
 */
-template <class U, typename T, template <typename> class S>
+template <class U, typename T, typename S>
 struct type_caster<wpi::units::unit<U, T, S>> {
   using value_type = wpi::units::unit<U, T, S>;
 
