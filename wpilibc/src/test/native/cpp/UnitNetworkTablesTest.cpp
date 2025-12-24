@@ -23,7 +23,7 @@ TEST_F(UnitNetworkTablesTest, Publish) {
       wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   pub.Set(2_m);
-  ASSERT_EQ(topic.GetProperty("unit"), "meter");
+  ASSERT_EQ(topic.GetProperty("unit"), "meters");
   ASSERT_TRUE(topic.IsMatchingUnit());
 }
 
