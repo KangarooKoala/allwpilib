@@ -1,6 +1,10 @@
 apriltag/src
 benchmark/src
+commandsv2/src
+glass/src
 ntcore/src
+romiVendordep/src
+tools/sysid/src
 wpilibc/src
 wpilibc/src/main/python/wpilib/src/rpy/MotorControllerGroup.cpp
 wpilibc/src/main/python/wpilib/src/rpy/MotorControllerGroup.h
@@ -11,3 +15,4 @@ wpimath/src/main/python/wpimath/_impl/src/PyTrajectoryConstraint.h
 wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
 wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
 wpimath/src/main/python/wpimath/_impl/src/type_casters/units_misc_type_caster.h
+xrpVendordep/src
