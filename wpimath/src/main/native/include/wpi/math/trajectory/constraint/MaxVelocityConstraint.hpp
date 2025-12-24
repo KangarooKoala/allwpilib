@@ -5,8 +5,7 @@
 #pragma once
 
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -24,23 +23,23 @@ class WPILIB_DLLEXPORT MaxVelocityConstraint : public TrajectoryConstraint {
    * @param maxVelocity The max velocity.
    */
   constexpr explicit MaxVelocityConstraint(
-      wpi::units::meters_per_second_t maxVelocity)
-      : m_maxVelocity(wpi::units::math::abs(maxVelocity)) {}
+      wpi::units::meters_per_second<> maxVelocity)
+      : m_maxVelocity(wpi::units::abs(maxVelocity)) {}
 
-  constexpr wpi::units::meters_per_second_t MaxVelocity(
+  constexpr wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     return m_maxVelocity;
   }
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second<> speed) const override {
     return {};
   }
 
  private:
-  wpi::units::meters_per_second_t m_maxVelocity;
+  wpi::units::meters_per_second<> m_maxVelocity;
 };
 
 }  // namespace wpi::math

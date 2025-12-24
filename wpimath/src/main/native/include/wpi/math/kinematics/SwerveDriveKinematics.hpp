@@ -21,8 +21,7 @@
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -164,7 +163,7 @@ class SwerveDriveKinematics
    * module states are not normalized. Sometimes, a user input may cause one of
    * the module speeds to go above the attainable max velocity. Use the
    * DesaturateWheelSpeeds(wpi::util::array<SwerveModuleState, NumModules>*,
-   * wpi::units::meters_per_second_t) function to rectify this issue. In
+   * wpi::units::meters_per_second<>) function to rectify this issue. In
    * addition, you can leverage the power of C++17 to directly assign the module
    * states to variables:
    *
@@ -200,10 +199,10 @@ class SwerveDriveKinematics
         m_firstOrderInverseKinematics * chassisSpeedsVector;
 
     for (size_t i = 0; i < NumModules; i++) {
-      wpi::units::meters_per_second_t x{moduleStateMatrix(i * 2, 0)};
-      wpi::units::meters_per_second_t y{moduleStateMatrix(i * 2 + 1, 0)};
+      wpi::units::meters_per_second<> x{moduleStateMatrix(i * 2, 0)};
+      wpi::units::meters_per_second<> y{moduleStateMatrix(i * 2 + 1, 0)};
 
-      auto speed = wpi::units::math::hypot(x, y);
+      auto speed = wpi::units::hypot(x, y);
       auto rotation = speed > 1e-6_mps ? Rotation2d{x.value(), y.value()}
                                        : m_moduleHeadings[i];
 
@@ -266,9 +265,9 @@ class SwerveDriveKinematics
     Eigen::Vector3d chassisSpeedsVector =
         m_firstOrderForwardKinematics.solve(moduleStateMatrix);
 
-    return {wpi::units::meters_per_second_t{chassisSpeedsVector(0)},
-            wpi::units::meters_per_second_t{chassisSpeedsVector(1)},
-            wpi::units::radians_per_second_t{chassisSpeedsVector(2)}};
+    return {wpi::units::meters_per_second<>{chassisSpeedsVector(0)},
+            wpi::units::meters_per_second<>{chassisSpeedsVector(1)},
+            wpi::units::radians_per_second<>{chassisSpeedsVector(2)}};
   }
 
   /**
@@ -319,9 +318,9 @@ class SwerveDriveKinematics
     Eigen::Vector3d chassisDeltaVector =
         m_firstOrderForwardKinematics.solve(moduleDeltaMatrix);
 
-    return {wpi::units::meter_t{chassisDeltaVector(0)},
-            wpi::units::meter_t{chassisDeltaVector(1)},
-            wpi::units::radian_t{chassisDeltaVector(2)}};
+    return {wpi::units::meters<>{chassisDeltaVector(0)},
+            wpi::units::meters<>{chassisDeltaVector(1)},
+            wpi::units::radians<>{chassisDeltaVector(2)}};
   }
 
   Twist2d ToTwist2d(
@@ -358,13 +357,13 @@ class SwerveDriveKinematics
    */
   static void DesaturateWheelSpeeds(
       wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
-      wpi::units::meters_per_second_t attainableMaxSpeed) {
+      wpi::units::meters_per_second<> attainableMaxSpeed) {
     auto& states = *moduleStates;
-    auto realMaxSpeed = wpi::units::math::abs(
+    auto realMaxSpeed = wpi::units::abs(
         std::max_element(states.begin(), states.end(),
                          [](const auto& a, const auto& b) {
-                           return wpi::units::math::abs(a.speed) <
-                                  wpi::units::math::abs(b.speed);
+                           return wpi::units::abs(a.speed) <
+                                  wpi::units::abs(b.speed);
                          })
             ->speed);
 
@@ -404,16 +403,16 @@ class SwerveDriveKinematics
   static void DesaturateWheelSpeeds(
       wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
       ChassisSpeeds desiredChassisSpeed,
-      wpi::units::meters_per_second_t attainableMaxModuleSpeed,
-      wpi::units::meters_per_second_t attainableMaxRobotTranslationSpeed,
-      wpi::units::radians_per_second_t attainableMaxRobotRotationSpeed) {
+      wpi::units::meters_per_second<> attainableMaxModuleSpeed,
+      wpi::units::meters_per_second<> attainableMaxRobotTranslationSpeed,
+      wpi::units::radians_per_second<> attainableMaxRobotRotationSpeed) {
     auto& states = *moduleStates;
 
-    auto realMaxSpeed = wpi::units::math::abs(
+    auto realMaxSpeed = wpi::units::abs(
         std::max_element(states.begin(), states.end(),
                          [](const auto& a, const auto& b) {
-                           return wpi::units::math::abs(a.speed) <
-                                  wpi::units::math::abs(b.speed);
+                           return wpi::units::abs(a.speed) <
+                                  wpi::units::abs(b.speed);
                          })
             ->speed);
 
@@ -423,17 +422,17 @@ class SwerveDriveKinematics
       return;
     }
 
-    auto translationalK = wpi::units::math::hypot(desiredChassisSpeed.vx,
+    auto translationalK = wpi::units::hypot(desiredChassisSpeed.vx,
                                                   desiredChassisSpeed.vy) /
                           attainableMaxRobotTranslationSpeed;
 
-    auto rotationalK = wpi::units::math::abs(desiredChassisSpeed.omega) /
+    auto rotationalK = wpi::units::abs(desiredChassisSpeed.omega) /
                        attainableMaxRobotRotationSpeed;
 
-    auto k = wpi::units::math::max(translationalK, rotationalK);
+    auto k = wpi::units::max(translationalK, rotationalK);
 
-    auto scale = wpi::units::math::min(
-        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::scalar_t{1});
+    auto scale = wpi::units::min(
+        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::dimensionless<>{1});
     for (auto& module : states) {
       module.speed = module.speed * scale;
     }
@@ -478,7 +477,7 @@ class SwerveDriveKinematics
   wpi::util::array<SwerveModuleAcceleration, NumModules>
   ToSwerveModuleAccelerations(
       const ChassisAccelerations& chassisAccelerations,
-      const units::radians_per_second_t angularVelocity = 0.0_rad_per_s,
+      const units::radians_per_second<> angularVelocity = 0.0_rad_per_s,
       const Translation2d& centerOfRotation = Translation2d{}) const {
     // Derivation for second-order kinematics from "Swerve Drive Second Order
     // Kinematics" by FRC Team 449 - The Blair Robot Project, Rafi Pedersen
@@ -487,11 +486,11 @@ class SwerveDriveKinematics
     wpi::util::array<SwerveModuleAcceleration, NumModules> moduleAccelerations(
         wpi::util::empty_array);
 
-    if (chassisAccelerations.ax == 0.0_mps_sq &&
-        chassisAccelerations.ay == 0.0_mps_sq &&
+    if (chassisAccelerations.ax == 0.0_mps2 &&
+        chassisAccelerations.ay == 0.0_mps2 &&
         chassisAccelerations.alpha == 0.0_rad_per_s_sq) {
       for (size_t i = 0; i < NumModules; i++) {
-        moduleAccelerations[i] = {0.0_mps_sq, Rotation2d{0.0_rad}};
+        moduleAccelerations[i] = {0.0_mps2, Rotation2d{0.0_rad}};
       }
       return moduleAccelerations;
     }
@@ -509,15 +508,15 @@ class SwerveDriveKinematics
         m_secondOrderInverseKinematics * chassisAccelerationsVector;
 
     for (size_t i = 0; i < NumModules; i++) {
-      units::meters_per_second_squared_t x{moduleAccelerationsMatrix(i * 2, 0)};
-      units::meters_per_second_squared_t y{
+      units::meters_per_second_squared<> x{moduleAccelerationsMatrix(i * 2, 0)};
+      units::meters_per_second_squared<> y{
           moduleAccelerationsMatrix(i * 2 + 1, 0)};
 
       // For swerve modules, we need to compute both linear acceleration and
       // angular acceleration The linear acceleration is the magnitude of the
       // acceleration vector
-      units::meters_per_second_squared_t linearAcceleration =
-          units::math::hypot(x, y);
+      units::meters_per_second_squared<> linearAcceleration =
+          units::hypot(x, y);
 
       if (linearAcceleration.value() < 1e-6) {
         moduleAccelerations[i] = {linearAcceleration, {}};
@@ -599,9 +598,9 @@ class SwerveDriveKinematics
 
     // the second order kinematics equation for swerve drive yields a state
     // vector [aₓ, a_y, ω², α]
-    return {units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
-            units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
-            units::radians_per_second_squared_t{chassisAccelerationsVector(3)}};
+    return {units::meters_per_second_squared<>{chassisAccelerationsVector(0)},
+            units::meters_per_second_squared<>{chassisAccelerationsVector(1)},
+            units::radians_per_second_squared<>{chassisAccelerationsVector(3)}};
   }
 
  private:

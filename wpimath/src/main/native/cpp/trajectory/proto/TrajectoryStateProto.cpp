@@ -26,9 +26,9 @@ wpi::util::Protobuf<wpi::math::Trajectory::State>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Trajectory::State{
-      wpi::units::second_t{msg.time},
-      wpi::units::meters_per_second_t{msg.velocity},
-      wpi::units::meters_per_second_squared_t{msg.acceleration},
+      wpi::units::seconds<>{msg.time},
+      wpi::units::meters_per_second<>{msg.velocity},
+      wpi::units::meters_per_second_squared<>{msg.acceleration},
       std::move(ipose[0]),
       wpi::units::curvature_t{msg.curvature},
   };

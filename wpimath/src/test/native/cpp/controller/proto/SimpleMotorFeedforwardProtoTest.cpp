@@ -8,8 +8,8 @@
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/velocity.h>
 
 using namespace wpi::math;
 
@@ -18,9 +18,9 @@ struct SimpleMotorFeedforwardProtoTestData {
   using Type = SimpleMotorFeedforward<T>;
 
   inline static const Type kTestData = {
-      wpi::units::volt_t{0.4},
-      wpi::units::volt_t{4.0} / (wpi::units::unit_t<T>{1} / 1_s),
-      wpi::units::volt_t{0.7} / (wpi::units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
+      wpi::units::volts<>{0.4},
+      wpi::units::volts<>{4.0} / (wpi::units::unit<T>{1} / 1_s),
+      wpi::units::volts<>{0.7} / (wpi::units::unit<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
     EXPECT_EQ(testData.GetKs().value(), data.GetKs().value());
@@ -32,10 +32,10 @@ struct SimpleMotorFeedforwardProtoTestData {
 
 INSTANTIATE_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardMeters, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<wpi::units::meters>);
+    SimpleMotorFeedforwardProtoTestData<wpi::units::meters_>);
 INSTANTIATE_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardFeet, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<wpi::units::feet>);
+    SimpleMotorFeedforwardProtoTestData<wpi::units::feet_>);
 INSTANTIATE_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardRadians, ProtoTest,
-    SimpleMotorFeedforwardProtoTestData<wpi::units::radians>);
+    SimpleMotorFeedforwardProtoTestData<wpi::units::radians_>);

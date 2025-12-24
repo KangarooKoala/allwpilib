@@ -11,13 +11,13 @@
 
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angular_acceleration.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/moment_of_inertia.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/moment_of_inertia.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -27,14 +27,14 @@ namespace wpi::math {
 class WPILIB_DLLEXPORT LinearSystemId {
  public:
   template <typename Distance>
-  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
-      Distance, wpi::units::inverse<wpi::units::seconds>>>;
+  using Velocity_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>>;
 
   template <typename Distance>
-  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>,
-      wpi::units::inverse<wpi::units::seconds>>>;
+  using Acceleration_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+      wpi::units::compound_conversion_factor<Distance,
+                                wpi::units::inverse<wpi::units::seconds_>>,
+      wpi::units::inverse<wpi::units::seconds_>>>;
 
   /**
    * Create a state-space model of the elevator system. The states of the system
@@ -48,7 +48,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if mass <= 0, radius <= 0, or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> ElevatorSystem(
-      DCMotor motor, wpi::units::kilogram_t mass, wpi::units::meter_t radius,
+      DCMotor motor, wpi::units::kilograms<> mass, wpi::units::meters<> radius,
       double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
@@ -63,7 +63,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
     Matrixd<2, 2> A{
         {0.0, 1.0},
         {0.0, (-gcem::pow(gearing, 2) * motor.Kt /
-               (motor.R * wpi::units::math::pow<2>(radius) * mass * motor.Kv))
+               (motor.R * wpi::units::pow<2>(radius) * mass * motor.Kv))
                   .value()}};
     Matrixd<2, 1> B{{0.0},
                     {(gearing * motor.Kt / (motor.R * radius * mass)).value()}};
@@ -84,7 +84,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<2, 1, 2> SingleJointedArmSystem(
-      DCMotor motor, wpi::units::kilogram_square_meter_t J, double gearing) {
+      DCMotor motor, wpi::units::kilogram_square_meters<> J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -125,8 +125,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   template <typename Distance>
-    requires std::same_as<wpi::units::meter, Distance> ||
-             std::same_as<wpi::units::radian, Distance>
+    requires std::same_as<wpi::units::meters_, Distance> ||
+             std::same_as<wpi::units::radians_, Distance>
   static constexpr LinearSystem<1, 1, 1> IdentifyVelocitySystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
@@ -168,8 +168,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   template <typename Distance>
-    requires std::same_as<wpi::units::meter, Distance> ||
-             std::same_as<wpi::units::radian, Distance>
+    requires std::same_as<wpi::units::meters_, Distance> ||
+             std::same_as<wpi::units::radians_, Distance>
   static constexpr LinearSystem<2, 1, 2> IdentifyPositionSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
@@ -211,8 +211,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular) {
+      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps2) kALinear,
+      decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps2) kAAngular) {
     if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
@@ -272,10 +272,10 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> IdentifyDrivetrainSystem(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps2) kALinear,
       decltype(1_V / 1_rad_per_s) kVAngular,
       decltype(1_V / 1_rad_per_s_sq) kAAngular,
-      wpi::units::meter_t trackwidth) {
+      wpi::units::meters<> trackwidth) {
     if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
@@ -319,7 +319,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if J <= 0 or gearing <= 0.
    */
   static constexpr LinearSystem<1, 1, 1> FlywheelSystem(
-      DCMotor motor, wpi::units::kilogram_square_meter_t J, double gearing) {
+      DCMotor motor, wpi::units::kilogram_square_meters<> J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -350,7 +350,7 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
-      DCMotor motor, wpi::units::kilogram_square_meter_t J, double gearing) {
+      DCMotor motor, wpi::units::kilogram_square_meters<> J, double gearing) {
     if (J <= 0_kg_sq_m) {
       throw std::domain_error("J must be greater than zero.");
     }
@@ -391,8 +391,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    * @throws std::domain_error if kV < 0 or kA <= 0.
    */
   template <typename Distance>
-    requires std::same_as<wpi::units::meter, Distance> ||
-             std::same_as<wpi::units::radian, Distance>
+    requires std::same_as<wpi::units::meters_, Distance> ||
+             std::same_as<wpi::units::radians_, Distance>
   static constexpr LinearSystem<2, 1, 2> DCMotorSystem(
       decltype(1_V / Velocity_t<Distance>(1)) kV,
       decltype(1_V / Acceleration_t<Distance>(1)) kA) {
@@ -427,8 +427,8 @@ class WPILIB_DLLEXPORT LinearSystemId {
    *         gearing <= 0.
    */
   static constexpr LinearSystem<2, 2, 2> DrivetrainVelocitySystem(
-      const DCMotor& motor, wpi::units::kilogram_t mass, wpi::units::meter_t r,
-      wpi::units::meter_t rb, wpi::units::kilogram_square_meter_t J,
+      const DCMotor& motor, wpi::units::kilograms<> mass, wpi::units::meters<> r,
+      wpi::units::meters<> rb, wpi::units::kilogram_square_meters<> J,
       double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
@@ -447,19 +447,19 @@ class WPILIB_DLLEXPORT LinearSystemId {
     }
 
     auto C1 = -gcem::pow(gearing, 2) * motor.Kt /
-              (motor.Kv * motor.R * wpi::units::math::pow<2>(r));
+              (motor.Kv * motor.R * wpi::units::pow<2>(r));
     auto C2 = gearing * motor.Kt / (motor.R * r);
 
     Matrixd<2, 2> A{
-        {((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value()},
-        {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C1).value(),
-         ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C1).value()}};
+        {((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value(),
+         ((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value()},
+        {((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value(),
+         ((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value()}};
     Matrixd<2, 2> B{
-        {((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value()},
-        {((1 / mass - wpi::units::math::pow<2>(rb) / J) * C2).value(),
-         ((1 / mass + wpi::units::math::pow<2>(rb) / J) * C2).value()}};
+        {((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value(),
+         ((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value()},
+        {((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value(),
+         ((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 

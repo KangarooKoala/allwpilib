@@ -10,9 +10,9 @@
 
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
 
 using namespace wpi::math;
 
@@ -59,7 +59,7 @@ TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForStraightLine) {
 TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisSpeeds chassisSpeeds{
-      0.0_mps, 0.0_mps, wpi::units::radians_per_second_t{std::numbers::pi}};
+      0.0_mps, 0.0_mps, wpi::units::radians_per_second<>{std::numbers::pi}};
   const auto wheelSpeeds = kinematics.ToWheelSpeeds(chassisSpeeds);
 
   EXPECT_NEAR(wheelSpeeds.left.value(), -0.381 * std::numbers::pi, kEpsilon);
@@ -69,8 +69,8 @@ TEST(DifferentialDriveKinematicsTest, InverseKinematicsForRotateInPlace) {
 TEST(DifferentialDriveKinematicsTest, ForwardKinematicsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelSpeeds wheelSpeeds{
-      wpi::units::meters_per_second_t{+0.381 * std::numbers::pi},
-      wpi::units::meters_per_second_t{-0.381 * std::numbers::pi}};
+      wpi::units::meters_per_second<>{+0.381 * std::numbers::pi},
+      wpi::units::meters_per_second<>{-0.381 * std::numbers::pi}};
   const auto chassisSpeeds = kinematics.ToChassisSpeeds(wheelSpeeds);
 
   EXPECT_NEAR(chassisSpeeds.vx.value(), 0, kEpsilon);
@@ -101,7 +101,7 @@ TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForZeros) {
 
 TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
-  const ChassisAccelerations chassisAccelerations{3.0_mps_sq, 0_mps_sq,
+  const ChassisAccelerations chassisAccelerations{3.0_mps2, 0_mps2,
                                                   0_rad_per_s_sq};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
@@ -112,8 +112,8 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForStraightLine) {
 
 TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForStraightLine) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
-  const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps_sq,
-                                                               3.0_mps_sq};
+  const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps2,
+                                                               3.0_mps2};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -125,8 +125,8 @@ TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForStraightLine) {
 TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{
-      0.0_mps_sq, 0.0_mps_sq,
-      wpi::units::radians_per_second_squared_t{std::numbers::pi}};
+      0.0_mps2, 0.0_mps2,
+      wpi::units::radians_per_second_squared<>{std::numbers::pi}};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
@@ -139,8 +139,8 @@ TEST(DifferentialDriveKinematicsTest, InverseAccelerationsForRotateInPlace) {
 TEST(DifferentialDriveKinematicsTest, ForwardAccelerationsForRotateInPlace) {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{
-      wpi::units::meters_per_second_squared_t{+0.381 * std::numbers::pi},
-      wpi::units::meters_per_second_squared_t{-0.381 * std::numbers::pi}};
+      wpi::units::meters_per_second_squared<>{+0.381 * std::numbers::pi},
+      wpi::units::meters_per_second_squared<>{-0.381 * std::numbers::pi}};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 

@@ -8,7 +8,7 @@
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -23,12 +23,12 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
  public:
   constexpr DifferentialDriveKinematicsConstraint(
       DifferentialDriveKinematics kinematics,
-      wpi::units::meters_per_second_t maxSpeed)
+      wpi::units::meters_per_second<> maxSpeed)
       : m_kinematics(std::move(kinematics)), m_maxSpeed(maxSpeed) {}
 
-  constexpr wpi::units::meters_per_second_t MaxVelocity(
+  constexpr wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     auto wheelSpeeds =
         m_kinematics.ToWheelSpeeds({velocity, 0_mps, velocity * curvature});
     wheelSpeeds.Desaturate(m_maxSpeed);
@@ -38,12 +38,12 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematicsConstraint
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second<> speed) const override {
     return {};
   }
 
  private:
   DifferentialDriveKinematics m_kinematics;
-  wpi::units::meters_per_second_t m_maxSpeed;
+  wpi::units::meters_per_second<> m_maxSpeed;
 };
 }  // namespace wpi::math

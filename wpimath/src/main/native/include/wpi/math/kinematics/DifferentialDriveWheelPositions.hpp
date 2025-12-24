@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -16,12 +16,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelPositions {
   /**
    * Distance driven by the left side.
    */
-  wpi::units::meter_t left = 0_m;
+  wpi::units::meters<> left = 0_m;
 
   /**
    * Distance driven by the right side.
    */
-  wpi::units::meter_t right = 0_m;
+  wpi::units::meters<> right = 0_m;
 
   /**
    * Checks equality between this DifferentialDriveWheelPositions and another

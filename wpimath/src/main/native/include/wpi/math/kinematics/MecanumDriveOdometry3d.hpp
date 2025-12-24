@@ -9,7 +9,7 @@
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/MecanumDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/timestamp.h"
 

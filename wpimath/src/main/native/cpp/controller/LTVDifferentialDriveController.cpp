@@ -13,10 +13,10 @@
 using namespace wpi::math;
 
 DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
-    const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
-    wpi::units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
-    wpi::units::meters_per_second_t leftVelocityRef,
-    wpi::units::meters_per_second_t rightVelocityRef) {
+    const Pose2d& currentPose, wpi::units::meters_per_second<> leftVelocity,
+    wpi::units::meters_per_second<> rightVelocity, const Pose2d& poseRef,
+    wpi::units::meters_per_second<> leftVelocityRef,
+    wpi::units::meters_per_second<> rightVelocityRef) {
   // This implements the linear time-varying differential drive controller in
   // theorem 8.7.4 of https://controls-in-frc.link/
   //
@@ -26,12 +26,12 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
   //     [vₗ]
   //     [vᵣ]
 
-  wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) /
+  wpi::units::meters_per_second<> velocity{(leftVelocity + rightVelocity) /
                                            2.0};
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
   // let the system stop.
-  if (wpi::units::math::abs(velocity) < 1e-4_mps) {
+  if (wpi::units::abs(velocity) < 1e-4_mps) {
     velocity = 1e-4_mps;
   }
 
@@ -44,7 +44,7 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
 
   m_error = r - x;
   m_error(2) =
-      wpi::math::AngleModulus(wpi::units::radian_t{m_error(2)}).value();
+      wpi::math::AngleModulus(wpi::units::radians<>{m_error(2)}).value();
 
   Eigen::Matrix<double, 5, 5> A{
       {0.0, 0.0, 0.0, 0.5, 0.5},
@@ -78,6 +78,6 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
 
   Eigen::Vector2d u = K * inRobotFrame * m_error;
 
-  return DifferentialDriveWheelVoltages{wpi::units::volt_t{u(0)},
-                                        wpi::units::volt_t{u(1)}};
+  return DifferentialDriveWheelVoltages{wpi::units::volts<>{u(0)},
+                                        wpi::units::volts<>{u(1)}};
 }

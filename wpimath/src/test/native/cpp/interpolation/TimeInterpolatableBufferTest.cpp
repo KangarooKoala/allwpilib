@@ -10,7 +10,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 TEST(TimeInterpolatableBufferTest, AddSample) {
   wpi::math::TimeInterpolatableBuffer<wpi::math::Rotation2d> buffer{10_s};

@@ -4,7 +4,7 @@ defaults:
 classes:
   wpi::math::ArmFeedforward:
     force_type_casters:
-    - wpi::units::radians_per_second_squared
+    - wpi::units::radians_per_second_squared_
     typealias:
     - wpi::math::ArmFeedforward::Acceleration
     - wpi::math::ArmFeedforward::kv_unit
@@ -13,19 +13,19 @@ classes:
       ArmFeedforward:
         overloads:
           '':
-          wpi::units::volt_t, wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>, wpi::units::second_t:
+          wpi::units::volts<>, wpi::units::volts<>, wpi::units::unit<kv_unit>, wpi::units::unit<ka_unit>, wpi::units::seconds<>:
             param_override:
               dt:
-                default: (wpi::units::second_t) 20_ms
+                default: (wpi::units::seconds<>) 20_ms
                 disable_type_caster_default_cast: true
       Calculate:
         overloads:
-          wpi::units::unit_t<Angle>, wpi::units::unit_t<Velocity>, wpi::units::unit_t<Acceleration> [const]:
+          wpi::units::unit<Angle>, wpi::units::unit<Velocity>, wpi::units::unit<Acceleration> [const]:
             ignore: true
-          wpi::units::unit_t<Angle>, wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity>, wpi::units::second_t [const]:
+          wpi::units::unit<Angle>, wpi::units::unit<Velocity>, wpi::units::unit<Velocity>, wpi::units::seconds<> [const]:
             ignore: true
-          wpi::units::unit_t<Angle>, wpi::units::unit_t<Velocity> [const]:
-          wpi::units::unit_t<Angle>, wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity> [const]:
+          wpi::units::unit<Angle>, wpi::units::unit<Velocity> [const]:
+          wpi::units::unit<Angle>, wpi::units::unit<Velocity>, wpi::units::unit<Velocity> [const]:
       MaxAchievableVelocity:
       MinAchievableVelocity:
       MaxAchievableAcceleration:

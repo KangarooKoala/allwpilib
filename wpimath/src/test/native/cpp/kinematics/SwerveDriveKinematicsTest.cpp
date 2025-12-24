@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/units/angular_velocity.hpp"
+#include <wpi/units/angular_velocity.h>
 
 using namespace wpi::math;
 
@@ -97,7 +97,7 @@ TEST_F(SwerveDriveKinematicsTest, StraightStrafeForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second<>{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds);
 
   EXPECT_NEAR(fl.speed.value(), 106.63, kEpsilon);
@@ -113,7 +113,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseKinematics) {
 
 TEST_F(SwerveDriveKinematicsTest, ConserveWheelAngle) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second<>{2 * std::numbers::pi}};
   m_kinematics.ToSwerveModuleStates(speeds);
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(ChassisSpeeds{});
 
@@ -175,7 +175,7 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardKinematicsWithDeltas) {
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterCORRotationInverseKinematics) {
   ChassisSpeeds speeds{0_mps, 0_mps,
-                       wpi::units::radians_per_second_t{2 * std::numbers::pi}};
+                       wpi::units::radians_per_second<>{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleStates(speeds, m_fl);
 
   EXPECT_NEAR(fl.speed.value(), 0.0, kEpsilon);
@@ -313,9 +313,9 @@ TEST_F(SwerveDriveKinematicsTest, DesaturateNegativeSpeed) {
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
   ChassisAccelerations accelerations{
-      0_mps_sq, 0_mps_sq,
-      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
-  wpi::units::radians_per_second_t angularVelocity =
+      0_mps2, 0_mps2,
+      wpi::units::radians_per_second_squared<>{2 * std::numbers::pi}};
+  wpi::units::radians_per_second<> angularVelocity =
       2_rad_per_s * std::numbers::pi;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity);
@@ -397,10 +397,10 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceInverseAccelerations) {
 }
 
 TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
-  SwerveModuleAcceleration flAccel{106.629_mps_sq, 135_deg};
-  SwerveModuleAcceleration frAccel{106.629_mps_sq, 45_deg};
-  SwerveModuleAcceleration blAccel{106.629_mps_sq, -135_deg};
-  SwerveModuleAcceleration brAccel{106.629_mps_sq, -45_deg};
+  SwerveModuleAcceleration flAccel{106.629_mps2, 135_deg};
+  SwerveModuleAcceleration frAccel{106.629_mps2, 45_deg};
+  SwerveModuleAcceleration blAccel{106.629_mps2, -135_deg};
+  SwerveModuleAcceleration brAccel{106.629_mps2, -45_deg};
 
   auto chassisAccelerations =
       m_kinematics.ToChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
@@ -412,9 +412,9 @@ TEST_F(SwerveDriveKinematicsTest, TurnInPlaceForwardAccelerations) {
 }
 
 TEST_F(SwerveDriveKinematicsTest, OffCenterRotationInverseAccelerations) {
-  ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq, 1_rad_per_s_sq};
+  ChassisAccelerations accelerations{0_mps2, 0_mps2, 1_rad_per_s_sq};
   // For this test, assume an angular velocity of 1 rad/s
-  wpi::units::radians_per_second_t angularVelocity = 1.0_rad_per_s;
+  wpi::units::radians_per_second<> angularVelocity = 1.0_rad_per_s;
   auto [flAccel, frAccel, blAccel, brAccel] =
       m_kinematics.ToSwerveModuleAccelerations(accelerations, angularVelocity,
                                                m_fl);

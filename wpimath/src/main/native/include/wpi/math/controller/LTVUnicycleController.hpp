@@ -10,10 +10,9 @@
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -37,7 +36,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    *
    * @param dt Discretization timestep.
    */
-  explicit LTVUnicycleController(wpi::units::second_t dt)
+  explicit LTVUnicycleController(wpi::units::seconds<> dt)
       : LTVUnicycleController{{0.0625, 0.125, 2.0}, {1.0, 2.0}, dt} {}
 
   /**
@@ -55,7 +54,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    */
   LTVUnicycleController(const wpi::util::array<double, 3>& Qelems,
                         const wpi::util::array<double, 2>& Relems,
-                        wpi::units::second_t dt)
+                        wpi::units::seconds<> dt)
       : m_Q{wpi::math::CostMatrix(Qelems)},
         m_R{wpi::math::CostMatrix(Relems)},
         m_dt{dt} {}
@@ -78,9 +77,9 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
     const auto& eRotate = m_poseError.Rotation();
     const auto& tolTranslate = m_poseTolerance.Translation();
     const auto& tolRotate = m_poseTolerance.Rotation();
-    return wpi::units::math::abs(eTranslate.X()) < tolTranslate.X() &&
-           wpi::units::math::abs(eTranslate.Y()) < tolTranslate.Y() &&
-           wpi::units::math::abs(eRotate.Radians()) < tolRotate.Radians();
+    return wpi::units::abs(eTranslate.X()) < tolTranslate.X() &&
+           wpi::units::abs(eTranslate.Y()) < tolTranslate.Y() &&
+           wpi::units::abs(eRotate.Radians()) < tolRotate.Radians();
   }
 
   /**
@@ -105,8 +104,8 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
    * @param angularVelocityRef The desired angular velocity.
    */
   ChassisSpeeds Calculate(const Pose2d& currentPose, const Pose2d& poseRef,
-                          wpi::units::meters_per_second_t linearVelocityRef,
-                          wpi::units::radians_per_second_t angularVelocityRef);
+                          wpi::units::meters_per_second<> linearVelocityRef,
+                          wpi::units::radians_per_second<> angularVelocityRef);
 
   /**
    * Returns the linear and angular velocity outputs of the LTV controller.
@@ -136,7 +135,7 @@ class WPILIB_DLLEXPORT LTVUnicycleController {
   Eigen::Matrix<double, 3, 3> m_Q;
   Eigen::Matrix<double, 2, 2> m_R;
 
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   Pose2d m_poseError;
   Pose2d m_poseTolerance;

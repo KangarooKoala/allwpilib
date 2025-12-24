@@ -6,16 +6,16 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/timestamp.h"
 
-static wpi::units::second_t now = 0_s;
+static wpi::units::seconds<> now = 0_s;
 
 class DebouncerTest : public ::testing::Test {
  protected:
   void SetUp() override {
     WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+        [] { return wpi::units::microseconds<>{now}.to<uint64_t>(); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }

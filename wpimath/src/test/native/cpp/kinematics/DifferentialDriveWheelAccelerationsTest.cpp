@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/acceleration.hpp"
+#include <wpi/units/acceleration.h>
 
 using namespace wpi::math;
 
@@ -20,16 +20,16 @@ TEST(DifferentialDriveWheelAccelerationsTest, DefaultConstructor) {
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, ParameterizedConstructor) {
-  DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps_sq,
-                                                         2.5_mps_sq};
+  DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps2,
+                                                         2.5_mps2};
 
   EXPECT_NEAR(wheelAccelerations.left.value(), 1.5, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.right.value(), 2.5, kEpsilon);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Plus) {
-  const DifferentialDriveWheelAccelerations left{1.0_mps_sq, 0.5_mps_sq};
-  const DifferentialDriveWheelAccelerations right{2.0_mps_sq, 1.5_mps_sq};
+  const DifferentialDriveWheelAccelerations left{1.0_mps2, 0.5_mps2};
+  const DifferentialDriveWheelAccelerations right{2.0_mps2, 1.5_mps2};
 
   const auto wheelAccelerations = left + right;
 
@@ -38,8 +38,8 @@ TEST(DifferentialDriveWheelAccelerationsTest, Plus) {
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Minus) {
-  const DifferentialDriveWheelAccelerations left{1.0_mps_sq, 0.5_mps_sq};
-  const DifferentialDriveWheelAccelerations right{2.0_mps_sq, 0.5_mps_sq};
+  const DifferentialDriveWheelAccelerations left{1.0_mps2, 0.5_mps2};
+  const DifferentialDriveWheelAccelerations right{2.0_mps2, 0.5_mps2};
 
   const auto wheelAccelerations = left - right;
 
@@ -49,7 +49,7 @@ TEST(DifferentialDriveWheelAccelerationsTest, Minus) {
 
 TEST(DifferentialDriveWheelAccelerationsTest, UnaryMinus) {
   const auto wheelAccelerations =
-      -DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq};
+      -DifferentialDriveWheelAccelerations{1.0_mps2, 0.5_mps2};
 
   EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.right.value(), -0.5, kEpsilon);
@@ -57,7 +57,7 @@ TEST(DifferentialDriveWheelAccelerationsTest, UnaryMinus) {
 
 TEST(DifferentialDriveWheelAccelerationsTest, Multiplication) {
   const auto wheelAccelerations =
-      DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} * 2.0;
+      DifferentialDriveWheelAccelerations{1.0_mps2, 0.5_mps2} * 2.0;
 
   EXPECT_NEAR(wheelAccelerations.left.value(), 2.0, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.right.value(), 1.0, kEpsilon);
@@ -65,7 +65,7 @@ TEST(DifferentialDriveWheelAccelerationsTest, Multiplication) {
 
 TEST(DifferentialDriveWheelAccelerationsTest, Division) {
   const auto wheelAccelerations =
-      DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} / 2.0;
+      DifferentialDriveWheelAccelerations{1.0_mps2, 0.5_mps2} / 2.0;
 
   EXPECT_NEAR(wheelAccelerations.left.value(), 0.5, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.right.value(), 0.25, kEpsilon);

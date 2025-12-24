@@ -8,7 +8,7 @@ extra_includes:
 classes:
   wpi::math::TrajectoryGenerator:
     force_type_casters:
-    - wpi::units::unit_t
+    - wpi::units::unit
     - wpi::units::curvature_t
     methods:
       GenerateTrajectory:

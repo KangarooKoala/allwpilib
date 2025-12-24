@@ -10,7 +10,7 @@ using namespace wpi::math;
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
+    wpi::units::meters<> leftDistance, wpi::units::meters<> rightDistance,
     const Pose2d& initialPose)
     : DifferentialDrivePoseEstimator{
           kinematics,  gyroAngle,          leftDistance,   rightDistance,
@@ -18,7 +18,7 @@ DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
 
 DifferentialDrivePoseEstimator::DifferentialDrivePoseEstimator(
     DifferentialDriveKinematics& kinematics, const Rotation2d& gyroAngle,
-    wpi::units::meter_t leftDistance, wpi::units::meter_t rightDistance,
+    wpi::units::meters<> leftDistance, wpi::units::meters<> rightDistance,
     const Pose2d& initialPose, const wpi::util::array<double, 3>& stateStdDevs,
     const wpi::util::array<double, 3>& visionMeasurementStdDevs)
     : PoseEstimator(kinematics, m_odometryImpl, stateStdDevs,

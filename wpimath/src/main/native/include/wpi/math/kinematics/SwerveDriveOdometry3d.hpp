@@ -13,7 +13,7 @@
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/timestamp.h"
 

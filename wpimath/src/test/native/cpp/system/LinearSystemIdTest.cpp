@@ -8,8 +8,8 @@
 
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/DCMotor.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/mass.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
 
 TEST(LinearSystemIDTest, IdentifyDrivetrainVelocitySystem) {
 #if __GNUC__ <= 11
@@ -83,12 +83,12 @@ TEST(LinearSystemIDTest, IdentifyPositionSystem) {
 
 #if __GNUC__ <= 11
   auto model =
-      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meter>(
-          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meters_>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #else
   constexpr auto model =
-      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meter>(
-          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meters_>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(
@@ -106,12 +106,12 @@ TEST(LinearSystemIDTest, IdentifyVelocitySystem) {
 
 #if __GNUC__ <= 11
   auto model =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meter>(
-          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters_>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #else
   constexpr auto model =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meter>(
-          kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters_>(
+          kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-kv / ka}, 0.001));

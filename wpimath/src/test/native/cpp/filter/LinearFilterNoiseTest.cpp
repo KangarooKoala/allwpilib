@@ -12,7 +12,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 // Filter constants
 static constexpr auto kFilterStep = 5_ms;

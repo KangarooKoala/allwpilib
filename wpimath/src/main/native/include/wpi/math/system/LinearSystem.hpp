@@ -13,7 +13,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Discretization.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/Algorithm.hpp"
 #include "wpi/util/SmallVector.hpp"
 
@@ -161,7 +161,7 @@ class LinearSystem {
    * @param dt       Timestep for model update.
    */
   StateVector CalculateX(const StateVector& x, const InputVector& clampedU,
-                         wpi::units::second_t dt) const {
+                         wpi::units::seconds<> dt) const {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);

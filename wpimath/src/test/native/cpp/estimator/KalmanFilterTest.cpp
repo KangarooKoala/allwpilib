@@ -12,8 +12,8 @@
 
 #include "wpi/math/system/plant/DCMotor.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
-#include "wpi/units/moment_of_inertia.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/moment_of_inertia.h>
+#include <wpi/units/time.h>
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = wpi::math::DCMotor::NEO();

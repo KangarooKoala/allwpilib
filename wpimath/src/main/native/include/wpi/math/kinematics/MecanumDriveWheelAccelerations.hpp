@@ -8,8 +8,7 @@
 #include <array>
 #include <cmath>
 
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/math.hpp"
+#include <wpi/units/acceleration.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -20,22 +19,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelAccelerations {
   /**
    * Acceleration of the front-left wheel.
    */
-  units::meters_per_second_squared_t frontLeft = 0_mps_sq;
+  units::meters_per_second_squared<> frontLeft = 0_mps2;
 
   /**
    * Acceleration of the front-right wheel.
    */
-  units::meters_per_second_squared_t frontRight = 0_mps_sq;
+  units::meters_per_second_squared<> frontRight = 0_mps2;
 
   /**
    * Acceleration of the rear-left wheel.
    */
-  units::meters_per_second_squared_t rearLeft = 0_mps_sq;
+  units::meters_per_second_squared<> rearLeft = 0_mps2;
 
   /**
    * Acceleration of the rear-right wheel.
    */
-  units::meters_per_second_squared_t rearRight = 0_mps_sq;
+  units::meters_per_second_squared<> rearRight = 0_mps2;
 
   /**
    * Adds two MecanumDriveWheelAccelerations and returns the sum.

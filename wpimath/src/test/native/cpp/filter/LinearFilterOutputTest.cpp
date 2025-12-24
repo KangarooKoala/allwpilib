@@ -14,7 +14,7 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/array.hpp"
 
 // Filter constants
@@ -123,7 +123,7 @@ INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
                                          kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
+void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::seconds<> h,
                           double min, double max) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
@@ -155,7 +155,7 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
 }
 
 template <int Derivative, int Samples, typename F, typename DfDx>
-void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
+void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::seconds<> h,
                            double min, double max) {
   auto filter =
       wpi::math::LinearFilter<double>::BackwardFiniteDifference<Derivative,

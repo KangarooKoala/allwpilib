@@ -12,8 +12,8 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 using namespace wpi::math;
 

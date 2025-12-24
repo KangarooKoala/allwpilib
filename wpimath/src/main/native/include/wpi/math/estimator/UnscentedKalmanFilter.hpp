@@ -16,7 +16,7 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -91,7 +91,7 @@ class UnscentedKalmanFilter {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       std::function<OutputVector(const StateVector&, const InputVector&)> h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
     m_contQ = CovarianceMatrix(stateStdDevs);
     m_contR = CovarianceMatrix(measurementStdDevs);
@@ -161,7 +161,7 @@ class UnscentedKalmanFilter {
           residualFuncY,
       std::function<StateVector(const StateVector&, const StateVector&)>
           addFuncX,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : m_f(std::move(f)),
         m_h(std::move(h)),
         m_meanFuncX(std::move(meanFuncX)),
@@ -251,7 +251,7 @@ class UnscentedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, wpi::units::second_t dt) {
+  void Predict(const InputVector& u, wpi::units::seconds<> dt) {
     m_dt = dt;
 
     // Discretize Q before projecting mean and covariance forward
@@ -491,7 +491,7 @@ class UnscentedKalmanFilter {
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
   Matrixd<States, NumSigmas> m_sigmasF;
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   SigmaPoints m_pts;
 };

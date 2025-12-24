@@ -12,7 +12,7 @@
 #include "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveOdometry3d.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

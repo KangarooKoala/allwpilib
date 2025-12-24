@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-#include "wpi/units/acceleration.hpp"
+#include <wpi/units/acceleration.h>
 
 using namespace wpi::math;
 
@@ -21,18 +21,18 @@ TEST(SwerveModuleAccelerationsTest, DefaultConstructor) {
 }
 
 TEST(SwerveModuleAccelerationsTest, ParameterizedConstructor) {
-  SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations{2.5_mps2, Rotation2d{1.5_rad}};
 
   EXPECT_NEAR(moduleAccelerations.acceleration.value(), 2.5, kEpsilon);
   EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, kEpsilon);
 }
 
 TEST(SwerveModuleAccelerationsTest, Equals) {
-  SwerveModuleAcceleration moduleAccelerations1{2.0_mps_sq,
+  SwerveModuleAcceleration moduleAccelerations1{2.0_mps2,
                                                 Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations2{2.0_mps_sq,
+  SwerveModuleAcceleration moduleAccelerations2{2.0_mps2,
                                                 Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations3{2.1_mps_sq,
+  SwerveModuleAcceleration moduleAccelerations3{2.1_mps2,
                                                 Rotation2d{1.5_rad}};
 
   EXPECT_EQ(moduleAccelerations1, moduleAccelerations2);

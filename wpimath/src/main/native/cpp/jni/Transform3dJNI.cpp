@@ -9,8 +9,8 @@
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/geometry/Twist3d.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;
@@ -28,8 +28,8 @@ Java_org_wpilib_math_jni_Transform3dJNI_log
    jdouble relQx, jdouble relQy, jdouble relQz)
 {
   wpi::math::Transform3d transform3d{
-      wpi::units::meter_t{relX}, wpi::units::meter_t{relY},
-      wpi::units::meter_t{relZ},
+      wpi::units::meters<>{relX}, wpi::units::meters<>{relY},
+      wpi::units::meters<>{relZ},
       wpi::math::Rotation3d{wpi::math::Quaternion{relQw, relQx, relQy, relQz}}};
 
   wpi::math::Twist3d result = transform3d.Log();

@@ -7,8 +7,8 @@
 #include "org_wpilib_math_jni_Twist3dJNI.h"
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/math/geometry/Twist3d.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::util::java;
@@ -26,9 +26,9 @@ Java_org_wpilib_math_jni_Twist3dJNI_exp
    jdouble twistRx, jdouble twistRy, jdouble twistRz)
 {
   wpi::math::Twist3d twist{
-      wpi::units::meter_t{twistDx},  wpi::units::meter_t{twistDy},
-      wpi::units::meter_t{twistDz},  wpi::units::radian_t{twistRx},
-      wpi::units::radian_t{twistRy}, wpi::units::radian_t{twistRz}};
+      wpi::units::meters<>{twistDx},  wpi::units::meters<>{twistDy},
+      wpi::units::meters<>{twistDz},  wpi::units::radians<>{twistRx},
+      wpi::units::radians<>{twistRy}, wpi::units::radians<>{twistRz}};
 
   wpi::math::Transform3d result = twist.Exp();
 

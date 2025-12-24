@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 namespace wpi::math {
 
@@ -34,8 +34,8 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
    */
   [[deprecated("Use constructor taking Ellipse2d instead.")]]
   constexpr EllipticalRegionConstraint(const Translation2d& center,
-                                       wpi::units::meter_t xWidth,
-                                       wpi::units::meter_t yWidth,
+                                       wpi::units::meters<> xWidth,
+                                       wpi::units::meters<> yWidth,
                                        const Rotation2d& rotation,
                                        const Constraint& constraint)
       : m_ellipse{Pose2d{center, rotation}, xWidth / 2.0, yWidth / 2.0},
@@ -52,20 +52,20 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
                                        const Constraint& constraint)
       : m_ellipse{ellipse}, m_constraint{constraint} {}
 
-  constexpr wpi::units::meters_per_second_t MaxVelocity(
+  constexpr wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return wpi::units::meters_per_second_t{
+      return wpi::units::meters_per_second<>{
           std::numeric_limits<double>::infinity()};
     }
   }
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t speed) const override {
+      wpi::units::meters_per_second<> speed) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, speed);
     } else {

@@ -11,7 +11,7 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveOdometry.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

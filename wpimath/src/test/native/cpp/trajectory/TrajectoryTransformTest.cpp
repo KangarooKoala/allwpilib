@@ -31,7 +31,7 @@ void TestSameShapedTrajectory(
 }
 
 TEST(TrajectoryTransformsTest, TransformBy) {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
+  wpi::math::TrajectoryConfig config{3_mps, 3_mps2};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, config);
 
@@ -47,7 +47,7 @@ TEST(TrajectoryTransformsTest, TransformBy) {
 }
 
 TEST(TrajectoryTransformsTest, RelativeTo) {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
+  wpi::math::TrajectoryConfig config{3_mps, 3_mps2};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
       wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
       wpi::math::Pose2d{5_m, 7_m, 90_deg}, config);

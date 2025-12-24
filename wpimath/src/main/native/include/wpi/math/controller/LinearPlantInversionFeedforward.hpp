@@ -12,7 +12,7 @@
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::math {
 
@@ -45,7 +45,7 @@ class LinearPlantInversionFeedforward {
   template <int Outputs>
   LinearPlantInversionFeedforward(
       const LinearSystem<States, Inputs, Outputs>& plant,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : LinearPlantInversionFeedforward(plant.A(), plant.B(), dt) {}
 
   /**
@@ -57,7 +57,7 @@ class LinearPlantInversionFeedforward {
    */
   LinearPlantInversionFeedforward(const Matrixd<States, States>& A,
                                   const Matrixd<States, Inputs>& B,
-                                  wpi::units::second_t dt)
+                                  wpi::units::seconds<> dt)
       : m_dt(dt) {
     DiscretizeAB<States, Inputs>(A, B, dt, &m_A, &m_B);
     Reset();
@@ -151,7 +151,7 @@ class LinearPlantInversionFeedforward {
   Matrixd<States, States> m_A;
   Matrixd<States, Inputs> m_B;
 
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   // Current reference
   StateVector m_r;

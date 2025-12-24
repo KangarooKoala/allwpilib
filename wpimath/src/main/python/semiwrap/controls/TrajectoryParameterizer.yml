@@ -4,7 +4,7 @@ defaults:
 classes:
   wpi::math::TrajectoryParameterizer:
     force_type_casters:
-    - wpi::units::unit_t
+    - wpi::units::unit
     - wpi::units::curvature_t
     methods:
       TimeParameterizeTrajectory:
