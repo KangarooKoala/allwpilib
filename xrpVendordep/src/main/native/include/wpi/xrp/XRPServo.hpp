@@ -9,7 +9,7 @@
 #include <string>
 
 #include "wpi/hal/SimDevice.h"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 
 namespace wpi::xrp {
 
@@ -37,14 +37,14 @@ class XRPServo {
    *
    * @param angle Desired angle in radians
    */
-  void SetAngle(wpi::units::radian_t angle);
+  void SetAngle(wpi::units::radians<> angle);
 
   /**
    * Get the servo angle.
    *
    * @return Current servo angle in radians
    */
-  wpi::units::radian_t GetAngle() const;
+  wpi::units::radians<> GetAngle() const;
 
   /**
    * Set the servo position.
