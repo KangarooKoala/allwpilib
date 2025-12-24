@@ -72,10 +72,10 @@ index 9566128b1b..3481866255 100644
 \ No newline at end of file
 +} // namespace pybind11
 diff --git a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
-index e154cd924e..91a314fe2d 100644
+index e154cd924e..4da3f4d98b 100644
 --- a/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
 +++ b/wpimath/src/main/python/wpimath/_impl/src/type_casters/units_compound_type_caster.h
-@@ -33,54 +33,55 @@ struct handle_type_name<
+@@ -33,54 +33,54 @@ struct handle_type_name<
    static constexpr auto name = _("wpimath.units.units_per_second_squared");
  };
  
@@ -133,7 +133,6 @@ index e154cd924e..91a314fe2d 100644
  
 -using unit_seconds = wpi::units::compound_conversion_factor<wpi::units::dimensionless_, wpi::units::seconds_>;
 -using unit_seconds_squared = wpi::units::compound_conversion_factor<unit_seconds, wpi::units::seconds_>;
-+// Are these necessary?
 +using unit_seconds_ = wpi::units::compound_conversion_factor<wpi::units::dimensionless_, wpi::units::seconds_>;
 +using unit_seconds_squared_ = wpi::units::compound_conversion_factor<unit_seconds_, wpi::units::seconds_>;
  
