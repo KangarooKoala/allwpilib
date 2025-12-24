@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/simulation/SimDeviceSim.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 using namespace wpi;
 
@@ -18,6 +18,6 @@ SharpIRSim::SharpIRSim(int channel) {
   m_simRange = deviceSim.GetDouble("Range (m)");
 }
 
-void SharpIRSim::SetRange(wpi::units::meter_t range) {
+void SharpIRSim::SetRange(wpi::units::meters<> range) {
   m_simRange.Set(range.value());
 }

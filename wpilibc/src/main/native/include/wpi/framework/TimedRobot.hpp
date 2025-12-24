@@ -13,9 +13,8 @@
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/frequency.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
 #include "wpi/util/priority_queue.hpp"
 
 namespace wpi {
@@ -49,14 +48,14 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit TimedRobot(wpi::units::second_t period = kDefaultPeriod);
+  explicit TimedRobot(wpi::units::seconds<> period = kDefaultPeriod);
 
   /**
    * Constructor for TimedRobot.
    *
    * @param frequency The frequency of the robot loop function.
    */
-  explicit TimedRobot(wpi::units::hertz_t frequency);
+  explicit TimedRobot(wpi::units::hertz<> frequency);
 
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
@@ -86,8 +85,8 @@ class TimedRobot : public IterativeRobotBase {
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
-                   wpi::units::second_t offset = 0_s);
+  void AddPeriodic(std::function<void()> callback, wpi::units::seconds<> period,
+                   wpi::units::seconds<> offset = 0_s);
 
  private:
   class Callback {

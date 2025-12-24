@@ -9,13 +9,13 @@ classes:
       AddPeriodic:
         param_override:
           offset:
-            default: (wpi::units::second_t) 0_s
+            default: (wpi::units::seconds<>) 0_s
             disable_type_caster_default_cast: true
       TimedRobot:
         overloads:
-          wpi::units::second_t:
+          wpi::units::seconds<>:
             param_override:
               period:
-                default: (wpi::units::second_t) kDefaultPeriod
+                default: (wpi::units::seconds<>) kDefaultPeriod
                 disable_type_caster_default_cast: true
-          wpi::units::hertz_t:
+          wpi::units::hertz<>:

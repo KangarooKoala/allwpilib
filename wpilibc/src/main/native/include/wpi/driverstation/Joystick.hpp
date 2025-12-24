@@ -7,7 +7,7 @@
 #include <array>
 
 #include "wpi/driverstation/GenericHID.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 
 namespace wpi {
 
@@ -259,7 +259,7 @@ class Joystick : public GenericHID {
    *
    * @return The direction of the vector.
    */
-  wpi::units::radian_t GetDirection() const;
+  wpi::units::radians<> GetDirection() const;
 
  private:
   enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };

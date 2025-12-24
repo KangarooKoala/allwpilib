@@ -14,7 +14,7 @@
 #include "wpi/hal/Types.h"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/priority_queue.hpp"
 
 namespace wpi {
@@ -62,7 +62,7 @@ class PeriodicOpMode : public OpMode {
    *
    * @param period period for callbacks to the Periodic() function
    */
-  explicit PeriodicOpMode(wpi::units::second_t period = kDefaultPeriod);
+  explicit PeriodicOpMode(wpi::units::seconds<> period = kDefaultPeriod);
 
  public:
   ~PeriodicOpMode() override;
@@ -112,13 +112,13 @@ class PeriodicOpMode : public OpMode {
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
-                   wpi::units::second_t offset = 0_s);
+  void AddPeriodic(std::function<void()> callback, wpi::units::seconds<> period,
+                   wpi::units::seconds<> offset = 0_s);
 
   /**
    * Gets time period between calls to Periodic() functions.
    */
-  wpi::units::second_t GetPeriod() const { return m_period; }
+  wpi::units::seconds<> GetPeriod() const { return m_period; }
 
   /**
    * Prints list of epochs added so far and their times.
@@ -165,7 +165,7 @@ class PeriodicOpMode : public OpMode {
   wpi::hal::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;
   std::chrono::microseconds m_startTime;
   int64_t m_loopStartTimeUs = 0;
-  wpi::units::second_t m_period;
+  wpi::units::seconds<> m_period;
   Watchdog m_watchdog;
 
   wpi::util::priority_queue<Callback, std::vector<Callback>,

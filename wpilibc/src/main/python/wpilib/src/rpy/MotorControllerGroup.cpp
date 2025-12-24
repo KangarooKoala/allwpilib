@@ -23,7 +23,7 @@ void PyMotorControllerGroup::Set(double speed) {
   }
 }
 
-void PyMotorControllerGroup::SetVoltage(wpi::units::volt_t output) {
+void PyMotorControllerGroup::SetVoltage(wpi::units::volts<> output) {
   for (auto motorController : m_motorControllers) {
     motorController->SetVoltage(m_isInverted ? -output : output);
   }

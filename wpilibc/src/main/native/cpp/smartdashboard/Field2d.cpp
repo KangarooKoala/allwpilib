@@ -39,7 +39,7 @@ void Field2d::SetRobotPose(const wpi::math::Pose2d& pose) {
   m_objects[0]->SetPose(pose);
 }
 
-void Field2d::SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y,
+void Field2d::SetRobotPose(wpi::units::meters<> x, wpi::units::meters<> y,
                            wpi::math::Rotation2d rotation) {
   std::scoped_lock lock(m_mutex);
   m_objects[0]->SetPose(x, y, rotation);

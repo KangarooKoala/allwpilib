@@ -78,7 +78,7 @@ class Compressor : public wpi::util::Sendable,
    *
    * @return Current drawn by the compressor.
    */
-  wpi::units::ampere_t GetCurrent() const;
+  wpi::units::amperes<> GetCurrent() const;
 
   /**
    * If supported by the device, returns the analog input voltage (on channel
@@ -89,7 +89,7 @@ class Compressor : public wpi::util::Sendable,
    *
    * @return The analog input voltage, in volts.
    */
-  wpi::units::volt_t GetAnalogVoltage() const;
+  wpi::units::volts<> GetAnalogVoltage() const;
 
   /**
    * If supported by the device, returns the pressure read by the analog
@@ -100,7 +100,7 @@ class Compressor : public wpi::util::Sendable,
    *
    * @return The pressure read by the analog pressure sensor.
    */
-  wpi::units::pounds_per_square_inch_t GetPressure() const;
+  wpi::units::pounds_per_square_inch<> GetPressure() const;
 
   /**
    * Disable the compressor.
@@ -130,8 +130,8 @@ class Compressor : public wpi::util::Sendable,
    * @param maxPressure The maximum pressure. The compressor will turn off when
    * the pressure reaches this value.
    */
-  void EnableAnalog(wpi::units::pounds_per_square_inch_t minPressure,
-                    wpi::units::pounds_per_square_inch_t maxPressure);
+  void EnableAnalog(wpi::units::pounds_per_square_inch<> minPressure,
+                    wpi::units::pounds_per_square_inch<> maxPressure);
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This
@@ -162,8 +162,8 @@ class Compressor : public wpi::util::Sendable,
    * off when the pressure reaches this value or the pressure switch is
    * disconnected or indicates that the system is full.
    */
-  void EnableHybrid(wpi::units::pounds_per_square_inch_t minPressure,
-                    wpi::units::pounds_per_square_inch_t maxPressure);
+  void EnableHybrid(wpi::units::pounds_per_square_inch<> minPressure,
+                    wpi::units::pounds_per_square_inch<> maxPressure);
 
   /**
    * Returns the active compressor configuration.

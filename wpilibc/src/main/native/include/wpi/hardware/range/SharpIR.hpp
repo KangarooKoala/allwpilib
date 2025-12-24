@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -66,8 +66,8 @@ class SharpIR : public wpi::util::Sendable,
    * @param min Minimum distance to report
    * @param max Maximum distance to report
    */
-  SharpIR(int channel, double a, double b, wpi::units::meter_t min,
-          wpi::units::meter_t max);
+  SharpIR(int channel, double a, double b, wpi::units::meters<> min,
+          wpi::units::meters<> max);
 
   /**
    * Get the analog input channel number.
@@ -81,7 +81,7 @@ class SharpIR : public wpi::util::Sendable,
    *
    * @return range of the target returned by the sensor
    */
-  wpi::units::meter_t GetRange() const;
+  wpi::units::meters<> GetRange() const;
 
   void InitSendable(wpi::util::SendableBuilder& builder) override;
 
@@ -93,8 +93,8 @@ class SharpIR : public wpi::util::Sendable,
 
   double m_A;
   double m_B;
-  wpi::units::meter_t m_min;
-  wpi::units::meter_t m_max;
+  wpi::units::meters<> m_min;
+  wpi::units::meters<> m_max;
 };
 
 }  // namespace wpi

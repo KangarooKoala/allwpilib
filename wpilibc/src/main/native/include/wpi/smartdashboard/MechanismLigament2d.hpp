@@ -10,7 +10,7 @@
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 #include "wpi/util/Color8Bit.hpp"
 
 namespace wpi {
@@ -26,7 +26,7 @@ namespace wpi {
 class MechanismLigament2d : public MechanismObject2d {
  public:
   MechanismLigament2d(std::string_view name, double length,
-                      wpi::units::degree_t angle, double lineWidth = 6,
+                      wpi::units::degrees<> angle, double lineWidth = 6,
                       const wpi::util::Color8Bit& color = {235, 137, 52});
 
   /**
@@ -62,7 +62,7 @@ class MechanismLigament2d : public MechanismObject2d {
    *
    * @param angle the angle
    */
-  void SetAngle(wpi::units::degree_t angle);
+  void SetAngle(wpi::units::degrees<> angle);
 
   /**
    * Get the ligament's angle relative to its parent.

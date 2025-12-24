@@ -14,7 +14,7 @@
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableEntry.hpp"
 #include "wpi/smartdashboard/FieldObject2d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -62,7 +62,7 @@ class Field2d : public wpi::nt::NTSendable,
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y,
+  void SetRobotPose(wpi::units::meters<> x, wpi::units::meters<> y,
                     wpi::math::Rotation2d rotation);
 
   /**

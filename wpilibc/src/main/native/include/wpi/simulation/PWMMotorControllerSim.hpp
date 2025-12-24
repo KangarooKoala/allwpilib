@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 namespace wpi {
 

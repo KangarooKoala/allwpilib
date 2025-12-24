@@ -8,8 +8,8 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/frequency.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -107,7 +107,7 @@ class DutyCycleEncoder : public wpi::util::Sendable,
    *
    * @return duty cycle frequency
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Get if the sensor is connected
@@ -126,7 +126,7 @@ class DutyCycleEncoder : public wpi::util::Sendable,
    *
    * @param frequency the minimum frequency.
    */
-  void SetConnectedFrequencyThreshold(wpi::units::hertz_t frequency);
+  void SetConnectedFrequencyThreshold(wpi::units::hertz<> frequency);
 
   /**
    * Get the encoder value.
@@ -161,7 +161,7 @@ class DutyCycleEncoder : public wpi::util::Sendable,
    *
    * @param frequency the assumed frequency of the sensor
    */
-  void SetAssumedFrequency(wpi::units::hertz_t frequency);
+  void SetAssumedFrequency(wpi::units::hertz<> frequency);
 
   /**
    * Set if this encoder is inverted.
@@ -184,10 +184,10 @@ class DutyCycleEncoder : public wpi::util::Sendable,
   double MapSensorRange(double pos) const;
 
   std::shared_ptr<DutyCycle> m_dutyCycle;
-  wpi::units::hertz_t m_frequencyThreshold = {100_Hz};
+  wpi::units::hertz<> m_frequencyThreshold = {100_Hz};
   double m_fullRange;
   double m_expectedZero;
-  wpi::units::second_t m_period{0_s};
+  wpi::units::seconds<> m_period{0_s};
   double m_sensorMin{0.0};
   double m_sensorMax{1.0};
   bool m_isInverted{false};

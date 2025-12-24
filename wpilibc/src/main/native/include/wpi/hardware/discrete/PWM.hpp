@@ -8,7 +8,7 @@
 
 #include "wpi/hal/PWM.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -74,7 +74,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * @param time Microsecond PWM value.
    */
-  void SetPulseTime(wpi::units::microsecond_t time);
+  void SetPulseTime(wpi::units::microseconds<> time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
@@ -83,7 +83,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    *
    * @return Microsecond PWM control value.
    */
-  wpi::units::microsecond_t GetPulseTime() const;
+  wpi::units::microseconds<> GetPulseTime() const;
 
   /**
    * Temporarily disables the PWM output. The next set call will re-enable

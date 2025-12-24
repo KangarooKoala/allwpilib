@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/simulation/SimDeviceSim.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 using namespace wpi;
 using namespace wpi::sim;

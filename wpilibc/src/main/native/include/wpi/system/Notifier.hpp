@@ -14,8 +14,8 @@
 #include <utility>
 
 #include "wpi/hal/Types.h"
-#include "wpi/units/frequency.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
 #include "wpi/util/mutex.hpp"
 
 namespace wpi {
@@ -95,7 +95,7 @@ class Notifier {
    *
    * @param delay Time to wait before the callback is called.
    */
-  void StartSingle(wpi::units::second_t delay);
+  void StartSingle(wpi::units::seconds<> delay);
 
   /**
    * Run the callback periodically with the given period.
@@ -106,7 +106,7 @@ class Notifier {
    * @param period Period after which to call the callback starting one
    *               period after the call to this method.
    */
-  void StartPeriodic(wpi::units::second_t period);
+  void StartPeriodic(wpi::units::seconds<> period);
 
   /**
    * Run the callback periodically with the given frequency.
@@ -117,7 +117,7 @@ class Notifier {
    * @param frequency Frequency after which to call the callback starting one
    *                  period after the call to this method.
    */
-  void StartPeriodic(wpi::units::hertz_t frequency);
+  void StartPeriodic(wpi::units::hertz<> frequency);
 
   /**
    * Stop further callback invocations.

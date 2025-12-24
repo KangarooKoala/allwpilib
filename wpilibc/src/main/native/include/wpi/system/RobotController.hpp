@@ -9,8 +9,8 @@
 #include <functional>
 #include <string>
 
-#include "wpi/units/temperature.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/temperature.h>
+#include <wpi/units/voltage.h>
 
 namespace wpi {
 
@@ -82,7 +82,7 @@ class RobotController {
    *
    * @return The battery voltage in Volts.
    */
-  static wpi::units::volt_t GetBatteryVoltage();
+  static wpi::units::volts<> GetBatteryVoltage();
 
   /**
    * Check if the FPGA outputs are enabled.
@@ -175,7 +175,7 @@ class RobotController {
    *
    * @return The brownout voltage
    */
-  static wpi::units::volt_t GetBrownoutVoltage();
+  static wpi::units::volts<> GetBrownoutVoltage();
 
   /**
    * Set the voltage the roboRIO will brownout and disable all outputs.
@@ -185,14 +185,14 @@ class RobotController {
    *
    * @param brownoutVoltage The brownout voltage
    */
-  static void SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage);
+  static void SetBrownoutVoltage(wpi::units::volts<> brownoutVoltage);
 
   /**
    * Get the current CPU temperature.
    *
    * @return current CPU temperature
    */
-  static wpi::units::celsius_t GetCPUTemp();
+  static wpi::units::celsius<> GetCPUTemp();
 
   /**
    * Get the current status of the CAN bus.

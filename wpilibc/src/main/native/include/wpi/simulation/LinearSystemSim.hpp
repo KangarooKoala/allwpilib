@@ -10,7 +10,7 @@
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::sim {
 /**
@@ -50,7 +50,7 @@ class LinearSystemSim {
    *
    * @param dt The time between updates.
    */
-  void Update(wpi::units::second_t dt) {
+  void Update(wpi::units::seconds<> dt) {
     // Update x. By default, this is the linear system dynamics xₖ₊₁ = Axₖ +
     // Buₖ.
     m_x = UpdateX(m_x, m_u, dt);
@@ -133,7 +133,7 @@ class LinearSystemSim {
    */
   virtual wpi::math::Vectord<States> UpdateX(
       const wpi::math::Vectord<States>& currentXhat,
-      const wpi::math::Vectord<Inputs>& u, wpi::units::second_t dt) {
+      const wpi::math::Vectord<Inputs>& u, wpi::units::seconds<> dt) {
     return m_plant.CalculateX(currentXhat, u, dt);
   }
 

@@ -44,18 +44,18 @@ PWM::~PWM() {
   }
 }
 
-void PWM::SetPulseTime(wpi::units::microsecond_t time) {
+void PWM::SetPulseTime(wpi::units::microseconds<> time) {
   int32_t status = 0;
   HAL_SetPWMPulseTimeMicroseconds(m_handle, time.value(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-wpi::units::microsecond_t PWM::GetPulseTime() const {
+wpi::units::microseconds<> PWM::GetPulseTime() const {
   int32_t status = 0;
   double value = HAL_GetPWMPulseTimeMicroseconds(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 
-  return wpi::units::microsecond_t{value};
+  return wpi::units::microseconds<>{value};
 }
 
 void PWM::SetDisabled() {
@@ -102,6 +102,6 @@ void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
   builder.AddDoubleProperty(
       "Value", [=, this] { return GetPulseTime().value(); },
       [=, this](double value) {
-        SetPulseTime(wpi::units::microsecond_t{value});
+        SetPulseTime(wpi::units::microseconds<>{value});
       });
 }

@@ -16,7 +16,7 @@
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/voltage.h>
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -59,7 +59,7 @@ class PWMMotorController
    *
    * @param output The voltage to output.
    */
-  void SetVoltage(wpi::units::volt_t output) override;
+  void SetVoltage(wpi::units::volts<> output) override;
 
   /**
    * Get the recently set value of the PWM. This value is affected by the
@@ -77,7 +77,7 @@ class PWMMotorController
    * @return The voltage of the motor controller, nominally between -12 V and 12
    *   V.
    */
-  virtual wpi::units::volt_t GetVoltage() const;
+  virtual wpi::units::volts<> GetVoltage() const;
 
   void SetInverted(bool isInverted) override;
 
@@ -137,11 +137,11 @@ class PWMMotorController
   void SetSpeed(double speed);
   double GetSpeed() const;
 
-  void SetBounds(wpi::units::microsecond_t maxPwm,
-                 wpi::units::microsecond_t deadbandMaxPwm,
-                 wpi::units::microsecond_t centerPwm,
-                 wpi::units::microsecond_t deadbandMinPwm,
-                 wpi::units::microsecond_t minPwm);
+  void SetBounds(wpi::units::microseconds<> maxPwm,
+                 wpi::units::microseconds<> deadbandMaxPwm,
+                 wpi::units::microseconds<> centerPwm,
+                 wpi::units::microseconds<> deadbandMinPwm,
+                 wpi::units::microseconds<> minPwm);
 
  private:
   bool m_isInverted = false;
@@ -152,16 +152,16 @@ class PWMMotorController
   wpi::hal::SimDouble m_simSpeed;
 
   bool m_eliminateDeadband{0};
-  wpi::units::microsecond_t m_minPwm{0};
-  wpi::units::microsecond_t m_deadbandMinPwm{0};
-  wpi::units::microsecond_t m_centerPwm{0};
-  wpi::units::microsecond_t m_deadbandMaxPwm{0};
-  wpi::units::microsecond_t m_maxPwm{0};
+  wpi::units::microseconds<> m_minPwm{0};
+  wpi::units::microseconds<> m_deadbandMinPwm{0};
+  wpi::units::microseconds<> m_centerPwm{0};
+  wpi::units::microseconds<> m_deadbandMaxPwm{0};
+  wpi::units::microseconds<> m_maxPwm{0};
 
-  wpi::units::microsecond_t GetMinPositivePwm() const;
-  wpi::units::microsecond_t GetMaxNegativePwm() const;
-  wpi::units::microsecond_t GetPositiveScaleFactor() const;
-  wpi::units::microsecond_t GetNegativeScaleFactor() const;
+  wpi::units::microseconds<> GetMinPositivePwm() const;
+  wpi::units::microseconds<> GetMaxNegativePwm() const;
+  wpi::units::microseconds<> GetPositiveScaleFactor() const;
+  wpi::units::microseconds<> GetNegativeScaleFactor() const;
 
   PWM* GetPwm() { return &m_pwm; }
 };

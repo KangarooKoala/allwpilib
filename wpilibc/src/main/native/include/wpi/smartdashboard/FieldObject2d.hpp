@@ -13,7 +13,7 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/nt/DoubleArrayTopic.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -52,7 +52,7 @@ class FieldObject2d {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetPose(wpi::units::meter_t x, wpi::units::meter_t y,
+  void SetPose(wpi::units::meters<> x, wpi::units::meters<> y,
                wpi::math::Rotation2d rotation);
 
   /**

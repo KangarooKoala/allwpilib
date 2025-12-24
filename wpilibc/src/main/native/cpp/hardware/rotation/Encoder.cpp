@@ -35,14 +35,14 @@ void Encoder::Reset() {
   WPILIB_CheckErrorStatus(status, "Reset");
 }
 
-wpi::units::second_t Encoder::GetPeriod() const {
+wpi::units::seconds<> Encoder::GetPeriod() const {
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
   WPILIB_CheckErrorStatus(status, "GetPeriod");
-  return wpi::units::second_t{value};
+  return wpi::units::seconds<>{value};
 }
 
-void Encoder::SetMaxPeriod(wpi::units::second_t maxPeriod) {
+void Encoder::SetMaxPeriod(wpi::units::seconds<> maxPeriod) {
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod.value(), &status);
   WPILIB_CheckErrorStatus(status, "SetMaxPeriod");

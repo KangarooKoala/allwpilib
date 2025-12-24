@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 
 namespace wpi {
 

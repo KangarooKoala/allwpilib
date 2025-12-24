@@ -15,7 +15,7 @@ using namespace wpi;
 static constexpr std::string_view kSmartDashboardType = "line";
 
 MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
-                                         wpi::units::degree_t angle,
+                                         wpi::units::degrees<> angle,
                                          double lineWeight,
                                          const wpi::util::Color8Bit& color)
     : MechanismObject2d{name},
@@ -53,7 +53,7 @@ void MechanismLigament2d::SetColor(const wpi::util::Color8Bit& color) {
   }
 }
 
-void MechanismLigament2d::SetAngle(wpi::units::degree_t angle) {
+void MechanismLigament2d::SetAngle(wpi::units::degrees<> angle) {
   std::scoped_lock lock(m_mutex);
   m_angle = angle.value();
   if (m_angleEntry) {

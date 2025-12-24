@@ -9,9 +9,9 @@
 #include "EdgeConfiguration.hpp"
 #include "wpi/hal/Counter.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/frequency.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -53,14 +53,14 @@ class Tachometer : public wpi::util::Sendable,
    *
    * @return Current frequency.
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Gets the tachometer period.
    *
    * @return Current period.
    */
-  wpi::units::second_t GetPeriod() const;
+  wpi::units::seconds<> GetPeriod() const;
 
   /**
    * Gets the number of edges per revolution.
@@ -83,7 +83,7 @@ class Tachometer : public wpi::util::Sendable,
    *
    * @return Current RPS.
    */
-  wpi::units::turns_per_second_t GetRevolutionsPerSecond() const;
+  wpi::units::turns_per_second<> GetRevolutionsPerSecond() const;
 
   /**
    * Gets the current tachometer revolutions per minute.
@@ -92,7 +92,7 @@ class Tachometer : public wpi::util::Sendable,
    *
    * @return Current RPM.
    */
-  wpi::units::revolutions_per_minute_t GetRevolutionsPerMinute() const;
+  wpi::units::revolutions_per_minute<> GetRevolutionsPerMinute() const;
 
   /**
    * Gets if the tachometer is stopped.
@@ -106,7 +106,7 @@ class Tachometer : public wpi::util::Sendable,
    *
    * @param maxPeriod The max period.
    */
-  void SetMaxPeriod(wpi::units::second_t maxPeriod);
+  void SetMaxPeriod(wpi::units::seconds<> maxPeriod);
 
  protected:
   void InitSendable(wpi::util::SendableBuilder& builder) override;
