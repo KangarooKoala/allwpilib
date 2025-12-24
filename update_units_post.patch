@@ -1,3 +1,16 @@
+diff --git a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
+index ee315fc464..0576be9b2c 100644
+--- a/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
++++ b/wpilibc/src/test/native/cpp/UnitNetworkTablesTest.cpp
+@@ -23,7 +23,7 @@ TEST_F(UnitNetworkTablesTest, Publish) {
+       wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
+   auto pub = topic.Publish();
+   pub.Set(2_m);
+-  ASSERT_EQ(topic.GetProperty("unit"), "meter");
++  ASSERT_EQ(topic.GetProperty("unit"), "meters");
+   ASSERT_TRUE(topic.IsMatchingUnit());
+ }
+ 
 diff --git a/wpimath/robotpy_native_build_info.bzl b/wpimath/robotpy_native_build_info.bzl
 index 103ac9ee62..16ab09f0f8 100644
 --- a/wpimath/robotpy_native_build_info.bzl
