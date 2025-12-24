@@ -69,7 +69,7 @@ class CommandJoystick : public CommandGenericHID {
    *
    * @return The direction of the vector.
    */
-  wpi::units::radian_t GetDirection() const;
+  wpi::units::radians<> GetDirection() const;
 
  private:
   wpi::Joystick m_hid;

@@ -12,7 +12,7 @@
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/FunctionExtras.hpp"
 
 namespace wpi::cmd {
@@ -279,7 +279,7 @@ class Trigger {
    * @param type The debounce type.
    * @return The debounced trigger.
    */
-  Trigger Debounce(wpi::units::second_t debounceTime,
+  Trigger Debounce(wpi::units::seconds<> debounceTime,
                    wpi::math::Debouncer::DebounceType type =
                        wpi::math::Debouncer::DebounceType::kRising);
 

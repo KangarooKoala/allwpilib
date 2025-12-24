@@ -8,7 +8,7 @@
 
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::cmd {
 /**
@@ -37,7 +37,7 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    *
    * @param time the match time after which to end, in seconds
    */
-  explicit WaitUntilCommand(wpi::units::second_t time);
+  explicit WaitUntilCommand(wpi::units::seconds<> time);
 
   WaitUntilCommand(WaitUntilCommand&& other) = default;
 

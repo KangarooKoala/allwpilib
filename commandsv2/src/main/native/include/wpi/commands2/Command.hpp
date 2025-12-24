@@ -11,7 +11,7 @@
 
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/Subsystem.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/Demangle.hpp"
 #include "wpi/util/SmallSet.hpp"
 #include "wpi/util/StackTrace.hpp"
@@ -192,7 +192,7 @@ class Command : public wpi::util::Sendable,
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  CommandPtr WithTimeout(wpi::units::second_t duration) &&;
+  CommandPtr WithTimeout(wpi::units::seconds<> duration) &&;
 
   /**
    * Decorates this command with an interrupt condition. If the specified

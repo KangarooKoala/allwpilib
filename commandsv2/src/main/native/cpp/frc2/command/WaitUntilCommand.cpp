@@ -13,7 +13,7 @@ using namespace wpi::cmd;
 WaitUntilCommand::WaitUntilCommand(std::function<bool()> condition)
     : m_condition{std::move(condition)} {}
 
-WaitUntilCommand::WaitUntilCommand(wpi::units::second_t time)
+WaitUntilCommand::WaitUntilCommand(wpi::units::seconds<> time)
     : m_condition{[=] { return wpi::Timer::GetMatchTime() - time > 0_s; }} {}
 
 bool WaitUntilCommand::IsFinished() {

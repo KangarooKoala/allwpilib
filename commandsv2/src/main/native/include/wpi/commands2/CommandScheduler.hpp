@@ -15,7 +15,7 @@
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Watchdog.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/FunctionExtras.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -57,7 +57,7 @@ class CommandScheduler final
    * Changes the period of the loop overrun watchdog. This should be kept in
    * sync with the TimedRobot period.
    */
-  void SetPeriod(wpi::units::second_t period);
+  void SetPeriod(wpi::units::seconds<> period);
 
   /**
    * Get the active button poll.
