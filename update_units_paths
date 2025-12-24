@@ -1,4 +1,6 @@
+apriltag/src
 benchmark/src
+ntcore/src
 wpimath/src
 wpimath/src/main/python/wpimath/_impl/src/PyTrajectoryConstraint.h
 wpimath/src/main/python/wpimath/_impl/src/type_casters/_units_base_type_caster.h
