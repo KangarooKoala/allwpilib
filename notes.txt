@@ -94,3 +94,5 @@ Notes:
    * Seems like an old change that didn't get properly updated and eventually reverted as it should have
  * cu_m to m3 (et al.)
  * No more metric_tons (instead tonnes)
+ * name() is now plural
+ * name() for derived units now returns nullptr (instead of compiler error from undefined function)
