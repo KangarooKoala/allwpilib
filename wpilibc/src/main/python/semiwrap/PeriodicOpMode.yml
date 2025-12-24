@@ -9,9 +9,17 @@ classes:
       End:
       GetLoopStartTime:
       AddPeriodic:
+        param_override:
+          offset:
+            default: (wpi::units::second_t) 0_s
+            disable_type_caster_default_cast: true
       GetPeriod:
       PrintWatchdogEpochs:
       OpModeRun:
       OpModeStop:
       PeriodicOpMode:
+        param_override:
+          period:
+            default: (wpi::units::second_t) kDefaultPeriod
+            disable_type_caster_default_cast: true
       LoopFunc:
