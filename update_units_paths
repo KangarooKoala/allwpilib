@@ -1,8 +1,10 @@
 apriltag/src
 benchmark/src
 commandsv2/src
+glass/src
 ntcore/src
 romiVendordep/src
+tools/sysid/src
 wpilibc/src
 wpilibc/src/main/python/wpilib/src/rpy/MotorControllerGroup.cpp
 wpilibc/src/main/python/wpilib/src/rpy/MotorControllerGroup.h
