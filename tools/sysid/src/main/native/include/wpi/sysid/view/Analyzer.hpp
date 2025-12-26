@@ -18,8 +18,8 @@
 #include "wpi/sysid/analysis/FeedbackAnalysis.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
 #include "wpi/sysid/view/AnalyzerPlot.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/StringMap.hpp"
 
@@ -223,7 +223,7 @@ class Analyzer : public wpi::glass::View {
   double m_accelRMSE;
   double m_Kp;
   double m_Kd;
-  wpi::units::millisecond_t m_timescale;
+  wpi::units::milliseconds<> m_timescale;
   bool m_timescaleValid = false;
 
   // Units

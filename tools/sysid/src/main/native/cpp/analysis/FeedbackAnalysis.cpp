@@ -10,14 +10,14 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/plant/LinearSystemId.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 using namespace sysid;
 
 using Kv_t = decltype(1_V / 1_mps);
-using Ka_t = decltype(1_V / 1_mps_sq);
+using Ka_t = decltype(1_V / 1_mps2);
 using Matrix1d = Eigen::Matrix<double, 1, 1>;
 
 FeedbackGains sysid::CalculatePositionFeedbackGains(
@@ -44,7 +44,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
   }
 
   auto system =
-      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meters>(
+      wpi::math::LinearSystemId::IdentifyPositionSystem<wpi::units::meters_>(
           Kv_t{Kv}, Ka_t{Ka});
 
   wpi::math::LinearQuadraticRegulator<2, 1> controller{
@@ -55,7 +55,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
       controller.K(0, 0) * preset.outputConversionFactor,
       controller.K(0, 1) * preset.outputConversionFactor /
           (preset.normalized ? 1
-                             : wpi::units::second_t{preset.period}.value())};
+                             : wpi::units::seconds<>{preset.period}.value())};
 }
 
 FeedbackGains sysid::CalculateVelocityFeedbackGains(
@@ -73,7 +73,7 @@ FeedbackGains sysid::CalculateVelocityFeedbackGains(
   }
 
   auto system =
-      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters>(
+      wpi::math::LinearSystemId::IdentifyVelocitySystem<wpi::units::meters_>(
           Kv_t{Kv}, Ka_t{Ka});
   wpi::math::LinearQuadraticRegulator<1, 1> controller{
       system, {params.qv}, {params.r}, preset.period};

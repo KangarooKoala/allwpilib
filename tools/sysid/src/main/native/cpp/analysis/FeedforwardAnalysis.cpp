@@ -15,8 +15,7 @@
 #include <fmt/ranges.h>
 
 #include "wpi/sysid/analysis/OLS.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace sysid {
 

@@ -18,7 +18,7 @@
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/Storage.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/array.hpp"
 
@@ -145,11 +145,11 @@ void ApplyMedianFilter(std::vector<PreparedData>* data, int window);
  * @param maxStepTime The maximum step test duration.
  * @return The updated minimum step test duration.
  */
-std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::units::second_t>
+std::tuple<wpi::units::seconds<>, wpi::units::seconds<>, wpi::units::seconds<>>
 TrimStepVoltageData(std::vector<PreparedData>* data,
                     AnalysisManager::Settings* settings,
-                    wpi::units::second_t minStepTime,
-                    wpi::units::second_t maxStepTime);
+                    wpi::units::seconds<> minStepTime,
+                    wpi::units::seconds<> maxStepTime);
 
 /**
  * Compute the mean time delta of the given data.
@@ -157,7 +157,7 @@ TrimStepVoltageData(std::vector<PreparedData>* data,
  * @param data A reference to all of the collected PreparedData
  * @return The mean time delta for all the data points
  */
-wpi::units::second_t GetMeanTimeDelta(const std::vector<PreparedData>& data);
+wpi::units::seconds<> GetMeanTimeDelta(const std::vector<PreparedData>& data);
 
 /**
  * Compute the mean time delta of the given data.
@@ -165,7 +165,7 @@ wpi::units::second_t GetMeanTimeDelta(const std::vector<PreparedData>& data);
  * @param data A reference to all of the collected PreparedData
  * @return The mean time delta for all the data points
  */
-wpi::units::second_t GetMeanTimeDelta(const Storage& data);
+wpi::units::seconds<> GetMeanTimeDelta(const Storage& data);
 
 /**
  * Creates a central finite difference filter that computes the nth
@@ -189,7 +189,7 @@ wpi::units::second_t GetMeanTimeDelta(const Storage& data);
  */
 template <int Derivative, int Samples>
 wpi::math::LinearFilter<double> CentralFiniteDifference(
-    wpi::units::second_t period) {
+    wpi::units::seconds<> period) {
   static_assert(Samples % 2 != 0, "Number of samples must be odd.");
 
   // Generate stencil points from -(samples - 1)/2 to (samples - 1)/2
@@ -223,10 +223,10 @@ wpi::math::LinearFilter<double> CentralFiniteDifference(
  */
 void InitialTrimAndFilter(wpi::util::StringMap<std::vector<PreparedData>>* data,
                           AnalysisManager::Settings* settings,
-                          std::vector<wpi::units::second_t>& positionDelays,
-                          std::vector<wpi::units::second_t>& velocityDelays,
-                          wpi::units::second_t& minStepTime,
-                          wpi::units::second_t& maxStepTime,
+                          std::vector<wpi::units::seconds<>>& positionDelays,
+                          std::vector<wpi::units::seconds<>>& velocityDelays,
+                          wpi::units::seconds<>& minStepTime,
+                          wpi::units::seconds<>& maxStepTime,
                           std::string_view unit = "");
 
 /**

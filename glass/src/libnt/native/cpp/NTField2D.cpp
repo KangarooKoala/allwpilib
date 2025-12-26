@@ -62,9 +62,9 @@ void NTField2DModel::ObjectModel::NTUpdate(const wpi::nt::Value& value) {
     m_poses.resize(size / 3);
     for (size_t i = 0; i < size / 3; ++i) {
       m_poses[i] = wpi::math::Pose2d{
-          wpi::units::meter_t{arr[i * 3 + 0]},
-          wpi::units::meter_t{arr[i * 3 + 1]},
-          wpi::math::Rotation2d{wpi::units::degree_t{arr[i * 3 + 2]}}};
+          wpi::units::meters<>{arr[i * 3 + 0]},
+          wpi::units::meters<>{arr[i * 3 + 1]},
+          wpi::math::Rotation2d{wpi::units::degrees<>{arr[i * 3 + 2]}}};
     }
   }
 }
