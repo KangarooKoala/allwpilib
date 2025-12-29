@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wpi/units/frequency.h>
 #include <wpi/units/time.h>
 
 namespace wpi::math {
@@ -48,7 +49,7 @@ class ExponentialProfile {
       wpi::units::compound_conversion_factor<Velocity,
                                 wpi::units::inverse<wpi::units::seconds_>>;
   using Input_t = wpi::units::unit<Input>;
-  using A_t = wpi::units::unit<wpi::units::inverse<wpi::units::seconds_>>;
+  using A_t = wpi::units::hertz<>;
   using B_t = wpi::units::unit<
       wpi::units::compound_conversion_factor<Acceleration, wpi::units::inverse<Input>>>;
   using KV = wpi::units::compound_conversion_factor<Input, wpi::units::inverse<Velocity>>;

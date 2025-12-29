@@ -15,6 +15,7 @@
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/angle.h>
+#include <wpi/units/frequency.h>
 #include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
