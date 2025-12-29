@@ -3343,7 +3343,7 @@ namespace wpi::units
 	}
 
 	/// Division of a dimensionless unit by a unit type with a linear scale
-	template<DimensionlessUnitType UnitTypeLhs, DimensionedUnitType UnitTypeRhs>
+	template<DimensionlessUnitType UnitTypeLhs, DimensionedUnitType UnitTypeRhs, std::enable_if_t<traits::is_dimensionless_unit_v<UnitTypeLhs>, int> = 0>
 		requires(traits::has_linear_scale_v<UnitTypeLhs, UnitTypeRhs> && traits::is_dimensionless_unit_v<UnitTypeLhs>)
 	constexpr auto operator/(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit<traits::strong_t<inverse<typename traits::unit_traits<UnitTypeRhs>::conversion_factor>>,
 		std::common_type_t<typename UnitTypeLhs::underlying_type, typename UnitTypeRhs::underlying_type>>
@@ -3363,7 +3363,7 @@ namespace wpi::units
 	}
 
 	/// Division of a dimensionless by a unit type with a linear scale
-	template<UnitType UnitTypeRhs, ArithmeticType T>
+	template<UnitType UnitTypeRhs, ArithmeticType T, std::enable_if_t<ArithmeticType<T>, int> = 0>
 		requires(traits::has_linear_scale_v<UnitTypeRhs>)
 	constexpr auto operator/(T lhs, const UnitTypeRhs& rhs) noexcept
 		-> unit<traits::strong_t<inverse<typename traits::unit_traits<UnitTypeRhs>::conversion_factor>>, std::common_type_t<T, typename UnitTypeRhs::underlying_type>>
@@ -3691,7 +3691,7 @@ namespace wpi::units
 	}
 
 	/// Subtraction between unit types with a decibel_scale and dimensionless dB units
-	template<DimensionlessUnitType UnitTypeLhs, DimensionedUnitType UnitTypeRhs>
+	template<DimensionlessUnitType UnitTypeLhs, DimensionedUnitType UnitTypeRhs, std::enable_if_t<traits::has_decibel_scale_v<UnitTypeLhs, UnitTypeRhs>, int> = 0>
 		requires(traits::has_decibel_scale_v<UnitTypeLhs, UnitTypeRhs>)
 	constexpr auto operator-(const UnitTypeLhs& lhs, const UnitTypeRhs& rhs) noexcept -> unit<traits::strong_t<inverse<typename traits::unit_traits<UnitTypeRhs>::conversion_factor>>,
 		std::common_type_t<typename UnitTypeLhs::underlying_type, typename UnitTypeRhs::underlying_type>, decibel_scale>

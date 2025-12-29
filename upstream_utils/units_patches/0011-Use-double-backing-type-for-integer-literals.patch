@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Fri, 23 Jan 2026 18:01:29 -0800
+Subject: [PATCH 11/11] Use double backing type for integer literals
+
+---
+ include/units/core.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 4d3c8f18ca89f68f0fe59c47cc8a9070298a6a74..5fba9d8b5b8ad7ae8490d2f3e42953155811d360 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -263,9 +263,9 @@ namespace units
+ 		{                                                                                                                                                                                              \
+ 			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                          \
+ 		}                                                                                                                                                                                              \
+-		constexpr namespaceName::namePlural<int> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
++		constexpr namespaceName::namePlural<double> operator""_##abbreviation(unsigned long long d) noexcept                                                                                              \
+ 		{                                                                                                                                                                                              \
+-			return namespaceName::namePlural<int>(static_cast<int>(d));                                                                                                                                \
++			return namespaceName::namePlural<double>(static_cast<double>(d));                                                                                                                                \
+ 		}                                                                                                                                                                                              \
+ 	}
+ #endif
