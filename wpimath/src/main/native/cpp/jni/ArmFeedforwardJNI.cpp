@@ -24,13 +24,13 @@ Java_org_wpilib_math_jni_ArmFeedforwardJNI_calculate
    jdouble dt)
 {
   return wpi::math::ArmFeedforward{
-      wpi::units::volt_t{ks}, wpi::units::volt_t{kg},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{kv},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{ka},
-      wpi::units::second_t{dt}}
-      .Calculate(wpi::units::radian_t{currentAngle},
-                 wpi::units::radians_per_second_t{currentVelocity},
-                 wpi::units::radians_per_second_t{nextVelocity})
+      wpi::units::volts<>{ks}, wpi::units::volts<>{kg},
+      wpi::units::unit<wpi::math::ArmFeedforward::kv_unit>{kv},
+      wpi::units::unit<wpi::math::ArmFeedforward::ka_unit>{ka},
+      wpi::units::seconds<>{dt}}
+      .Calculate(wpi::units::radians<>{currentAngle},
+                 wpi::units::radians_per_second<>{currentVelocity},
+                 wpi::units::radians_per_second<>{nextVelocity})
       .value();
 }
 

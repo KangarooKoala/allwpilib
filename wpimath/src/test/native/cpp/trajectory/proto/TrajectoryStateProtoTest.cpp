@@ -14,7 +14,7 @@ namespace {
 using ProtoType = wpi::util::Protobuf<wpi::math::Trajectory::State>;
 
 const Trajectory::State kExpectedData = Trajectory::State{
-    1.91_s, 4.4_mps, 17.4_mps_sq,
+    1.91_s, 4.4_mps, 17.4_mps2,
     Pose2d{Translation2d{1.74_m, 19.1_m}, Rotation2d{22.9_rad}},
     wpi::units::curvature_t{0.174}};
 }  // namespace

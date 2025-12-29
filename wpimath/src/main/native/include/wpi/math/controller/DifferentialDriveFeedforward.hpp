@@ -7,13 +7,13 @@
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angular_acceleration.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -39,11 +39,11 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * right wheels, in meters.
    */
   constexpr DifferentialDriveFeedforward(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps2) kALinear,
       decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meter_t trackwidth)
+      decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meters<> trackwidth)
       // See Models::DifferentialDriveFromSysId(decltype(1_V / 1_mps),
-      // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
+      // decltype(1_V / 1_mps2), decltype(1_V / 1_rad_per_s), decltype(1_V /
       // 1_rad_per_s_sq))
       : DifferentialDriveFeedforward{kVLinear, kALinear,
                                      kVAngular * 2.0 / trackwidth * 1_rad,
@@ -61,9 +61,9 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * second squared).
    */
   constexpr DifferentialDriveFeedforward(decltype(1_V / 1_mps) kVLinear,
-                                         decltype(1_V / 1_mps_sq) kALinear,
+                                         decltype(1_V / 1_mps2) kALinear,
                                          decltype(1_V / 1_mps) kVAngular,
-                                         decltype(1_V / 1_mps_sq) kAAngular)
+                                         decltype(1_V / 1_mps2) kAAngular)
       : m_plant{wpi::math::Models::DifferentialDriveFromSysId(
             kVLinear, kALinear, kVAngular, kAAngular)},
         m_kVLinear{kVLinear},
@@ -86,16 +86,16 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param dt Discretization timestep.
    */
   DifferentialDriveWheelVoltages Calculate(
-      wpi::units::meters_per_second_t currentLeftVelocity,
-      wpi::units::meters_per_second_t nextLeftVelocity,
-      wpi::units::meters_per_second_t currentRightVelocity,
-      wpi::units::meters_per_second_t nextRightVelocity,
-      wpi::units::second_t dt);
+      wpi::units::meters_per_second<> currentLeftVelocity,
+      wpi::units::meters_per_second<> nextLeftVelocity,
+      wpi::units::meters_per_second<> currentRightVelocity,
+      wpi::units::meters_per_second<> nextRightVelocity,
+      wpi::units::seconds<> dt);
 
   decltype(1_V / 1_mps) m_kVLinear;
-  decltype(1_V / 1_mps_sq) m_kALinear;
+  decltype(1_V / 1_mps2) m_kALinear;
   decltype(1_V / 1_mps) m_kVAngular;
-  decltype(1_V / 1_mps_sq) m_kAAngular;
+  decltype(1_V / 1_mps2) m_kAAngular;
 };
 }  // namespace wpi::math
 

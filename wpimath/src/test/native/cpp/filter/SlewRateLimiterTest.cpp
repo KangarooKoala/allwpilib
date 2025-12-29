@@ -6,27 +6,27 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
 #include "wpi/util/timestamp.h"
 
-static wpi::units::second_t now = 0_s;
+static wpi::units::seconds<> now = 0_s;
 
 class SlewRateLimiterTest : public ::testing::Test {
  protected:
   void SetUp() override {
     WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+        [] { return wpi::units::microseconds<>{now}.to<uint64_t>(); });
   }
 
   void TearDown() override { WPI_SetNowImpl(nullptr); }
 };
 
 TEST_F(SlewRateLimiterTest, SlewRateLimit) {
-  WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+  WPI_SetNowImpl([] { return wpi::units::microseconds<>{now}.to<uint64_t>(); });
 
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps);
 
   now += 1_s;
 
@@ -34,7 +34,7 @@ TEST_F(SlewRateLimiterTest, SlewRateLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps);
 
   now += 1_s;
 
@@ -42,7 +42,7 @@ TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
 }
 
 TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps, -0.5_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 

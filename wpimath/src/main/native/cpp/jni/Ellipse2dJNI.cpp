@@ -26,11 +26,11 @@ Java_org_wpilib_math_jni_Ellipse2dJNI_nearest
 {
   auto point =
       wpi::math::Ellipse2d{
-          wpi::math::Pose2d{wpi::units::meter_t{centerX},
-                            wpi::units::meter_t{centerY},
-                            wpi::units::radian_t{centerHeading}},
-          wpi::units::meter_t{xSemiAxis}, wpi::units::meter_t{ySemiAxis}}
-          .Nearest({wpi::units::meter_t{pointX}, wpi::units::meter_t{pointY}});
+          wpi::math::Pose2d{wpi::units::meters<>{centerX},
+                            wpi::units::meters<>{centerY},
+                            wpi::units::radians<>{centerHeading}},
+          wpi::units::meters<>{xSemiAxis}, wpi::units::meters<>{ySemiAxis}}
+          .Nearest({wpi::units::meters<>{pointX}, wpi::units::meters<>{pointY}});
 
   wpi::util::array buf{point.X().value(), point.Y().value()};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());

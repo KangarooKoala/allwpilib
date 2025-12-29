@@ -15,7 +15,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::math {
 

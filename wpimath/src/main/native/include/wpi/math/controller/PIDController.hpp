@@ -12,7 +12,7 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
@@ -37,7 +37,7 @@ class WPILIB_DLLEXPORT PIDController
    *               default is 20 milliseconds. Must be positive.
    */
   constexpr PIDController(double Kp, double Ki, double Kd,
-                          wpi::units::second_t period = 20_ms)
+                          wpi::units::seconds<> period = 20_ms)
       : m_Kp(Kp), m_Ki(Ki), m_Kd(Kd), m_period(period) {
     bool invalidGains = false;
     if (Kp < 0.0) {
@@ -174,7 +174,7 @@ class WPILIB_DLLEXPORT PIDController
    *
    * @return The period of the controller.
    */
-  constexpr wpi::units::second_t GetPeriod() const { return m_period; }
+  constexpr wpi::units::seconds<> GetPeriod() const { return m_period; }
 
   /**
    * Gets the error tolerance of this controller. Defaults to 0.05.
@@ -418,7 +418,7 @@ class WPILIB_DLLEXPORT PIDController
   double m_iZone = std::numeric_limits<double>::infinity();
 
   // The period (in seconds) of the control loop running this controller
-  wpi::units::second_t m_period;
+  wpi::units::seconds<> m_period;
 
   double m_maximumIntegral = 1.0;
 

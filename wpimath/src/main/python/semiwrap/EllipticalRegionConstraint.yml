@@ -10,15 +10,15 @@ classes:
     methods:
       EllipticalRegionConstraint:
         overloads:
-          const Translation2d&, wpi::units::meter_t, wpi::units::meter_t, const Rotation2d&, const Constraint&:
+          const Translation2d&, wpi::units::meters<>, wpi::units::meters<>, const Rotation2d&, const Constraint&:
           const Ellipse2d&, const Constraint&:
       MaxVelocity:
       MinMaxAcceleration:
 
     template_inline_code: |
       cls_EllipticalRegionConstraint
-        .def_static("fromFeet", [](const Translation2d& center, wpi::units::foot_t xWidth,
-                                   wpi::units::foot_t yWidth, const Rotation2d& rotation,
+        .def_static("fromFeet", [](const Translation2d& center, wpi::units::feet<> xWidth,
+                                   wpi::units::feet<> yWidth, const Rotation2d& rotation,
                                    const Constraint& constraint) {
           return std::make_shared<EllipticalRegionConstraint<Constraint>>(center, xWidth, yWidth, rotation, constraint);
         }, py::arg("center"), py::arg("xWidth"), py::arg("yWidth"), py::arg("rotation"), py::arg("constraint"))

@@ -11,8 +11,8 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/units/curvature.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/curvature.h>
+#include <wpi/units/length.h>
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -143,8 +143,8 @@ class Spline {
    * @return The Translation2d.
    */
   static constexpr Translation2d FromVector(const Eigen::Vector2d& vector) {
-    return Translation2d{wpi::units::meter_t{vector(0)},
-                         wpi::units::meter_t{vector(1)}};
+    return Translation2d{wpi::units::meters<>{vector(0)},
+                         wpi::units::meters<>{vector(1)}};
   }
 };
 

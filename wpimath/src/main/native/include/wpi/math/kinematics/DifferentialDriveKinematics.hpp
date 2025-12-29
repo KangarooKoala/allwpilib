@@ -14,8 +14,8 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -40,7 +40,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
+  constexpr explicit DifferentialDriveKinematics(wpi::units::meters<> trackwidth)
       : trackwidth(trackwidth) {
     if (!std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
@@ -83,8 +83,8 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * @param rightDistance The distance measured by the right encoder.
    * @return The resulting Twist2d.
    */
-  constexpr Twist2d ToTwist2d(const wpi::units::meter_t leftDistance,
-                              const wpi::units::meter_t rightDistance) const {
+  constexpr Twist2d ToTwist2d(const wpi::units::meters<> leftDistance,
+                              const wpi::units::meters<> rightDistance) const {
     return {(leftDistance + rightDistance) / 2, 0_m,
             (rightDistance - leftDistance) / trackwidth * 1_rad};
   }
@@ -105,7 +105,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
       const DifferentialDriveWheelAccelerations& wheelAccelerations)
       const override {
     return {(wheelAccelerations.left + wheelAccelerations.right) / 2.0,
-            0_mps_sq,
+            0_mps2,
             (wheelAccelerations.right - wheelAccelerations.left) / trackwidth *
                 1_rad};
   }
@@ -119,7 +119,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   }
 
   /// Differential drive trackwidth.
-  wpi::units::meter_t trackwidth;
+  wpi::units::meters<> trackwidth;
 };
 }  // namespace wpi::math
 

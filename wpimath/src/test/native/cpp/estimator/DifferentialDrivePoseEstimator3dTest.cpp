@@ -16,9 +16,9 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
 #include "wpi/util/print.hpp"
 
 void testFollowTrajectory(
@@ -30,11 +30,11 @@ void testFollowTrajectory(
     std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
-    const wpi::units::second_t dt, const wpi::units::second_t kVisionUpdateRate,
-    const wpi::units::second_t kVisionUpdateDelay, const bool checkError,
+    const wpi::units::seconds<> dt, const wpi::units::seconds<> kVisionUpdateRate,
+    const wpi::units::seconds<> kVisionUpdateDelay, const bool checkError,
     const bool debug) {
-  wpi::units::meter_t leftDistance = 0_m;
-  wpi::units::meter_t rightDistance = 0_m;
+  wpi::units::meters<> leftDistance = 0_m;
+  wpi::units::meters<> rightDistance = 0_m;
 
   estimator.ResetPosition(wpi::math::Rotation3d{}, leftDistance, rightDistance,
                           wpi::math::Pose3d{startingPose});
@@ -42,11 +42,11 @@ void testFollowTrajectory(
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  wpi::units::second_t t = 0_s;
+  wpi::units::seconds<> t = 0_s;
 
-  std::vector<std::pair<wpi::units::second_t, wpi::math::Pose2d>> visionPoses;
+  std::vector<std::pair<wpi::units::seconds<>, wpi::math::Pose2d>> visionPoses;
   std::vector<
-      std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::math::Pose2d>>
+      std::tuple<wpi::units::seconds<>, wpi::units::seconds<>, wpi::math::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -125,8 +125,8 @@ void testFollowTrajectory(
     wpi::util::print(
         "apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
-    wpi::units::second_t apply_time;
-    wpi::units::second_t measure_time;
+    wpi::units::seconds<> apply_time;
+    wpi::units::seconds<> measure_time;
     wpi::math::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
@@ -175,7 +175,7 @@ TEST(DifferentialDrivePoseEstimator3dTest, Accuracy) {
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
+          wpi::math::TrajectoryConfig(2_mps, 2_mps2));
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -207,11 +207,11 @@ TEST(DifferentialDrivePoseEstimator3dTest, BadInitialPose) {
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
+          wpi::math::TrajectoryConfig(2_mps, 2_mps2));
 
-  for (wpi::units::degree_t offset_direction_degs = 0_deg;
+  for (wpi::units::degrees<> offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
-    for (wpi::units::degree_t offset_heading_degs = 0_deg;
+    for (wpi::units::degrees<> offset_heading_degs = 0_deg;
          offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
@@ -271,9 +271,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 0_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 0_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
         0_deg);
 
@@ -281,9 +281,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 3_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 1_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
         90_deg);
 
@@ -291,9 +291,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, SimultaneousVisionMeasurements) {
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 2_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 4_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().ToRotation2d().Radians() -
         180_deg);
 
@@ -357,9 +357,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, TestSampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(wpi::units::second_t{time},
-                             wpi::math::Rotation3d{}, wpi::units::meter_t{time},
-                             wpi::units::meter_t{time});
+    estimator.UpdateWithTime(wpi::units::seconds<>{time},
+                             wpi::math::Rotation3d{}, wpi::units::meters<>{time},
+                             wpi::units::meters<>{time});
   }
 
   // Sample at an added time

@@ -39,22 +39,22 @@ inline_code: |
   cls_State
     .def(
       py::init<
-        wpi::units::second_t,
-        wpi::units::meters_per_second_t,
-        wpi::units::meters_per_second_squared_t,
+        wpi::units::seconds<>,
+        wpi::units::meters_per_second<>,
+        wpi::units::meters_per_second_squared<>,
         Pose2d,
         wpi::units::curvature_t
       >(),
       py::arg("t") = 0_s,
       py::arg("velocity") = 0_mps,
-      py::arg("acceleration") = 0_mps_sq,
+      py::arg("acceleration") = 0_mps2,
       py::arg("pose") = Pose2d(),
       py::arg("curvature") = 0.0
     )
-    .def_property_readonly("velocity_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second_t {
+    .def_property_readonly("velocity_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second<> {
       return self->velocity;
     })
-    .def_property_readonly("acceleration_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second_squared_t {
+    .def_property_readonly("acceleration_fps", [](wpi::math::Trajectory::State * self) -> wpi::units::feet_per_second_squared<> {
       return self->acceleration;
     })
     .def("__repr__", [](wpi::math::Trajectory::State *self) {

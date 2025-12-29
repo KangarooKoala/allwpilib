@@ -7,18 +7,17 @@
 #include <gtest/gtest.h>
 
 #include "wpi/math/system/Models.hpp"
-#include "wpi/units/math.hpp"
 
 namespace wpi::math {
 
 TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr wpi::units::second_t dt = 5_ms;
-  constexpr auto maxA = 2_mps_sq;
+  constexpr wpi::units::seconds<> dt = 5_ms;
+  constexpr auto maxA = 2_mps2;
   constexpr auto maxAlpha = 2_rad_per_s_sq;
 
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});
 
@@ -32,15 +31,15 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    EXPECT_GT(wpi::units::math::abs(a), maxA);
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
+    EXPECT_GT(wpi::units::abs(a), maxA);
   }
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{-12.0, 12.0};
-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+    wpi::units::radians_per_second_squared<> alpha{(accels(1) - accels(0)) /
                                                    trackwidth.value()};
-    EXPECT_GT(wpi::units::math::abs(alpha), maxAlpha);
+    EXPECT_GT(wpi::units::abs(alpha), maxAlpha);
   }
 
   // Forward
@@ -48,19 +47,19 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
+    wpi::units::radians_per_second_squared<> alpha{(accels(1) - accels(0)) /
                                                    trackwidth.value()};
-    EXPECT_LE(wpi::units::math::abs(a), maxA);
-    EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+    EXPECT_LE(wpi::units::abs(a), maxA);
+    EXPECT_LE(wpi::units::abs(alpha), maxAlpha);
   }
 
   // Backward
@@ -68,19 +67,19 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
+    wpi::units::radians_per_second_squared<> alpha{(accels(1) - accels(0)) /
                                                    trackwidth.value()};
-    EXPECT_LE(wpi::units::math::abs(a), maxA);
-    EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+    EXPECT_LE(wpi::units::abs(a), maxA);
+    EXPECT_LE(wpi::units::abs(alpha), maxAlpha);
   }
 
   // Rotate CCW
@@ -88,28 +87,28 @@ TEST(DifferentialDriveAccelerationLimiterTest, LowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    wpi::units::radians_per_second_squared_t alpha{(accels(1) - accels(0)) /
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
+    wpi::units::radians_per_second_squared<> alpha{(accels(1) - accels(0)) /
                                                    trackwidth.value()};
-    EXPECT_LE(wpi::units::math::abs(a), maxA);
-    EXPECT_LE(wpi::units::math::abs(alpha), maxAlpha);
+    EXPECT_LE(wpi::units::abs(a), maxA);
+    EXPECT_LE(wpi::units::abs(alpha), maxAlpha);
   }
 }
 
 TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
 
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});
@@ -117,7 +116,7 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   // Limits are so high, they don't get hit, so states of constrained and
   // unconstrained systems should match
   DifferentialDriveAccelerationLimiter accelLimiter{
-      plant, trackwidth, 1e3_mps_sq, 1e3_rad_per_s_sq};
+      plant, trackwidth, 1e3_mps2, 1e3_rad_per_s_sq};
 
   Vectord<2> x{0.0, 0.0};
   Vectord<2> xAccelLimiter{0.0, 0.0};
@@ -127,9 +126,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -144,9 +143,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -161,9 +160,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
@@ -174,13 +173,13 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
 
 TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   constexpr auto trackwidth = 0.9_m;
-  constexpr wpi::units::second_t dt = 5_ms;
-  constexpr auto minA = -1_mps_sq;
-  constexpr auto maxA = 2_mps_sq;
+  constexpr wpi::units::seconds<> dt = 5_ms;
+  constexpr auto minA = -1_mps2;
+  constexpr auto maxA = 2_mps2;
   constexpr auto maxAlpha = 2_rad_per_s_sq;
 
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});
 
@@ -194,9 +193,9 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   {
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{12.0, 12.0};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
-    EXPECT_GT(wpi::units::math::abs(a), maxA);
-    EXPECT_GT(wpi::units::math::abs(a), -minA);
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
+    EXPECT_GT(wpi::units::abs(a), maxA);
+    EXPECT_GT(wpi::units::abs(a), -minA);
   }
 
   // a should always be within [minA, maxA]
@@ -205,15 +204,15 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
     EXPECT_GE(a, minA);
     EXPECT_LE(a, maxA);
   }
@@ -223,15 +222,15 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
   for (auto t = 0_s; t < 3_s; t += dt) {
     x = plant.CalculateX(x, u, dt);
     auto [left, right] = accelLimiter.Calculate(
-        wpi::units::meters_per_second_t{xAccelLimiter(0)},
-        wpi::units::meters_per_second_t{xAccelLimiter(1)},
-        wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)});
+        wpi::units::meters_per_second<>{xAccelLimiter(0)},
+        wpi::units::meters_per_second<>{xAccelLimiter(1)},
+        wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)});
     xAccelLimiter =
         plant.CalculateX(xAccelLimiter, Vectord<2>{left, right}, dt);
 
     Vectord<2> accels =
         plant.A() * xAccelLimiter + plant.B() * Vectord<2>{left, right};
-    wpi::units::meters_per_second_squared_t a{(accels(0) + accels(1)) / 2.0};
+    wpi::units::meters_per_second_squared<> a{(accels(0) + accels(1)) / 2.0};
     EXPECT_GE(a, minA);
     EXPECT_LE(a, maxA);
   }
@@ -239,18 +238,18 @@ TEST(DifferentialDriveAccelerationLimiterTest, SeparateMinMaxLowLimits) {
 
 TEST(DifferentialDriveAccelerationLimiterTest, MinAccelGreaterThanMaxAccel) {
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});
   EXPECT_NO_THROW({
-    DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps_sq,
+    DifferentialDriveAccelerationLimiter accelLimiter(plant, 1_m, 1_mps2,
                                                       1_rad_per_s_sq);
   });
 
   EXPECT_THROW(
       {
         DifferentialDriveAccelerationLimiter accelLimiter(
-            plant, 1_m, 1_mps_sq, -1_mps_sq, 1_rad_per_s_sq);
+            plant, 1_m, 1_mps2, -1_mps2, 1_rad_per_s_sq);
       },
       std::invalid_argument);
 }

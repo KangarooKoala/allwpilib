@@ -20,15 +20,15 @@ inline_code: |
   cls_SwerveModuleState
     .def(
       py::init<
-        wpi::units::meters_per_second_t, wpi::math::Rotation2d
+        wpi::units::meters_per_second<>, wpi::math::Rotation2d
       >(),
       py::arg("speed") = 0, py::arg("angle") = wpi::math::Rotation2d()
     )
     .def_property("speed_fps",
-      [](SwerveModuleState * self) -> wpi::units::feet_per_second_t {
+      [](SwerveModuleState * self) -> wpi::units::feet_per_second<> {
         return self->speed;
       },
-      [](SwerveModuleState * self, wpi::units::feet_per_second_t speed) {
+      [](SwerveModuleState * self, wpi::units::feet_per_second<> speed) {
         self->speed = speed;
       }
     )

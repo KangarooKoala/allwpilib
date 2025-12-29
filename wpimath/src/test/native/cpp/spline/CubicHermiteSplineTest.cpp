@@ -12,7 +12,7 @@
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 using namespace wpi::math;
 

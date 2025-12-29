@@ -7,8 +7,7 @@
 #include <algorithm>
 #include <array>
 
-#include "wpi/units/math.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -19,22 +18,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
   /**
    * Speed of the front-left wheel.
    */
-  wpi::units::meters_per_second_t frontLeft = 0_mps;
+  wpi::units::meters_per_second<> frontLeft = 0_mps;
 
   /**
    * Speed of the front-right wheel.
    */
-  wpi::units::meters_per_second_t frontRight = 0_mps;
+  wpi::units::meters_per_second<> frontRight = 0_mps;
 
   /**
    * Speed of the rear-left wheel.
    */
-  wpi::units::meters_per_second_t rearLeft = 0_mps;
+  wpi::units::meters_per_second<> rearLeft = 0_mps;
 
   /**
    * Speed of the rear-right wheel.
    */
-  wpi::units::meters_per_second_t rearRight = 0_mps;
+  wpi::units::meters_per_second<> rearRight = 0_mps;
 
   /**
    * Renormalizes the wheel speeds if any individual speed is above the
@@ -50,14 +49,14 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
    * @return Desaturated MecanumDriveWheelSpeeds.
    */
   constexpr MecanumDriveWheelSpeeds Desaturate(
-      wpi::units::meters_per_second_t attainableMaxSpeed) const {
-    std::array<wpi::units::meters_per_second_t, 4> wheelSpeeds{
+      wpi::units::meters_per_second<> attainableMaxSpeed) const {
+    std::array<wpi::units::meters_per_second<>, 4> wheelSpeeds{
         frontLeft, frontRight, rearLeft, rearRight};
-    wpi::units::meters_per_second_t realMaxSpeed =
-        wpi::units::math::abs(*std::max_element(
+    wpi::units::meters_per_second<> realMaxSpeed =
+        wpi::units::abs(*std::max_element(
             wheelSpeeds.begin(), wheelSpeeds.end(),
             [](const auto& a, const auto& b) {
-              return wpi::units::math::abs(a) < wpi::units::math::abs(b);
+              return wpi::units::abs(a) < wpi::units::abs(b);
             }));
 
     if (realMaxSpeed > attainableMaxSpeed) {

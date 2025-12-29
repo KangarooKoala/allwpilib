@@ -137,7 +137,7 @@ class TravelingSalesman {
   // Default cost is distance between poses
   std::function<double(const Pose2d&, const Pose2d&)> m_cost =
       [](const Pose2d& a, const Pose2d& b) -> double {
-    return wpi::units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
+    return wpi::units::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
   };
 
   /**

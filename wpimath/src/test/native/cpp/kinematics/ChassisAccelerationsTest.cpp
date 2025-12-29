@@ -8,8 +8,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angular_acceleration.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angular_acceleration.h>
 
 using namespace wpi::math;
 
@@ -24,7 +24,7 @@ TEST(ChassisAccelerationsTest, DefaultConstructor) {
 }
 
 TEST(ChassisAccelerationsTest, ParameterizedConstructor) {
-  ChassisAccelerations accelerations{1.0_mps_sq, 2.0_mps_sq, 3.0_rad_per_s_sq};
+  ChassisAccelerations accelerations{1.0_mps2, 2.0_mps2, 3.0_rad_per_s_sq};
 
   EXPECT_NEAR(accelerations.ax.value(), 1.0, kEpsilon);
   EXPECT_NEAR(accelerations.ay.value(), 2.0, kEpsilon);
@@ -33,7 +33,7 @@ TEST(ChassisAccelerationsTest, ParameterizedConstructor) {
 
 TEST(ChassisAccelerationsTest, ToRobotRelative) {
   const auto chassisAccelerations =
-      ChassisAccelerations{1.0_mps_sq, 0.0_mps_sq, 0.5_rad_per_s_sq}
+      ChassisAccelerations{1.0_mps2, 0.0_mps2, 0.5_rad_per_s_sq}
           .ToRobotRelative(Rotation2d{-90_deg});
 
   EXPECT_NEAR(chassisAccelerations.ax.value(), 0.0, kEpsilon);
@@ -43,7 +43,7 @@ TEST(ChassisAccelerationsTest, ToRobotRelative) {
 
 TEST(ChassisAccelerationsTest, ToFieldRelative) {
   const auto chassisAccelerations =
-      ChassisAccelerations{1.0_mps_sq, 0.0_mps_sq, 0.5_rad_per_s_sq}
+      ChassisAccelerations{1.0_mps2, 0.0_mps2, 0.5_rad_per_s_sq}
           .ToFieldRelative(Rotation2d{45_deg});
 
   EXPECT_NEAR(chassisAccelerations.ax.value(), 1.0 / std::sqrt(2.0), kEpsilon);
@@ -52,8 +52,8 @@ TEST(ChassisAccelerationsTest, ToFieldRelative) {
 }
 
 TEST(ChassisAccelerationsTest, Plus) {
-  const ChassisAccelerations left{1.0_mps_sq, 0.5_mps_sq, 0.75_rad_per_s_sq};
-  const ChassisAccelerations right{2.0_mps_sq, 1.5_mps_sq, 0.25_rad_per_s_sq};
+  const ChassisAccelerations left{1.0_mps2, 0.5_mps2, 0.75_rad_per_s_sq};
+  const ChassisAccelerations right{2.0_mps2, 1.5_mps2, 0.25_rad_per_s_sq};
 
   const auto chassisAccelerations = left + right;
 
@@ -63,8 +63,8 @@ TEST(ChassisAccelerationsTest, Plus) {
 }
 
 TEST(ChassisAccelerationsTest, Minus) {
-  const ChassisAccelerations left{1.0_mps_sq, 0.5_mps_sq, 0.75_rad_per_s_sq};
-  const ChassisAccelerations right{2.0_mps_sq, 0.5_mps_sq, 0.25_rad_per_s_sq};
+  const ChassisAccelerations left{1.0_mps2, 0.5_mps2, 0.75_rad_per_s_sq};
+  const ChassisAccelerations right{2.0_mps2, 0.5_mps2, 0.25_rad_per_s_sq};
 
   const auto chassisAccelerations = left - right;
 
@@ -75,7 +75,7 @@ TEST(ChassisAccelerationsTest, Minus) {
 
 TEST(ChassisAccelerationsTest, UnaryMinus) {
   const auto chassisAccelerations =
-      -ChassisAccelerations{1.0_mps_sq, 0.5_mps_sq, 0.75_rad_per_s_sq};
+      -ChassisAccelerations{1.0_mps2, 0.5_mps2, 0.75_rad_per_s_sq};
 
   EXPECT_NEAR(chassisAccelerations.ax.value(), -1.0, kEpsilon);
   EXPECT_NEAR(chassisAccelerations.ay.value(), -0.5, kEpsilon);
@@ -84,7 +84,7 @@ TEST(ChassisAccelerationsTest, UnaryMinus) {
 
 TEST(ChassisAccelerationsTest, Multiplication) {
   const auto chassisAccelerations =
-      ChassisAccelerations{1.0_mps_sq, 0.5_mps_sq, 0.75_rad_per_s_sq} * 2.0;
+      ChassisAccelerations{1.0_mps2, 0.5_mps2, 0.75_rad_per_s_sq} * 2.0;
 
   EXPECT_NEAR(chassisAccelerations.ax.value(), 2.0, kEpsilon);
   EXPECT_NEAR(chassisAccelerations.ay.value(), 1.0, kEpsilon);
@@ -93,7 +93,7 @@ TEST(ChassisAccelerationsTest, Multiplication) {
 
 TEST(ChassisAccelerationsTest, Division) {
   const auto chassisAccelerations =
-      ChassisAccelerations{2.0_mps_sq, 1.0_mps_sq, 1.5_rad_per_s_sq} / 2.0;
+      ChassisAccelerations{2.0_mps2, 1.0_mps2, 1.5_rad_per_s_sq} / 2.0;
 
   EXPECT_NEAR(chassisAccelerations.ax.value(), 1.0, kEpsilon);
   EXPECT_NEAR(chassisAccelerations.ay.value(), 0.5, kEpsilon);

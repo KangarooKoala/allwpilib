@@ -12,30 +12,30 @@
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 using namespace wpi::math;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
-  SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps_sq};
+  SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
+                                                        3_V / 1_mps2};
   const DifferentialDriveKinematics kinematics{0.5_m};
   const auto maxVoltage = 10_V;
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
   auto trajectory = TestTrajectory::GetTrajectory(config);
 
-  wpi::units::second_t time = 0_s;
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.TotalTime();
+  wpi::units::seconds<> time = 0_s;
+  wpi::units::seconds<> dt = 20_ms;
+  wpi::units::seconds<> duration = trajectory.TotalTime();
 
   while (time < duration) {
     const Trajectory::State point = trajectory.Sample(time);
@@ -63,14 +63,14 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
 }
 
 TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
-  SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps_sq};
+  SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
+                                                        3_V / 1_mps2};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth
   const DifferentialDriveKinematics kinematics{3_m};
   const auto maxVoltage = 10_V;
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 

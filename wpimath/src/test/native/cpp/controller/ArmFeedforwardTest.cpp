@@ -11,10 +11,10 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/units/angular_acceleration.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 
 namespace {
 
@@ -38,9 +38,9 @@ using Kg_unit = decltype(1_V);
  */
 wpi::math::Matrixd<2, 1> Simulate(
     Ks_unit Ks, Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
-    wpi::units::radian_t currentAngle,
-    wpi::units::radians_per_second_t currentVelocity, wpi::units::volt_t input,
-    wpi::units::second_t dt) {
+    wpi::units::radians<> currentAngle,
+    wpi::units::radians_per_second<> currentVelocity, wpi::units::volts<> input,
+    wpi::units::seconds<> dt) {
   wpi::math::Matrixd<2, 2> A{{0.0, 1.0}, {0.0, -Kv.value() / Ka.value()}};
   wpi::math::Matrixd<2, 1> B{{0.0}, {1.0 / Ka.value()}};
 
@@ -71,10 +71,10 @@ wpi::math::Matrixd<2, 1> Simulate(
  */
 void CalculateAndSimulate(const wpi::math::ArmFeedforward& armFF, Ks_unit Ks,
                           Kv_unit Kv, Ka_unit Ka, Kg_unit Kg,
-                          wpi::units::radian_t currentAngle,
-                          wpi::units::radians_per_second_t currentVelocity,
-                          wpi::units::radians_per_second_t nextVelocity,
-                          wpi::units::second_t dt) {
+                          wpi::units::radians<> currentAngle,
+                          wpi::units::radians_per_second<> currentVelocity,
+                          wpi::units::radians_per_second<> nextVelocity,
+                          wpi::units::seconds<> dt) {
   auto input = armFF.Calculate(currentAngle, currentVelocity, nextVelocity);
   EXPECT_NEAR(
       nextVelocity.value(),
@@ -126,7 +126,7 @@ TEST(ArmFeedforwardTest, CalculateIllConditionedModel) {
   EXPECT_DOUBLE_EQ(
       armFF.Calculate(currentAngle, currentVelocity, nextVelocity).value(),
       (Ks + Kv * currentVelocity + Ka * averageAccel +
-       Kg * wpi::units::math::cos(currentAngle))
+       Kg * wpi::units::cos(currentAngle))
           .value());
 }
 

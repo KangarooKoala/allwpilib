@@ -10,8 +10,7 @@
 #include <vector>
 
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::math {
 
@@ -62,7 +61,7 @@ class KalmanFilterLatencyCompensator {
    */
   void AddObserverState(const KalmanFilterType& observer, Vectord<Inputs> u,
                         Vectord<Outputs> localY,
-                        wpi::units::second_t timestamp) {
+                        wpi::units::seconds<> timestamp) {
     // Add the new state into the vector.
     m_pastObserverSnapshots.emplace_back(timestamp,
                                          ObserverSnapshot{observer, u, localY});
@@ -86,11 +85,11 @@ class KalmanFilterLatencyCompensator {
    */
   template <int Rows>
   void ApplyPastGlobalMeasurement(
-      KalmanFilterType* observer, wpi::units::second_t nominalDt,
+      KalmanFilterType* observer, wpi::units::seconds<> nominalDt,
       Vectord<Rows> y,
       std::function<void(const Vectord<Inputs>& u, const Vectord<Rows>& y)>
           globalMeasurementCorrect,
-      wpi::units::second_t timestamp) {
+      wpi::units::seconds<> timestamp) {
     if (m_pastObserverSnapshots.size() == 0) {
       // State map was empty, which means that we got a measurement right at
       // startup. The only thing we can do is ignore the measurement.
@@ -131,14 +130,14 @@ class KalmanFilterLatencyCompensator {
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
-      wpi::units::second_t prevTimeDiff = wpi::units::math::abs(
+      wpi::units::seconds<> prevTimeDiff = wpi::units::abs(
           timestamp - m_pastObserverSnapshots[prevIdx].first);
-      wpi::units::second_t nextTimeDiff = wpi::units::math::abs(
+      wpi::units::seconds<> nextTimeDiff = wpi::units::abs(
           timestamp - m_pastObserverSnapshots[nextIdx].first);
       indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
     }
 
-    wpi::units::second_t lastTimestamp =
+    wpi::units::seconds<> lastTimestamp =
         m_pastObserverSnapshots[indexOfClosestEntry].first - nominalDt;
 
     // We will now go back in time to the state of the system at the time when
@@ -175,7 +174,7 @@ class KalmanFilterLatencyCompensator {
 
  private:
   static constexpr size_t kMaxPastObserverStates = 300;
-  std::vector<std::pair<wpi::units::second_t, ObserverSnapshot>>
+  std::vector<std::pair<wpi::units::seconds<>, ObserverSnapshot>>
       m_pastObserverSnapshots;
 };
 }  // namespace wpi::math

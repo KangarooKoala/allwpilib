@@ -10,7 +10,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::math {
 
@@ -54,7 +54,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&, const InputVector&)> f,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : m_dt(dt), m_f(f) {
     m_B = NumericalJacobianU<States, States, Inputs>(f, StateVector::Zero(),
                                                      InputVector::Zero());
@@ -73,7 +73,7 @@ class ControlAffinePlantInversionFeedforward {
    */
   ControlAffinePlantInversionFeedforward(
       std::function<StateVector(const StateVector&)> f,
-      const Matrixd<States, Inputs>& B, wpi::units::second_t dt)
+      const Matrixd<States, Inputs>& B, wpi::units::seconds<> dt)
       : m_B(B), m_dt(dt) {
     m_f = [=](const StateVector& x, const InputVector& u) -> StateVector {
       return f(x);
@@ -177,7 +177,7 @@ class ControlAffinePlantInversionFeedforward {
  private:
   Matrixd<States, Inputs> m_B;
 
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   /**
    * The model dynamics.

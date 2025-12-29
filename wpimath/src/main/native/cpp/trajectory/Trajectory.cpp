@@ -19,10 +19,10 @@ void wpi::math::to_json(wpi::util::json& json, const Trajectory::State& state) {
 void wpi::math::from_json(const wpi::util::json& json,
                           Trajectory::State& state) {
   state.pose = json.at("pose").get<Pose2d>();
-  state.t = wpi::units::second_t{json.at("time").get<double>()};
+  state.t = wpi::units::seconds<>{json.at("time").get<double>()};
   state.velocity =
-      wpi::units::meters_per_second_t{json.at("velocity").get<double>()};
-  state.acceleration = wpi::units::meters_per_second_squared_t{
+      wpi::units::meters_per_second<>{json.at("velocity").get<double>()};
+  state.acceleration = wpi::units::meters_per_second_squared<>{
       json.at("acceleration").get<double>()};
   state.curvature = wpi::units::curvature_t{json.at("curvature").get<double>()};
 }

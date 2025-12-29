@@ -10,7 +10,7 @@
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -31,15 +31,15 @@ class ProfiledPIDController
     : public wpi::util::Sendable,
       public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
  public:
-  using Distance_t = wpi::units::unit_t<Distance>;
+  using Distance_t = wpi::units::unit<Distance>;
   using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Velocity_t = wpi::units::unit_t<Velocity>;
+      wpi::units::compound_conversion_factor<Distance,
+                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity_t = wpi::units::unit<Velocity>;
   using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+      wpi::units::compound_conversion_factor<Velocity,
+                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration_t = wpi::units::unit<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
@@ -57,7 +57,7 @@ class ProfiledPIDController
    */
   constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
                                   Constraints constraints,
-                                  wpi::units::second_t period = 20_ms)
+                                  wpi::units::seconds<> period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
@@ -158,7 +158,7 @@ class ProfiledPIDController
    *
    * @return The period of the controller.
    */
-  constexpr wpi::units::second_t GetPeriod() const {
+  constexpr wpi::units::seconds<> GetPeriod() const {
     return m_controller.GetPeriod();
   }
 

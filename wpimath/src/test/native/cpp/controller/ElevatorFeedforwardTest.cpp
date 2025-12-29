@@ -8,9 +8,9 @@
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
 
 static constexpr auto Ks = 0.5_V;
 static constexpr auto Kv = 1.5_V * 1_s / 1_m;
@@ -25,7 +25,7 @@ TEST(ElevatorFeedforwardTest, Calculate) {
 
   wpi::math::Matrixd<1, 1> A{-Kv.value() / Ka.value()};
   wpi::math::Matrixd<1, 1> B{1.0 / Ka.value()};
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
   wpi::math::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
 
   wpi::math::Vectord<1> r{2.0};

@@ -25,7 +25,7 @@ wpi::util::Protobuf<wpi::math::SwerveModuleState>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::SwerveModuleState{
-      wpi::units::meters_per_second_t{msg.speed},
+      wpi::units::meters_per_second<>{msg.speed},
       iangle[0],
   };
 }

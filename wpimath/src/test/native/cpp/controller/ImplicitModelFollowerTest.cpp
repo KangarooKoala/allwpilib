@@ -11,10 +11,10 @@
 namespace wpi::math {
 
 TEST(ImplicitModelFollowerTest, SameModel) {
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});
 
@@ -55,10 +55,10 @@ TEST(ImplicitModelFollowerTest, SameModel) {
 }
 
 TEST(ImplicitModelFollowerTest, SlowerRefModel) {
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
 
   auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
                                                   Kv_t{1.0}, Ka_t{1.0});

@@ -8,17 +8,16 @@
 
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/units/math.hpp"
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::abs(val1 - val2), eps)
 
-static constexpr wpi::units::meter_t kTolerance{1 / 12.0};
-static constexpr wpi::units::radian_t kAngularTolerance{2.0 * std::numbers::pi /
+static constexpr wpi::units::meters<> kTolerance{1 / 12.0};
+static constexpr wpi::units::radians<> kAngularTolerance{2.0 * std::numbers::pi /
                                                         180.0};
 
 TEST(LTVUnicycleControllerTest, ReachesReference) {
-  constexpr wpi::units::second_t kDt = 20_ms;
+  constexpr wpi::units::seconds<> kDt = 20_ms;
 
   wpi::math::LTVUnicycleController controller{
       {0.0625, 0.125, 2.5}, {4.0, 4.0}, kDt};
@@ -27,7 +26,7 @@ TEST(LTVUnicycleControllerTest, ReachesReference) {
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8_mps, 0.1_mps2});
 
   auto totalTime = trajectory.TotalTime();
   for (size_t i = 0; i < (totalTime / kDt).value(); ++i) {

@@ -23,50 +23,50 @@ inline_code: |
   cls_MecanumDriveWheelSpeeds
     .def(
       py::init<
-        wpi::units::meters_per_second_t, wpi::units::meters_per_second_t,
-        wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
+        wpi::units::meters_per_second<>, wpi::units::meters_per_second<>,
+        wpi::units::meters_per_second<>, wpi::units::meters_per_second<>
       >(),
       py::arg("frontLeft") = 0, py::arg("frontRight") = 0,
       py::arg("rearLeft") = 0, py::arg("rearRight") = 0
     )
     .def_static("fromFeet", [](
-        wpi::units::feet_per_second_t frontLeft,
-        wpi::units::feet_per_second_t frontRight,
-        wpi::units::feet_per_second_t rearLeft,
-        wpi::units::feet_per_second_t rearRight
+        wpi::units::feet_per_second<> frontLeft,
+        wpi::units::feet_per_second<> frontRight,
+        wpi::units::feet_per_second<> rearLeft,
+        wpi::units::feet_per_second<> rearRight
     ){
       return MecanumDriveWheelSpeeds{frontLeft, frontRight, rearLeft, rearRight};
     }, py::arg("frontLeft"), py::arg("frontRight"),
        py::arg("rearLeft"), py::arg("rearRight"))
     .def_property("frontLeft_fps",
-      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
+      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second<> {
         return self->frontLeft;
       },
-      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second_t fps) {
+      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second<> fps) {
         self->frontLeft = fps;
       }
     )
     .def_property("frontRight_fps", 
-      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
+      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second<> {
         return self->frontRight;
       },
-      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second_t fps) {
+      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second<> fps) {
         self->frontRight = fps;
       }
     )
     .def_property("rearLeft_fps",
-      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
+      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second<> {
         return self->rearLeft;
       },
-      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second_t fps) {
+      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second<> fps) {
         self->rearLeft = fps;
       }
     )
     .def_property("rearRight_fps", 
-      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second_t {
+      [](MecanumDriveWheelSpeeds * self) -> wpi::units::feet_per_second<> {
         return self->rearRight;
       },
-      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second_t fps) {
+      [](MecanumDriveWheelSpeeds * self, wpi::units::feet_per_second<> fps) {
         self->rearRight = fps;
       }
     )

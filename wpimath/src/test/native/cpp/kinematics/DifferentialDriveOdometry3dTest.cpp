@@ -34,7 +34,7 @@ TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
 
   const auto& pose =
       odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg}, 0_m,
-                      wpi::units::meter_t{5 * std::numbers::pi});
+                      wpi::units::meters<>{5 * std::numbers::pi});
 
   EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
   EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);

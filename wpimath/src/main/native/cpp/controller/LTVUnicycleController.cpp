@@ -6,14 +6,13 @@
 
 #include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/system/Discretization.hpp"
-#include "wpi/units/math.hpp"
 
 using namespace wpi::math;
 
 ChassisSpeeds LTVUnicycleController::Calculate(
     const Pose2d& currentPose, const Pose2d& poseRef,
-    wpi::units::meters_per_second_t linearVelocityRef,
-    wpi::units::radians_per_second_t angularVelocityRef) {
+    wpi::units::meters_per_second<> linearVelocityRef,
+    wpi::units::radians_per_second<> angularVelocityRef) {
   // The change in global pose for a unicycle is defined by the following three
   // equations.
   //
@@ -53,7 +52,7 @@ ChassisSpeeds LTVUnicycleController::Calculate(
 
   // The DARE is ill-conditioned if the velocity is close to zero, so don't
   // let the system stop.
-  if (wpi::units::math::abs(linearVelocityRef) < 1e-4_mps) {
+  if (wpi::units::abs(linearVelocityRef) < 1e-4_mps) {
     linearVelocityRef = 1e-4_mps;
   }
 
@@ -79,6 +78,6 @@ ChassisSpeeds LTVUnicycleController::Calculate(
   Eigen::Vector2d u = K * e;
 
   return ChassisSpeeds{
-      linearVelocityRef + wpi::units::meters_per_second_t{u(0)}, 0_mps,
-      angularVelocityRef + wpi::units::radians_per_second_t{u(1)}};
+      linearVelocityRef + wpi::units::meters_per_second<>{u(0)}, 0_mps,
+      angularVelocityRef + wpi::units::radians_per_second<>{u(1)}};
 }

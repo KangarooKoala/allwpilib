@@ -13,7 +13,7 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -49,7 +49,7 @@ class WPILIB_DLLEXPORT Pose2d {
    * @param y The y component of the translational component of the pose.
    * @param rotation The rotational component of the pose.
    */
-  constexpr Pose2d(wpi::units::meter_t x, wpi::units::meter_t y,
+  constexpr Pose2d(wpi::units::meters<> x, wpi::units::meters<> y,
                    Rotation2d rotation)
       : m_translation{x, y}, m_rotation{std::move(rotation)} {}
 
@@ -111,14 +111,14 @@ class WPILIB_DLLEXPORT Pose2d {
    *
    * @return The x component of the pose's translation.
    */
-  constexpr wpi::units::meter_t X() const { return m_translation.X(); }
+  constexpr wpi::units::meters<> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the pose's translation.
    *
    * @return The y component of the pose's translation.
    */
-  constexpr wpi::units::meter_t Y() const { return m_translation.Y(); }
+  constexpr wpi::units::meters<> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the underlying rotation.
