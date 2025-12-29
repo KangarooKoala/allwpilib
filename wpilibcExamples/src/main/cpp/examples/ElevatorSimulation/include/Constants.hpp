@@ -6,13 +6,13 @@
 
 #include <numbers>
 
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/mass.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -34,18 +34,18 @@ inline constexpr double kElevatorKp = 5.0;
 inline constexpr double kElevatorKi = 0.0;
 inline constexpr double kElevatorKd = 0.0;
 
-inline constexpr wpi::units::volt_t kElevatorkS = 0.0_V;
-inline constexpr wpi::units::volt_t kElevatorkG = 0.762_V;
+inline constexpr wpi::units::volts<> kElevatorkS = 0.0_V;
+inline constexpr wpi::units::volts<> kElevatorkG = 0.762_V;
 inline constexpr auto kElevatorkV = 0.762_V / 1_mps;
-inline constexpr auto kElevatorkA = 0.0_V / 1_mps_sq;
+inline constexpr auto kElevatorkA = 0.0_V / 1_mps2;
 
 inline constexpr double kElevatorGearing = 10.0;
-inline constexpr wpi::units::meter_t kElevatorDrumRadius = 2_in;
-inline constexpr wpi::units::kilogram_t kCarriageMass = 4.0_kg;
+inline constexpr wpi::units::meters<> kElevatorDrumRadius = 2_in;
+inline constexpr wpi::units::kilograms<> kCarriageMass = 4.0_kg;
 
-inline constexpr wpi::units::meter_t kSetpoint = 75_cm;
-inline constexpr wpi::units::meter_t kMinElevatorHeight = 0_cm;
-inline constexpr wpi::units::meter_t kMaxElevatorHeight = 1.25_m;
+inline constexpr wpi::units::meters<> kSetpoint = 75_cm;
+inline constexpr wpi::units::meters<> kMinElevatorHeight = 0_cm;
+inline constexpr wpi::units::meters<> kMaxElevatorHeight = 1.25_m;
 
 // distance per pulse = (distance per revolution) / (pulses per revolution)
 //  = (Pi * D) / ppr

@@ -7,8 +7,8 @@
 #include "subsystems/Drivetrain.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 class TurnDegrees
     : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnDegrees> {
@@ -21,7 +21,7 @@ class TurnDegrees
    * @param angle Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  TurnDegrees(double speed, wpi::units::degree_t angle, Drivetrain* drive)
+  TurnDegrees(double speed, wpi::units::degrees<> angle, Drivetrain* drive)
       : m_speed(speed), m_angle(angle), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -33,8 +33,8 @@ class TurnDegrees
 
  private:
   double m_speed;
-  wpi::units::degree_t m_angle;
+  wpi::units::degrees<> m_angle;
   Drivetrain* m_drive;
 
-  wpi::units::meter_t GetAverageTurningDistance();
+  wpi::units::meters<> GetAverageTurningDistance();
 };

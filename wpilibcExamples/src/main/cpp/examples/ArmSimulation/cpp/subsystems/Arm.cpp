@@ -43,7 +43,7 @@ void Arm::SimulationPeriodic() {
 
 void Arm::LoadPreferences() {
   // Read Preferences for Arm setpoint and kP on entering Teleop
-  m_armSetpoint = wpi::units::degree_t{
+  m_armSetpoint = wpi::units::degrees<>{
       wpi::Preferences::GetDouble(kArmPositionKey, m_armSetpoint.value())};
   if (m_armKp != wpi::Preferences::GetDouble(kArmPKey, m_armKp)) {
     m_armKp = wpi::Preferences::GetDouble(kArmPKey, m_armKp);
@@ -55,8 +55,8 @@ void Arm::ReachSetpoint() {
   // Here, we run PID control like normal, with a setpoint read from
   // preferences in degrees.
   double pidOutput = m_controller.Calculate(
-      m_encoder.GetDistance(), (wpi::units::radian_t{m_armSetpoint}.value()));
-  m_motor.SetVoltage(wpi::units::volt_t{pidOutput});
+      m_encoder.GetDistance(), (wpi::units::radians<>{m_armSetpoint}.value()));
+  m_motor.SetVoltage(wpi::units::volts<>{pidOutput});
 }
 
 void Arm::Stop() {

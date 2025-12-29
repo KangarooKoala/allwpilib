@@ -18,14 +18,14 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 class Elevator {
  public:
   Elevator();
   void SimulationPeriodic();
   void UpdateTelemetry();
-  void ReachGoal(wpi::units::meter_t goal);
+  void ReachGoal(wpi::units::meters<> goal);
   void Reset();
   void Stop();
 
@@ -34,12 +34,12 @@ class Elevator {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::NEO(2);
 
   // Standard classes for controlling our elevator
-  wpi::math::ExponentialProfile<wpi::units::meters,
-                                wpi::units::volts>::Constraints m_constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints m_constraints{
       Constants::kElevatorMaxV, Constants::kElevatorkV, Constants::kElevatorkA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
       m_profile{m_constraints};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       m_setpoint;
 
   wpi::math::PIDController m_controller{

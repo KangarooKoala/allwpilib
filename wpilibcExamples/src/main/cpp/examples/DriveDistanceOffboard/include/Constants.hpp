@@ -6,11 +6,11 @@
 
 #include <numbers>
 
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 /**
  * The Constants header provides a convenient place for teams to hold robot-wide
@@ -22,7 +22,7 @@
  */
 
 namespace DriveConstants {
-inline constexpr wpi::units::second_t kDt{0.02};
+inline constexpr wpi::units::seconds<> kDt{0.02};
 inline constexpr int kLeftMotor1Port = 0;
 inline constexpr int kLeftMotor2Port = 1;
 inline constexpr int kRightMotor1Port = 2;
@@ -39,7 +39,7 @@ inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
 inline constexpr double kp = 1;
 
 inline constexpr auto kMaxSpeed = 3_mps;
-inline constexpr auto kMaxAcceleration = 3_mps_sq;
+inline constexpr auto kMaxAcceleration = 3_mps2;
 
 }  // namespace DriveConstants
 

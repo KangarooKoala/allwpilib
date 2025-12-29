@@ -13,8 +13,8 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/angular_velocity.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/angular_velocity.h>
 
 class Shooter : public wpi::cmd::SubsystemBase {
  public:
@@ -27,7 +27,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second_t setpoint);
+  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second<> setpoint);
 
  private:
   wpi::PWMSparkMax m_shooterMotor{ShooterConstants::kShooterMotorPort};
@@ -36,7 +36,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
   wpi::Encoder m_shooterEncoder{ShooterConstants::kEncoderPorts[0],
                                 ShooterConstants::kEncoderPorts[1],
                                 ShooterConstants::kEncoderReversed};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_shooterFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_shooterFeedforward{
       ShooterConstants::kS, ShooterConstants::kV};
   wpi::math::PIDController m_shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

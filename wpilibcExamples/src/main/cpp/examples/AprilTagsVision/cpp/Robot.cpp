@@ -21,8 +21,8 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 /**
  * This is a demo program showing the detection of AprilTags.

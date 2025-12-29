@@ -17,7 +17,7 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 class Arm {
  public:
@@ -30,7 +30,7 @@ class Arm {
  private:
   // The P gain for the PID controller that drives this arm.
   double m_armKp = kDefaultArmKp;
-  wpi::units::degree_t m_armSetpoint = kDefaultArmSetpoint;
+  wpi::units::degrees<> m_armSetpoint = kDefaultArmSetpoint;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   wpi::math::DCMotor m_armGearbox = wpi::math::DCMotor::Vex775Pro(2);

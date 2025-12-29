@@ -18,15 +18,15 @@
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/mass.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
+#include <wpi/units/time.h>
 
 class PotentiometerPIDTest : public testing::Test {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);
   static constexpr double kElevatorGearing = 10.0;
-  static constexpr wpi::units::meter_t kElevatorDrumRadius = 2.0_in;
-  static constexpr wpi::units::kilogram_t kCarriageMass = 4.0_kg;
+  static constexpr wpi::units::meters<> kElevatorDrumRadius = 2.0_in;
+  static constexpr wpi::units::kilograms<> kCarriageMass = 4.0_kg;
 
   Robot m_robot;
   std::optional<std::thread> m_thread;

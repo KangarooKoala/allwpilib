@@ -45,12 +45,12 @@ void Drivetrain::SetSpeeds(
   const double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.value());
 
-  m_leftLeader.SetVoltage(wpi::units::volt_t{leftOutput} + leftFeedforward);
-  m_rightLeader.SetVoltage(wpi::units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(wpi::units::volts<>{leftOutput} + leftFeedforward);
+  m_rightLeader.SetVoltage(wpi::units::volts<>{rightOutput} + rightFeedforward);
 }
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
-                       wpi::units::radians_per_second_t rot) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xSpeed,
+                       wpi::units::radians_per_second<> rot) {
   SetSpeeds(m_kinematics.ToWheelSpeeds({xSpeed, 0_mps, rot}));
 }
 
@@ -80,9 +80,9 @@ wpi::math::Pose3d Drivetrain::ObjectToRobotPose(
   std::vector<double> val{cameraToObjectEntry.Get()};
 
   // Reconstruct cameraToObject Transform3D from networktables.
-  wpi::math::Translation3d translation{wpi::units::meter_t{val[0]},
-                                       wpi::units::meter_t{val[1]},
-                                       wpi::units::meter_t{val[2]}};
+  wpi::math::Translation3d translation{wpi::units::meters<>{val[0]},
+                                       wpi::units::meters<>{val[1]},
+                                       wpi::units::meters<>{val[2]}};
   wpi::math::Rotation3d rotation{
       wpi::math::Quaternion{val[3], val[4], val[5], val[6]}};
   wpi::math::Transform3d cameraToObject{translation, rotation};
@@ -93,8 +93,8 @@ wpi::math::Pose3d Drivetrain::ObjectToRobotPose(
 
 void Drivetrain::UpdateOdometry() {
   m_poseEstimator.Update(m_imu.GetRotation2d(),
-                         wpi::units::meter_t{m_leftEncoder.GetDistance()},
-                         wpi::units::meter_t{m_rightEncoder.GetDistance()});
+                         wpi::units::meters<>{m_leftEncoder.GetDistance()},
+                         wpi::units::meters<>{m_rightEncoder.GetDistance()});
 
   // Publish cameraToObject transformation to networktables --this would
   // normally be handled by the computer vision solution.
@@ -121,9 +121,9 @@ void Drivetrain::SimulationPeriodic() {
   // To update our simulation, we set motor voltage inputs, update the
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro.
-  m_drivetrainSimulator.SetInputs(wpi::units::volt_t{m_leftLeader.Get()} *
+  m_drivetrainSimulator.SetInputs(wpi::units::volts<>{m_leftLeader.Get()} *
                                       wpi::RobotController::GetInputVoltage(),
-                                  wpi::units::volt_t{m_rightLeader.Get()} *
+                                  wpi::units::volts<>{m_rightLeader.Get()} *
                                       wpi::RobotController::GetInputVoltage());
   m_drivetrainSimulator.Update(20_ms);
 

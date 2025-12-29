@@ -12,7 +12,7 @@
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/moment_of_inertia.hpp"
+#include <wpi/units/moment_of_inertia.h>
 
 /**
  * This is a sample program to demonstrate the use of a
@@ -25,11 +25,11 @@ class Robot : public wpi::TimedRobot {
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    wpi::units::radians_per_second_t setpoint = wpi::units::math::max(
+    wpi::units::radians_per_second<> setpoint = wpi::units::max(
         0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang-bang controller
-    wpi::units::volt_t bangOutput =
+    wpi::units::volts<> bangOutput =
         m_bangBangController.Calculate(m_encoder.GetRate(), setpoint.value()) *
         12_V;
 
@@ -53,7 +53,7 @@ class Robot : public wpi::TimedRobot {
     // simulation, and write the simulated velocities to our simulated encoder
     m_flywheelSim.SetInputVoltage(
         m_flywheelMotor.Get() *
-        wpi::units::volt_t{wpi::RobotController::GetInputVoltage()});
+        wpi::units::volts<>{wpi::RobotController::GetInputVoltage()});
     m_flywheelSim.Update(20_ms);
     m_encoderSim.SetRate(m_flywheelSim.GetAngularVelocity().value());
   }
@@ -64,7 +64,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
 
   // Max setpoint for joystick control
-  static constexpr wpi::units::radians_per_second_t kMaxSetpointValue =
+  static constexpr wpi::units::radians_per_second<> kMaxSetpointValue =
       6000_rpm;
 
   // Joystick to control setpoint
@@ -77,11 +77,11 @@ class Robot : public wpi::TimedRobot {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  static constexpr wpi::units::volt_t kFlywheelKs = 0.0001_V;
+  static constexpr wpi::units::volts<> kFlywheelKs = 0.0001_V;
   static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
   static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
       0.0003_V / 1_rev_per_m_per_s;
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_feedforward{
       kFlywheelKs, kFlywheelKv, kFlywheelKa};
 
   // Simulation classes help us simulate our robot
@@ -91,7 +91,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr double kFlywheelGearing = 1.0;
 
   // 1/2 MR²
-  static constexpr wpi::units::kilogram_square_meter_t
+  static constexpr wpi::units::kilogram_square_meters<>
       kFlywheelMomentOfInertia = 0.5 * 1.5_lb * 4_in * 4_in;
 
   wpi::math::DCMotor m_gearbox = wpi::math::DCMotor::NEO(1);

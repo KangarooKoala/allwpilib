@@ -24,10 +24,10 @@
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
 
 /**
  * Represents a differential drive style drivetrain.
@@ -36,9 +36,9 @@ class Drivetrain {
  public:
   Drivetrain();
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second<> kMaxSpeed =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second<> kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
   /**
@@ -53,8 +53,8 @@ class Drivetrain {
    * @param xSpeed Linear velocity.
    * @param rot Angular Velocity.
    */
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::radians_per_second_t rot);
+  void Drive(wpi::units::meters_per_second<> xSpeed,
+             wpi::units::radians_per_second<> rot);
 
   /**
    * Updates the field-relative position.
@@ -106,8 +106,8 @@ class Drivetrain {
       wpi::nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr wpi::units::meter_t kWheelRadius = 0.0508_m;
+  static constexpr wpi::units::meters<> kTrackwidth = 0.381_m * 2;
+  static constexpr wpi::units::meters<> kWheelRadius = 0.0508_m;
   static constexpr int kEncoderResolution = 4096;
 
   static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0,
@@ -116,7 +116,7 @@ class Drivetrain {
   wpi::math::Transform3d m_robotToCamera{
       wpi::math::Translation3d{1_m, 1_m, 1_m},
       wpi::math::Rotation3d{0_rad, 0_rad,
-                            wpi::units::radian_t{std::numbers::pi / 2}}};
+                            wpi::units::radians<>{std::numbers::pi / 2}}};
 
   wpi::nt::NetworkTableInstance m_inst{
       wpi::nt::NetworkTableInstance::GetDefault()};
@@ -152,15 +152,15 @@ class Drivetrain {
   wpi::math::DifferentialDrivePoseEstimator m_poseEstimator{
       m_kinematics,
       m_imu.GetRotation2d(),
-      wpi::units::meter_t{m_leftEncoder.GetDistance()},
-      wpi::units::meter_t{m_rightEncoder.GetDistance()},
+      wpi::units::meters<>{m_leftEncoder.GetDistance()},
+      wpi::units::meters<>{m_rightEncoder.GetDistance()},
       wpi::math::Pose2d{},
       {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
       1_V, 3_V / 1_mps};
 
   // Simulation classes
@@ -170,7 +170,7 @@ class Drivetrain {
   wpi::Field2d m_fieldApproximation;
   wpi::math::LinearSystem<2, 2, 2> m_drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(
-          1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
+          1.98_V / 1_mps, 0.2_V / 1_mps2, 1.5_V / 1_mps, 0.3_V / 1_mps2);
   wpi::sim::DifferentialDrivetrainSim m_drivetrainSimulator{
       m_drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

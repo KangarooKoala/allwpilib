@@ -12,7 +12,7 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {
   // Read from the sensor
-  wpi::units::meter_t position = wpi::units::meter_t{m_potentiometer.Get()};
+  wpi::units::meters<> position = wpi::units::meters<>{m_potentiometer.Get()};
 
   // Run the PID Controller
   double pidOut = m_pidController.Calculate(position.value());

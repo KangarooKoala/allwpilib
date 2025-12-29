@@ -5,7 +5,7 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/acceleration.hpp"
+#include <wpi/units/acceleration.h>
 
 /**
  * Collision detection snippets for frc-docs.
@@ -28,8 +28,8 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::units::meters_per_second_squared_t m_prevXAccel = 0.0_mps_sq;
-  wpi::units::meters_per_second_squared_t m_prevYAccel = 0.0_mps_sq;
+  wpi::units::meters_per_second_squared<> m_prevXAccel = 0.0_mps2;
+  wpi::units::meters_per_second_squared<> m_prevYAccel = 0.0_mps2;
   wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
 };
 

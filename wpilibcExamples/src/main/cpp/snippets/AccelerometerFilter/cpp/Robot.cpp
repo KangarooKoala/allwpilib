@@ -6,7 +6,7 @@
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/math/filter/LinearFilter.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/acceleration.hpp"
+#include <wpi/units/acceleration.h>
 
 /**
  * Accelerometer filtering snippets for frc-docs.
@@ -15,10 +15,10 @@
 class Robot : public wpi::TimedRobot {
  public:
   void RobotPeriodic() override {
-    wpi::units::meters_per_second_squared_t XAccel =
+    wpi::units::meters_per_second_squared<> XAccel =
         m_accelerometer.GetAccelX();
     // Get the filtered X acceleration
-    wpi::units::meters_per_second_squared_t filteredXAccel =
+    wpi::units::meters_per_second_squared<> filteredXAccel =
         m_xAccelFilter.Calculate(XAccel);
 
     wpi::SmartDashboard::PutNumber("X Acceleration", XAccel.value());
@@ -28,9 +28,9 @@ class Robot : public wpi::TimedRobot {
 
  private:
   wpi::OnboardIMU m_accelerometer{wpi::OnboardIMU::MountOrientation::kFlat};
-  wpi::math::LinearFilter<wpi::units::meters_per_second_squared_t>
+  wpi::math::LinearFilter<wpi::units::meters_per_second_squared<>>
       m_xAccelFilter = wpi::math::LinearFilter<
-          wpi::units::meters_per_second_squared_t>::MovingAverage(10);
+          wpi::units::meters_per_second_squared<>>::MovingAverage(10);
 };
 
 #ifndef RUNNING_WPILIB_TESTS

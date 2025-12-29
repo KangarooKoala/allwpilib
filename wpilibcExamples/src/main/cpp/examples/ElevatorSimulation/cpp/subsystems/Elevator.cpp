@@ -39,14 +39,14 @@ void Elevator::UpdateTelemetry() {
   m_elevatorMech2d->SetLength(m_encoder.GetDistance());
 }
 
-void Elevator::ReachGoal(wpi::units::meter_t goal) {
+void Elevator::ReachGoal(wpi::units::meters<> goal) {
   m_controller.SetGoal(goal);
   // With the setpoint value we run PID control like normal
   double pidOutput =
-      m_controller.Calculate(wpi::units::meter_t{m_encoder.GetDistance()});
-  wpi::units::volt_t feedforwardOutput =
+      m_controller.Calculate(wpi::units::meters<>{m_encoder.GetDistance()});
+  wpi::units::volts<> feedforwardOutput =
       m_feedforward.Calculate(m_controller.GetSetpoint().velocity);
-  m_motor.SetVoltage(wpi::units::volt_t{pidOutput} + feedforwardOutput);
+  m_motor.SetVoltage(wpi::units::volts<>{pidOutput} + feedforwardOutput);
 }
 
 void Elevator::Stop() {

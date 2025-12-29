@@ -13,11 +13,11 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
-#include "wpi/units/angular_acceleration.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 class SwerveModule {
  public:
@@ -44,14 +44,14 @@ class SwerveModule {
   wpi::Encoder m_turningEncoder;
 
   wpi::math::PIDController m_drivePIDController{1.0, 0, 0};
-  wpi::math::ProfiledPIDController<wpi::units::radians> m_turningPIDController{
+  wpi::math::ProfiledPIDController<wpi::units::radians_> m_turningPIDController{
       1.0,
       0.0,
       0.0,
       {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_driveFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_driveFeedforward{
       1_V, 3_V / 1_mps};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_turnFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

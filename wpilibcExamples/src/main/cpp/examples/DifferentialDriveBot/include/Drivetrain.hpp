@@ -13,10 +13,10 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/velocity.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
 
 /**
  * Represents a differential drive style drivetrain.
@@ -45,18 +45,18 @@ class Drivetrain {
     m_rightEncoder.Reset();
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxSpeed =
+  static constexpr wpi::units::meters_per_second<> kMaxSpeed =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second<> kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetSpeeds(const wpi::math::DifferentialDriveWheelSpeeds& speeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::radians_per_second_t rot);
+  void Drive(wpi::units::meters_per_second<> xSpeed,
+             wpi::units::radians_per_second<> rot);
   void UpdateOdometry();
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
+  static constexpr wpi::units::meters<> kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
@@ -75,11 +75,11 @@ class Drivetrain {
 
   wpi::math::DifferentialDriveKinematics m_kinematics{kTrackwidth};
   wpi::math::DifferentialDriveOdometry m_odometry{
-      m_imu.GetRotation2d(), wpi::units::meter_t{m_leftEncoder.GetDistance()},
-      wpi::units::meter_t{m_rightEncoder.GetDistance()}};
+      m_imu.GetRotation2d(), wpi::units::meters<>{m_leftEncoder.GetDistance()},
+      wpi::units::meters<>{m_rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
       1_V, 3_V / 1_mps};
 };

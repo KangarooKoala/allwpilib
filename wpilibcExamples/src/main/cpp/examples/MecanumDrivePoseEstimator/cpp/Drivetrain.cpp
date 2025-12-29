@@ -8,30 +8,30 @@
 #include "wpi/system/Timer.hpp"
 
 wpi::math::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {wpi::units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          wpi::units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          wpi::units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          wpi::units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+  return {wpi::units::meters_per_second<>{m_frontLeftEncoder.GetRate()},
+          wpi::units::meters_per_second<>{m_frontRightEncoder.GetRate()},
+          wpi::units::meters_per_second<>{m_backLeftEncoder.GetRate()},
+          wpi::units::meters_per_second<>{m_backRightEncoder.GetRate()}};
 }
 
 wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
-  return {wpi::units::meter_t{m_frontLeftEncoder.GetDistance()},
-          wpi::units::meter_t{m_frontRightEncoder.GetDistance()},
-          wpi::units::meter_t{m_backLeftEncoder.GetDistance()},
-          wpi::units::meter_t{m_backRightEncoder.GetDistance()}};
+  return {wpi::units::meters<>{m_frontLeftEncoder.GetDistance()},
+          wpi::units::meters<>{m_frontRightEncoder.GetDistance()},
+          wpi::units::meters<>{m_backLeftEncoder.GetDistance()},
+          wpi::units::meters<>{m_backRightEncoder.GetDistance()}};
 }
 
 void Drivetrain::SetSpeeds(
     const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds) {
-  std::function<void(wpi::units::meters_per_second_t, const wpi::Encoder&,
+  std::function<void(wpi::units::meters_per_second<>, const wpi::Encoder&,
                      wpi::math::PIDController&, wpi::PWMSparkMax&)>
       calcAndSetSpeeds = [&m_feedforward = m_feedforward](
-                             wpi::units::meters_per_second_t speed,
+                             wpi::units::meters_per_second<> speed,
                              const auto& encoder, auto& controller,
                              auto& motor) {
         auto feedforward = m_feedforward.Calculate(speed);
         double output = controller.Calculate(encoder.GetRate(), speed.value());
-        motor.SetVoltage(wpi::units::volt_t{output} + feedforward);
+        motor.SetVoltage(wpi::units::volts<>{output} + feedforward);
       };
 
   calcAndSetSpeeds(wheelSpeeds.frontLeft, m_frontLeftEncoder,
@@ -44,10 +44,10 @@ void Drivetrain::SetSpeeds(
                    m_backRightPIDController, m_backRightMotor);
 }
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
-                       wpi::units::meters_per_second_t ySpeed,
-                       wpi::units::radians_per_second_t rot, bool fieldRelative,
-                       wpi::units::second_t period) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xSpeed,
+                       wpi::units::meters_per_second<> ySpeed,
+                       wpi::units::radians_per_second<> rot, bool fieldRelative,
+                       wpi::units::seconds<> period) {
   wpi::math::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
   if (fieldRelative) {
     chassisSpeeds = chassisSpeeds.ToRobotRelative(

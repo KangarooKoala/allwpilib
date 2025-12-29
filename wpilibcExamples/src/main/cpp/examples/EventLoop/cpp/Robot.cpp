@@ -10,10 +10,10 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;
@@ -54,9 +54,9 @@ class Robot : public wpi::TimedRobot {
         .IfHigh([&shooter = m_shooter, &controller = m_controller, &ff = m_ff,
                  &encoder = m_shooterEncoder] {
           shooter.SetVoltage(
-              wpi::units::volt_t{controller.Calculate(encoder.GetRate(),
+              wpi::units::volts<>{controller.Calculate(encoder.GetRate(),
                                                       SHOT_VELOCITY.value())} +
-              ff.Calculate(wpi::units::radians_per_second_t{SHOT_VELOCITY}));
+              ff.Calculate(wpi::units::radians_per_second<>{SHOT_VELOCITY}));
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = m_shooter] { shooter.Set(0.0); });
@@ -84,7 +84,7 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax m_shooter{0};
   wpi::Encoder m_shooterEncoder{0, 1};
   wpi::math::PIDController m_controller{0.3, 0, 0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_ff{0.1_V,
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_ff{0.1_V,
                                                               0.065_V / 1_rpm};
 
   wpi::PWMSparkMax m_kicker{1};

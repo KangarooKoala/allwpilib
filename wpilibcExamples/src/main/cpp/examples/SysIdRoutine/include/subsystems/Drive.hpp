@@ -41,7 +41,7 @@ class Drive : public wpi::cmd::SubsystemBase {
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                               nullptr},
       wpi::cmd::sysid::Mechanism{
-          [this](wpi::units::volt_t driveVoltage) {
+          [this](wpi::units::volts<> driveVoltage) {
             m_leftMotor.SetVoltage(driveVoltage);
             m_rightMotor.SetVoltage(driveVoltage);
           },
@@ -49,15 +49,15 @@ class Drive : public wpi::cmd::SubsystemBase {
             log->Motor("drive-left")
                 .voltage(m_leftMotor.Get() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::meter_t{m_leftEncoder.GetDistance()})
+                .position(wpi::units::meters<>{m_leftEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::meters_per_second_t{m_leftEncoder.GetRate()});
+                    wpi::units::meters_per_second<>{m_leftEncoder.GetRate()});
             log->Motor("drive-right")
                 .voltage(m_rightMotor.Get() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::meter_t{m_rightEncoder.GetDistance()})
+                .position(wpi::units::meters<>{m_rightEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::meters_per_second_t{m_rightEncoder.GetRate()});
+                    wpi::units::meters_per_second<>{m_rightEncoder.GetRate()});
           },
           this}};
 };

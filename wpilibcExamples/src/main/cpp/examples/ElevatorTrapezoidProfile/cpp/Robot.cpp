@@ -9,15 +9,15 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t kDt = 20_ms;
+  static constexpr wpi::units::seconds<> kDt = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -44,16 +44,16 @@ class Robot : public wpi::TimedRobot {
  private:
   wpi::Joystick m_joystick{1};
   ExampleSmartMotorController m_motor{1};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1.5_V * 1_s / 1_m};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::TrapezoidProfile<wpi::units::meters> m_profile{
-      {1.75_mps, 0.75_mps_sq}};
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_goal;
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State m_setpoint;
+  wpi::math::TrapezoidProfile<wpi::units::meters_> m_profile{
+      {1.75_mps, 0.75_mps2}};
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State m_goal;
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State m_setpoint;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

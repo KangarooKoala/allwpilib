@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/commands2/SubsystemBase.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 #include "wpi/xrp/XRPServo.hpp"
 
 class Arm : public wpi::cmd::SubsystemBase {
@@ -20,7 +20,7 @@ class Arm : public wpi::cmd::SubsystemBase {
    *
    * @param angle the commanded angle
    */
-  void SetAngle(wpi::units::radian_t angle);
+  void SetAngle(wpi::units::radians<> angle);
 
  private:
   wpi::xrp::XRPServo m_armServo{4};

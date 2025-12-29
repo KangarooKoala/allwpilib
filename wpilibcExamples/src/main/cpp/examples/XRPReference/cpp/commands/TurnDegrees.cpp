@@ -6,7 +6,6 @@
 
 #include <numbers>
 
-#include "wpi/units/math.hpp"
 
 void TurnDegrees::Initialize() {
   // Set motors to stop, read encoder values for starting point
@@ -33,8 +32,8 @@ bool TurnDegrees::IsFinished() {
   return GetAverageTurningDistance() >= inchPerDegree * m_angle;
 }
 
-wpi::units::meter_t TurnDegrees::GetAverageTurningDistance() {
-  auto l = wpi::units::math::abs(m_drive->GetLeftDistance());
-  auto r = wpi::units::math::abs(m_drive->GetRightDistance());
+wpi::units::meters<> TurnDegrees::GetAverageTurningDistance() {
+  auto l = wpi::units::abs(m_drive->GetLeftDistance());
+  auto r = wpi::units::abs(m_drive->GetRightDistance());
   return (l + r) / 2;
 }

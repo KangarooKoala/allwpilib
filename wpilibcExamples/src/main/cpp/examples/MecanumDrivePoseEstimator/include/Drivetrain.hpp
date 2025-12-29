@@ -33,14 +33,14 @@ class Drivetrain {
   wpi::math::MecanumDriveWheelSpeeds GetCurrentState() const;
   wpi::math::MecanumDriveWheelPositions GetCurrentDistances() const;
   void SetSpeeds(const wpi::math::MecanumDriveWheelSpeeds& wheelSpeeds);
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed,
-             wpi::units::radians_per_second_t rot, bool fieldRelative,
-             wpi::units::second_t period);
+  void Drive(wpi::units::meters_per_second<> xSpeed,
+             wpi::units::meters_per_second<> ySpeed,
+             wpi::units::radians_per_second<> rot, bool fieldRelative,
+             wpi::units::seconds<> period);
   void UpdateOdometry();
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second<> kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:
@@ -72,7 +72,7 @@ class Drivetrain {
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
       1_V, 3_V / 1_mps};
 
   // Gains are for example purposes only - must be determined for your own

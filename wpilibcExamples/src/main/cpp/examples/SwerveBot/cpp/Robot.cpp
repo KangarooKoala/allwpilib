@@ -23,9 +23,9 @@ class Robot : public wpi::TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_xspeedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_yspeedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> m_xspeedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> m_yspeedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> m_rotLimiter{3 / 1_s};
 
   void DriveWithJoystick(bool fieldRelative) {
     // Get the x speed. We are inverting this because gamepads return

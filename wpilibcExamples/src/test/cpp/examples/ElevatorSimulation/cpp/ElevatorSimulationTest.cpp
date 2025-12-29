@@ -15,9 +15,9 @@
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/mass.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
+#include <wpi/units/time.h>
 
 using namespace Constants;
 

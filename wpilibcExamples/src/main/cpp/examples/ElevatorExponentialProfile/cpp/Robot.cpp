@@ -9,15 +9,15 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/trajectory/ExponentialProfile.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t kDt = 20_ms;
+  static constexpr wpi::units::seconds<> kDt = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -47,17 +47,17 @@ class Robot : public wpi::TimedRobot {
  private:
   wpi::Joystick m_joystick{1};
   ExampleSmartMotorController m_motor{1};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
-      1_V, 1_V / 1_mps, 1_V / 1_mps_sq};
+      1_V, 1_V / 1_mps, 1_V / 1_mps2};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>
-      m_profile{{10_V, 1_V / 1_mps, 1_V / 1_mps_sq}};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      m_profile{{10_V, 1_V / 1_mps, 1_V / 1_mps2}};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       m_goal;
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       m_setpoint;
 };
 

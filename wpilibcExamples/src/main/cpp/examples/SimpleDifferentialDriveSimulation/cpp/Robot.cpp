@@ -16,7 +16,7 @@ class Robot : public wpi::TimedRobot {
     m_trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
         wpi::math::Pose2d{2_m, 2_m, 0_rad}, {},
         wpi::math::Pose2d{6_m, 4_m, 0_rad},
-        wpi::math::TrajectoryConfig(2_mps, 2_mps_sq));
+        wpi::math::TrajectoryConfig(2_mps, 2_mps2));
   }
 
   void RobotPeriodic() override { m_drive.Periodic(); }
@@ -56,8 +56,8 @@ class Robot : public wpi::TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_speedLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> m_rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> m_speedLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> m_rotLimiter{3 / 1_s};
 
   Drivetrain m_drive;
   wpi::math::Trajectory m_trajectory;

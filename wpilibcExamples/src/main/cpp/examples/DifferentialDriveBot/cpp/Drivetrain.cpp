@@ -13,17 +13,17 @@ void Drivetrain::SetSpeeds(
   const double rightOutput = m_rightPIDController.Calculate(
       m_rightEncoder.GetRate(), speeds.right.value());
 
-  m_leftLeader.SetVoltage(wpi::units::volt_t{leftOutput} + leftFeedforward);
-  m_rightLeader.SetVoltage(wpi::units::volt_t{rightOutput} + rightFeedforward);
+  m_leftLeader.SetVoltage(wpi::units::volts<>{leftOutput} + leftFeedforward);
+  m_rightLeader.SetVoltage(wpi::units::volts<>{rightOutput} + rightFeedforward);
 }
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xSpeed,
-                       wpi::units::radians_per_second_t rot) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xSpeed,
+                       wpi::units::radians_per_second<> rot) {
   SetSpeeds(m_kinematics.ToWheelSpeeds({xSpeed, 0_mps, rot}));
 }
 
 void Drivetrain::UpdateOdometry() {
   m_odometry.Update(m_imu.GetRotation2d(),
-                    wpi::units::meter_t{m_leftEncoder.GetDistance()},
-                    wpi::units::meter_t{m_rightEncoder.GetDistance()});
+                    wpi::units::meters<>{m_leftEncoder.GetDistance()},
+                    wpi::units::meters<>{m_rightEncoder.GetDistance()});
 }

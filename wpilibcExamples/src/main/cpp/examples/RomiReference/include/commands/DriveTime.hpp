@@ -8,7 +8,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/system/Timer.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
  public:
@@ -20,7 +20,7 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
    * @param time How much time to drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveTime(double speed, wpi::units::second_t time, Drivetrain* drive)
+  DriveTime(double speed, wpi::units::seconds<> time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -32,7 +32,7 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
 
  private:
   double m_speed;
-  wpi::units::second_t m_duration;
+  wpi::units::seconds<> m_duration;
   Drivetrain* m_drive;
   wpi::Timer m_timer;
 };

@@ -7,10 +7,10 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/velocity.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
 
 /**
  * wpi::math::ProfiledPIDController with feedforward snippets for frc-docs.
@@ -22,10 +22,10 @@ class Robot : public wpi::TimedRobot {
 
   // Controls a simple motor's position using a
   // wpi::math::SimpleMotorFeedforward and a wpi::math::ProfiledPIDController
-  void GoToPosition(wpi::units::meter_t goalPosition) {
+  void GoToPosition(wpi::units::meters<> goalPosition) {
     auto pidVal = m_controller.Calculate(
-        wpi::units::meter_t{m_encoder.GetDistance()}, goalPosition);
-    m_motor.SetVoltage(wpi::units::volt_t{pidVal} +
+        wpi::units::meters<>{m_encoder.GetDistance()}, goalPosition);
+    m_motor.SetVoltage(wpi::units::volts<>{pidVal} +
                        m_feedforward.Calculate(
                            m_lastSpeed, m_controller.GetSetpoint().velocity));
     m_lastSpeed = m_controller.GetSetpoint().velocity;
@@ -37,14 +37,14 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
-      1.0, 0.0, 0.0, {5_mps, 10_mps_sq}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> m_feedforward{
-      0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps_sq};
+  wpi::math::ProfiledPIDController<wpi::units::meters_> m_controller{
+      1.0, 0.0, 0.0, {5_mps, 10_mps2}};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> m_feedforward{
+      0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps2};
   wpi::Encoder m_encoder{0, 1};
   wpi::PWMSparkMax m_motor{0};
 
-  wpi::units::meters_per_second_t m_lastSpeed = 0_mps;
+  wpi::units::meters_per_second<> m_lastSpeed = 0_mps;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

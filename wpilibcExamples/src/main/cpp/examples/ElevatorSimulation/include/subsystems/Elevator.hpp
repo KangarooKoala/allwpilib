@@ -18,14 +18,14 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 class Elevator {
  public:
   Elevator();
   void SimulationPeriodic();
   void UpdateTelemetry();
-  void ReachGoal(wpi::units::meter_t goal);
+  void ReachGoal(wpi::units::meters<> goal);
   void Stop();
 
  private:
@@ -33,9 +33,9 @@ class Elevator {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints m_constraints{
-      2.45_mps, 2.45_mps_sq};
-  wpi::math::ProfiledPIDController<wpi::units::meters> m_controller{
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::Constraints m_constraints{
+      2.45_mps, 2.45_mps2};
+  wpi::math::ProfiledPIDController<wpi::units::meters_> m_controller{
       Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd,
       m_constraints};
 

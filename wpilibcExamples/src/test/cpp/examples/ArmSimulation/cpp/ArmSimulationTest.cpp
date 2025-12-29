@@ -15,11 +15,11 @@
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
-#include "wpi/units/length.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
 #include "wpi/util/Preferences.hpp"
 
-class ArmSimulationTest : public testing::TestWithParam<wpi::units::degree_t> {
+class ArmSimulationTest : public testing::TestWithParam<wpi::units::degrees<>> {
   Robot m_robot;
   std::optional<std::thread> m_thread;
 
@@ -52,7 +52,7 @@ TEST_P(ArmSimulationTest, Teleop) {
   EXPECT_TRUE(wpi::Preferences::ContainsKey(kArmPositionKey));
   EXPECT_TRUE(wpi::Preferences::ContainsKey(kArmPKey));
   wpi::Preferences::SetDouble(kArmPositionKey, GetParam().value());
-  wpi::units::degree_t setpoint = GetParam();
+  wpi::units::degrees<> setpoint = GetParam();
   EXPECT_DOUBLE_EQ(setpoint.value(),
                    wpi::Preferences::GetDouble(kArmPositionKey, NAN));
 
@@ -80,8 +80,8 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(1.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
-                    .convert<wpi::units::degree>()
+                wpi::units::radians<>(m_encoderSim.GetDistance())
+                    .convert<wpi::units::degrees_>()
                     .value(),
                 2.0);
 
@@ -89,8 +89,8 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(0.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
-                    .convert<wpi::units::degree>()
+                wpi::units::radians<>(m_encoderSim.GetDistance())
+                    .convert<wpi::units::degrees_>()
                     .value(),
                 2.0);
   }
@@ -114,8 +114,8 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(1.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
-                    .convert<wpi::units::degree>()
+                wpi::units::radians<>(m_encoderSim.GetDistance())
+                    .convert<wpi::units::degrees_>()
                     .value(),
                 2.0);
 
@@ -123,8 +123,8 @@ TEST_P(ArmSimulationTest, Teleop) {
     wpi::sim::StepTiming(0.5_s);
 
     EXPECT_NEAR(setpoint.value(),
-                wpi::units::radian_t(m_encoderSim.GetDistance())
-                    .convert<wpi::units::degree>()
+                wpi::units::radians<>(m_encoderSim.GetDistance())
+                    .convert<wpi::units::degrees_>()
                     .value(),
                 2.0);
   }
@@ -144,7 +144,7 @@ TEST_P(ArmSimulationTest, Teleop) {
 INSTANTIATE_TEST_SUITE_P(
     ArmSimulationTests, ArmSimulationTest,
     testing::Values(kDefaultArmSetpoint, 25.0_deg, 50.0_deg),
-    [](const testing::TestParamInfo<wpi::units::degree_t>& info) {
+    [](const testing::TestParamInfo<wpi::units::degrees<>>& info) {
       return testing::PrintToString(info.param.value())
           .append(std::string(info.param.abbreviation()));
     });

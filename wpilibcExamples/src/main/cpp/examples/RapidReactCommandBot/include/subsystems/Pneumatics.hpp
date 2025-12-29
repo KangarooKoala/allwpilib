@@ -10,7 +10,7 @@
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
-#include "wpi/units/pressure.hpp"
+#include <wpi/units/pressure.h>
 
 class Pneumatics : wpi::cmd::SubsystemBase {
  public:
@@ -23,7 +23,7 @@ class Pneumatics : wpi::cmd::SubsystemBase {
    *
    * @return the measured pressure, in PSI
    */
-  wpi::units::pounds_per_square_inch_t GetPressure();
+  wpi::units::pounds_per_square_inch<> GetPressure();
 
  private:
   // External analog pressure sensor

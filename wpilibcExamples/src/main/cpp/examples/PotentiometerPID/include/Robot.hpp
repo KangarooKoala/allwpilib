@@ -11,7 +11,7 @@
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 #include "wpi/math/controller/PIDController.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a
@@ -28,10 +28,10 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kJoystickChannel = 3;
 
   // The elevator can move 1.5 meters from top to bottom
-  static constexpr wpi::units::meter_t kFullHeight = 1.5_m;
+  static constexpr wpi::units::meters<> kFullHeight = 1.5_m;
 
   // Bottom, middle, and top elevator setpoints
-  static constexpr std::array<wpi::units::meter_t, 3> kSetpoints = {
+  static constexpr std::array<wpi::units::meters<>, 3> kSetpoints = {
       {0.2_m, 0.8_m, 1.4_m}};
 
  private:

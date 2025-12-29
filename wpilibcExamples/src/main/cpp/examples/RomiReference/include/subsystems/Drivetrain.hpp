@@ -9,14 +9,14 @@
 #include "wpi/hardware/motor/Spark.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/romi/RomiGyro.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 class Drivetrain : public wpi::cmd::SubsystemBase {
  public:
   static constexpr double kCountsPerRevolution = 1440.0;
-  static constexpr wpi::units::meter_t kWheelDiameter = 70_mm;
+  static constexpr wpi::units::meters<> kWheelDiameter = 70_mm;
 
   Drivetrain();
 
@@ -57,42 +57,42 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
    *
    * @return the left-side distance driven
    */
-  wpi::units::meter_t GetLeftDistance();
+  wpi::units::meters<> GetLeftDistance();
 
   /**
    * Gets the right distance driven.
    *
    * @return the right-side distance driven
    */
-  wpi::units::meter_t GetRightDistance();
+  wpi::units::meters<> GetRightDistance();
 
   /**
    * Returns the average distance traveled by the left and right encoders.
    *
    * @return The average distance traveled by the left and right encoders.
    */
-  wpi::units::meter_t GetAverageDistance();
+  wpi::units::meters<> GetAverageDistance();
 
   /**
    * Current angle of the Romi around the X-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleX();
+  wpi::units::radians<> GetGyroAngleX();
 
   /**
    * Current angle of the Romi around the Y-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleY();
+  wpi::units::radians<> GetGyroAngleY();
 
   /**
    * Current angle of the Romi around the Z-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleZ();
+  wpi::units::radians<> GetGyroAngleZ();
 
   /**
    * Reset the gyro.

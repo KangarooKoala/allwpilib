@@ -5,8 +5,8 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/units/acceleration.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/acceleration.h>
+#include <wpi/units/angle.h>
 
 /**
  * Onboard IMU snippets for frc-docs.

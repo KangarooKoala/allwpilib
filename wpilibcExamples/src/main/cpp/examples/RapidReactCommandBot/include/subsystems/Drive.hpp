@@ -15,8 +15,8 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 class Drive : public wpi::cmd::SubsystemBase {
  public:
@@ -37,7 +37,7 @@ class Drive : public wpi::cmd::SubsystemBase {
    * @param distance The distance to drive forward in meters
    * @param speed The fraction of max speed at which to drive
    */
-  wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meter_t distance,
+  wpi::cmd::CommandPtr DriveDistanceCommand(wpi::units::meters<> distance,
                                             double speed);
 
   /**
@@ -46,7 +46,7 @@ class Drive : public wpi::cmd::SubsystemBase {
    *
    * @param angle The angle to turn to
    */
-  wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degree_t angle);
+  wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degrees<> angle);
 
  private:
   wpi::PWMSparkMax m_leftLeader{DriveConstants::kLeftMotor1Port};
@@ -67,11 +67,11 @@ class Drive : public wpi::cmd::SubsystemBase {
 
   wpi::OnboardIMU m_imu{wpi::OnboardIMU::kFlat};
 
-  wpi::math::ProfiledPIDController<wpi::units::radians> m_controller{
+  wpi::math::ProfiledPIDController<wpi::units::radians_> m_controller{
       DriveConstants::kTurnP,
       DriveConstants::kTurnI,
       DriveConstants::kTurnD,
       {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> m_feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

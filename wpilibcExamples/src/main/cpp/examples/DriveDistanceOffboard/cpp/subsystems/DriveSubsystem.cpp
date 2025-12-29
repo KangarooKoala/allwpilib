@@ -34,10 +34,10 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::SetDriveStates(
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight) {
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentRight,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   m_leftLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::kPosition,
@@ -60,12 +60,12 @@ void DriveSubsystem::ResetEncoders() {
   m_rightLeader.ResetEncoder();
 }
 
-wpi::units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
-  return wpi::units::meter_t{m_leftLeader.GetEncoderDistance()};
+wpi::units::meters<> DriveSubsystem::GetLeftEncoderDistance() {
+  return wpi::units::meters<>{m_leftLeader.GetEncoderDistance()};
 }
 
-wpi::units::meter_t DriveSubsystem::GetRightEncoderDistance() {
-  return wpi::units::meter_t{m_rightLeader.GetEncoderDistance()};
+wpi::units::meters<> DriveSubsystem::GetRightEncoderDistance() {
+  return wpi::units::meters<>{m_rightLeader.GetEncoderDistance()};
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
@@ -73,7 +73,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
-    wpi::units::meter_t distance) {
+    wpi::units::meters<> distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning
@@ -95,7 +95,7 @@ wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
-    wpi::units::meter_t distance) {
+    wpi::units::meters<> distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning

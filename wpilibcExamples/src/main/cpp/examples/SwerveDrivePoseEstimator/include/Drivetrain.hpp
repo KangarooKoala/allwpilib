@@ -19,14 +19,14 @@ class Drivetrain {
  public:
   Drivetrain() { m_imu.ResetYaw(); }
 
-  void Drive(wpi::units::meters_per_second_t xSpeed,
-             wpi::units::meters_per_second_t ySpeed,
-             wpi::units::radians_per_second_t rot, bool fieldRelative,
-             wpi::units::second_t period);
+  void Drive(wpi::units::meters_per_second<> xSpeed,
+             wpi::units::meters_per_second<> ySpeed,
+             wpi::units::radians_per_second<> rot, bool fieldRelative,
+             wpi::units::seconds<> period);
   void UpdateOdometry();
 
   static constexpr auto kMaxSpeed = 3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularSpeed{
+  static constexpr wpi::units::radians_per_second<> kMaxAngularSpeed{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:

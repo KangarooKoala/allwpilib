@@ -7,7 +7,7 @@
 #include "subsystems/Drivetrain.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 class DriveDistance
     : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {
@@ -20,7 +20,7 @@ class DriveDistance
    * @param distance The distance the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveDistance(double speed, wpi::units::meter_t distance, Drivetrain* drive)
+  DriveDistance(double speed, wpi::units::meters<> distance, Drivetrain* drive)
       : m_speed(speed), m_distance(distance), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -32,6 +32,6 @@ class DriveDistance
 
  private:
   double m_speed;
-  wpi::units::meter_t m_distance;
+  wpi::units::meters<> m_distance;
   Drivetrain* m_drive;
 };

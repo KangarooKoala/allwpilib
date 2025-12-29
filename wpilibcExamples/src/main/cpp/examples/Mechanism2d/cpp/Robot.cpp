@@ -11,7 +11,7 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
 
@@ -41,7 +41,7 @@ class Robot : public wpi::TimedRobot {
     // update the dashboard mechanism's state
     m_elevator->SetLength(kElevatorMinimumLength +
                           m_elevatorEncoder.GetDistance());
-    m_wrist->SetAngle(wpi::units::degree_t{m_wristPotentiometer.Get()});
+    m_wrist->SetAngle(wpi::units::degrees<>{m_wristPotentiometer.Get()});
   }
 
   void TeleopPeriodic() override {

@@ -8,7 +8,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/system/Timer.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
  public:
@@ -19,7 +19,7 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
    * @param time How much time to turn
    * @param drive The drive subsystem on which this command will run
    */
-  TurnTime(double speed, wpi::units::second_t time, Drivetrain* drive)
+  TurnTime(double speed, wpi::units::seconds<> time, Drivetrain* drive)
       : m_speed(speed), m_duration(time), m_drive(drive) {
     AddRequirements(m_drive);
   }
@@ -31,7 +31,7 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
 
  private:
   double m_speed;
-  wpi::units::second_t m_duration;
+  wpi::units::seconds<> m_duration;
   Drivetrain* m_drive;
   wpi::Timer m_timer;
 };

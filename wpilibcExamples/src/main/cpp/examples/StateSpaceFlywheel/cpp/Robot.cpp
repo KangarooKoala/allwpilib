@@ -13,7 +13,7 @@
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
-#include "wpi/units/angular_velocity.hpp"
+#include <wpi/units/angular_velocity.h>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller
@@ -24,9 +24,9 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kEncoderAChannel = 0;
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
-  static constexpr wpi::units::radians_per_second_t kSpinup = 500_rpm;
+  static constexpr wpi::units::radians_per_second<> kSpinup = 500_rpm;
 
-  static constexpr wpi::units::kilogram_square_meter_t
+  static constexpr wpi::units::kilogram_square_meters<>
       kFlywheelMomentOfInertia = 0.00032_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the flywheel
@@ -109,7 +109,7 @@ class Robot : public wpi::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    m_motor.SetVoltage(wpi::units::volt_t{m_loop.U(0)});
+    m_motor.SetVoltage(wpi::units::volts<>{m_loop.U(0)});
   }
 };
 

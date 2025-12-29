@@ -42,7 +42,7 @@ wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
       .WithName("ArcadeDrive");
 }
 
-wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
+wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meters<> distance,
                                                  double speed) {
   return RunOnce([this] {
            // Reset encoders at the start of the command
@@ -52,16 +52,16 @@ wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
       // Drive forward at specified speed
       .AndThen(Run([this, speed] { m_drive.ArcadeDrive(speed, 0.0); }))
       .Until([this, distance] {
-        return wpi::units::math::max(
-                   wpi::units::meter_t(m_leftEncoder.GetDistance()),
-                   wpi::units::meter_t(m_rightEncoder.GetDistance())) >=
+        return wpi::units::max(
+                   wpi::units::meters<>(m_leftEncoder.GetDistance()),
+                   wpi::units::meters<>(m_rightEncoder.GetDistance())) >=
                distance;
       })
       // Stop the drive when the command ends
       .FinallyDo([this](bool interrupted) { m_drive.StopMotor(); });
 }
 
-wpi::cmd::CommandPtr Drive::TurnToAngleCommand(wpi::units::degree_t angle) {
+wpi::cmd::CommandPtr Drive::TurnToAngleCommand(wpi::units::degrees<> angle) {
   return StartRun(
              [this] { m_controller.Reset(m_imu.GetRotation2d().Degrees()); },
              [this, angle] {

@@ -5,8 +5,8 @@
 #include "subsystems/Shooter.hpp"
 
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/angle.h>
+#include <wpi/units/voltage.h>
 
 Shooter::Shooter() {
   m_shooterEncoder.SetDistancePerPulse(
@@ -18,10 +18,10 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
   return wpi::cmd::cmd::Run(
              [this, shooterSpeed] {
                m_shooterMotor.SetVoltage(
-                   wpi::units::volt_t{m_shooterFeedback.Calculate(
+                   wpi::units::volts<>{m_shooterFeedback.Calculate(
                        m_shooterEncoder.GetRate(), shooterSpeed())} +
                    m_shooterFeedforward.Calculate(
-                       wpi::units::turns_per_second_t{shooterSpeed()}));
+                       wpi::units::turns_per_second<>{shooterSpeed()}));
                m_feederMotor.Set(constants::shooter::kFeederSpeed);
              },
              {this})
