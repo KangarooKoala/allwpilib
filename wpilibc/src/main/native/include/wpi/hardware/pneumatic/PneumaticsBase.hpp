@@ -9,10 +9,10 @@
 
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
-#include "wpi/units/current.hpp"
-#include "wpi/units/pressure.hpp"
-#include "wpi/units/time.hpp"
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/current.h>
+#include <wpi/units/pressure.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 
 namespace wpi {
 class Solenoid;
@@ -46,7 +46,7 @@ class PneumaticsBase {
    *
    * @return The current drawn by the compressor.
    */
-  virtual wpi::units::ampere_t GetCompressorCurrent() const = 0;
+  virtual wpi::units::amperes<> GetCompressorCurrent() const = 0;
 
   /** Disables the compressor. */
   virtual void DisableCompressor() = 0;
@@ -75,8 +75,8 @@ class PneumaticsBase {
    * off when the pressure reaches this value.
    */
   virtual void EnableCompressorAnalog(
-      wpi::units::pounds_per_square_inch_t minPressure,
-      wpi::units::pounds_per_square_inch_t maxPressure) = 0;
+      wpi::units::pounds_per_square_inch<> minPressure,
+      wpi::units::pounds_per_square_inch<> maxPressure) = 0;
 
   /**
    * If supported by the device, enables the compressor in hybrid mode. This
@@ -108,8 +108,8 @@ class PneumaticsBase {
    * disconnected or indicates that the system is full.
    */
   virtual void EnableCompressorHybrid(
-      wpi::units::pounds_per_square_inch_t minPressure,
-      wpi::units::pounds_per_square_inch_t maxPressure) = 0;
+      wpi::units::pounds_per_square_inch<> minPressure,
+      wpi::units::pounds_per_square_inch<> maxPressure) = 0;
 
   /**
    * Returns the active compressor configuration.
@@ -164,7 +164,7 @@ class PneumaticsBase {
    * @param index solenoid index
    * @param duration shot duration
    */
-  virtual void SetOneShotDuration(int index, wpi::units::second_t duration) = 0;
+  virtual void SetOneShotDuration(int index, wpi::units::seconds<> duration) = 0;
 
   /**
    * Check if a solenoid channel is valid.
@@ -215,7 +215,7 @@ class PneumaticsBase {
    * @param channel The analog input channel to read voltage from.
    * @return The voltage of the specified analog input channel.
    */
-  virtual wpi::units::volt_t GetAnalogVoltage(int channel) const = 0;
+  virtual wpi::units::volts<> GetAnalogVoltage(int channel) const = 0;
 
   /**
    * If supported by the device, returns the pressure read by an analog
@@ -228,7 +228,7 @@ class PneumaticsBase {
    * @return The pressure read by an analog pressure sensor on the
    * specified analog input channel.
    */
-  virtual wpi::units::pounds_per_square_inch_t GetPressure(
+  virtual wpi::units::pounds_per_square_inch<> GetPressure(
       int channel) const = 0;
 
   /**

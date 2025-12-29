@@ -29,7 +29,7 @@ void FieldObject2d::SetPose(const wpi::math::Pose2d& pose) {
   SetPoses({pose});
 }
 
-void FieldObject2d::SetPose(wpi::units::meter_t x, wpi::units::meter_t y,
+void FieldObject2d::SetPose(wpi::units::meters<> x, wpi::units::meters<> y,
                             wpi::math::Rotation2d rotation) {
   SetPoses({{x, y, rotation}});
 }
@@ -106,8 +106,8 @@ void FieldObject2d::UpdateFromEntry() const {
   }
   m_poses.resize(size / 3);
   for (size_t i = 0; i < size / 3; ++i) {
-    m_poses[i] = wpi::math::Pose2d{wpi::units::meter_t{arr[i * 3 + 0]},
-                                   wpi::units::meter_t{arr[i * 3 + 1]},
-                                   wpi::units::degree_t{arr[i * 3 + 2]}};
+    m_poses[i] = wpi::math::Pose2d{wpi::units::meters<>{arr[i * 3 + 0]},
+                                   wpi::units::meters<>{arr[i * 3 + 1]},
+                                   wpi::units::degrees<>{arr[i * 3 + 2]}};
   }
 }

@@ -10,7 +10,7 @@
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/AddressableLEDTypes.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
 

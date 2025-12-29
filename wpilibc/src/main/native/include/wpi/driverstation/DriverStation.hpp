@@ -11,7 +11,7 @@
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/Synchronization.h"
 
 namespace wpi::log {
@@ -594,7 +594,7 @@ class DriverStation final {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static wpi::units::second_t GetMatchTime();
+  static wpi::units::seconds<> GetMatchTime();
 
   /**
    * Read the battery voltage.

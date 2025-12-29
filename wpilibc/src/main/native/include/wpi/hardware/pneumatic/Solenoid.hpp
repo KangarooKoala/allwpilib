@@ -9,7 +9,7 @@
 #include "wpi/hal/Types.h"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -101,7 +101,7 @@ class Solenoid : public wpi::util::Sendable,
    *
    * @see startPulse()
    */
-  void SetPulseDuration(wpi::units::second_t duration);
+  void SetPulseDuration(wpi::units::seconds<> duration);
 
   /**
    * %Trigger the pneumatics module to generate a pulse of the duration set in

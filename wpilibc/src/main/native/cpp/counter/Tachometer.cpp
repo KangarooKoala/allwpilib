@@ -34,7 +34,7 @@ void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-wpi::units::hertz_t Tachometer::GetFrequency() const {
+wpi::units::hertz<> Tachometer::GetFrequency() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
     return 0_Hz;
@@ -42,11 +42,11 @@ wpi::units::hertz_t Tachometer::GetFrequency() const {
   return 1 / period;
 }
 
-wpi::units::second_t Tachometer::GetPeriod() const {
+wpi::units::seconds<> Tachometer::GetPeriod() const {
   int32_t status = 0;
   double period = HAL_GetCounterPeriod(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-  return wpi::units::second_t{period};
+  return wpi::units::seconds<>{period};
 }
 
 int Tachometer::GetEdgesPerRevolution() const {
@@ -56,7 +56,7 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
   m_edgesPerRevolution = edges;
 }
 
-wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
+wpi::units::turns_per_second<> Tachometer::GetRevolutionsPerSecond() const {
   auto period = GetPeriod();
   if (period.value() == 0) {
     return 0_tps;
@@ -66,12 +66,12 @@ wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
     return 0_tps;
   }
   auto rotationHz = ((1.0 / edgesPerRevolution) / period);
-  return wpi::units::turns_per_second_t{rotationHz.value()};
+  return wpi::units::turns_per_second<>{rotationHz.value()};
 }
 
-wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute()
+wpi::units::revolutions_per_minute<> Tachometer::GetRevolutionsPerMinute()
     const {
-  return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
+  return wpi::units::revolutions_per_minute<>{GetRevolutionsPerSecond()};
 }
 
 bool Tachometer::GetStopped() const {
@@ -81,7 +81,7 @@ bool Tachometer::GetStopped() const {
   return stopped;
 }
 
-void Tachometer::SetMaxPeriod(wpi::units::second_t maxPeriod) {
+void Tachometer::SetMaxPeriod(wpi::units::seconds<> maxPeriod) {
   int32_t status = 0;
   HAL_SetCounterMaxPeriod(m_handle, maxPeriod.value(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);

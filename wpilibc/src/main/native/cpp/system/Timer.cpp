@@ -12,16 +12,16 @@
 
 namespace wpi {
 
-void Wait(wpi::units::second_t seconds) {
+void Wait(wpi::units::seconds<> seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
-wpi::units::second_t GetTime() {
+wpi::units::seconds<> GetTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::system_clock;
 
-  return wpi::units::second_t{
+  return wpi::units::seconds<>{
       duration_cast<duration<double>>(system_clock::now().time_since_epoch())
           .count()};
 }
@@ -34,7 +34,7 @@ Timer::Timer() {
   Reset();
 }
 
-wpi::units::second_t Timer::Get() const {
+wpi::units::seconds<> Timer::Get() const {
   if (m_running) {
     return (GetTimestamp() - m_startTime) + m_accumulatedTime;
   } else {
@@ -69,11 +69,11 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(wpi::units::second_t period) const {
+bool Timer::HasElapsed(wpi::units::seconds<> period) const {
   return Get() >= period;
 }
 
-bool Timer::AdvanceIfElapsed(wpi::units::second_t period) {
+bool Timer::AdvanceIfElapsed(wpi::units::seconds<> period) {
   if (Get() >= period) {
     // Advance the start time by the period.
     m_startTime += period;
@@ -88,15 +88,15 @@ bool Timer::IsRunning() const {
   return m_running;
 }
 
-wpi::units::second_t Timer::GetTimestamp() {
-  return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
+wpi::units::seconds<> Timer::GetTimestamp() {
+  return wpi::units::seconds<>{wpi::RobotController::GetTime() * 1.0e-6};
 }
 
-wpi::units::second_t Timer::GetFPGATimestamp() {
+wpi::units::seconds<> Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  return wpi::units::second_t{wpi::RobotController::GetFPGATime() * 1.0e-6};
+  return wpi::units::seconds<>{wpi::RobotController::GetFPGATime() * 1.0e-6};
 }
 
-wpi::units::second_t Timer::GetMatchTime() {
+wpi::units::seconds<> Timer::GetMatchTime() {
   return wpi::DriverStation::GetMatchTime();
 }

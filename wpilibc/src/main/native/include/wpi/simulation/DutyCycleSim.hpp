@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "wpi/simulation/CallbackStore.hpp"
-#include "wpi/units/frequency.hpp"
+#include <wpi/units/frequency.h>
 
 namespace wpi {
 
@@ -76,14 +76,14 @@ class DutyCycleSim {
    *
    * @return the duty cycle frequency
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Change the duty cycle frequency.
    *
    * @param frequency the new frequency
    */
-  void SetFrequency(wpi::units::hertz_t frequency);
+  void SetFrequency(wpi::units::hertz<> frequency);
 
   /**
    * Register a callback to be run whenever the output changes.

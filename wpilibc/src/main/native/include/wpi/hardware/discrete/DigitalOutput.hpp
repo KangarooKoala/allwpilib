@@ -6,7 +6,7 @@
 
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -66,7 +66,7 @@ class DigitalOutput : public wpi::util::Sendable,
    *
    * @param pulseLength The pulse length in seconds
    */
-  void Pulse(wpi::units::second_t pulseLength);
+  void Pulse(wpi::units::seconds<> pulseLength);
 
   /**
    * Determine if the pulse is still going.

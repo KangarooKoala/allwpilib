@@ -9,7 +9,7 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include "wpi/units/angle.hpp"
+#include <wpi/units/angle.h>
 #include "wpi/util/Color8Bit.hpp"
 
 class Mechanism2dTest;
@@ -59,14 +59,14 @@ TEST(Mechanism2dTest, Ligament) {
       "/SmartDashboard/mechanism/root/ligament/weight");
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
   wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
-      "ligament", 3, wpi::units::degree_t{90}, 1,
+      "ligament", 3, wpi::units::degrees<>{90}, 1,
       wpi::util::Color8Bit{255, 255, 255});
   wpi::SmartDashboard::PutData("mechanism", &mechanism);
   EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
   EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));
   EXPECT_EQ(ligament->GetLength(), lengthEntry.GetDouble(0.0));
   EXPECT_EQ(ligament->GetLineWeight(), weightEntry.GetDouble(0.0));
-  ligament->SetAngle(wpi::units::degree_t{45});
+  ligament->SetAngle(wpi::units::degrees<>{45});
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);

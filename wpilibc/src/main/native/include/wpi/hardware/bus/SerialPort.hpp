@@ -9,7 +9,7 @@
 
 #include "wpi/hal/SerialPort.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi {
 
@@ -199,7 +199,7 @@ class SerialPort {
    *
    * @param timeout The time to wait for I/O.
    */
-  void SetTimeout(wpi::units::second_t timeout);
+  void SetTimeout(wpi::units::seconds<> timeout);
 
   /**
    * Specify the size of the input buffer.

@@ -97,7 +97,7 @@ void ExpansionHubMotor::SetPercentagePower(double power) {
   m_setpointPublisher.Set(power);
 }
 
-void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
+void ExpansionHubMotor::SetVoltage(wpi::units::volts<> voltage) {
   m_modePublisher.Set(kVoltageMode);
   m_setpointPublisher.Set(voltage.value());
 }
@@ -120,8 +120,8 @@ void ExpansionHubMotor::SetFloatOn0(bool floatOn0) {
   m_floatOn0Publisher.Set(floatOn0);
 }
 
-wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
-  return wpi::units::ampere_t{m_currentSubscriber.Get(0)};
+wpi::units::amperes<> ExpansionHubMotor::GetCurrent() const {
+  return wpi::units::amperes<>{m_currentSubscriber.Get(0)};
 }
 
 void ExpansionHubMotor::SetDistancePerCount(double perCount) {

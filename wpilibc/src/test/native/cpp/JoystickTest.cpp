@@ -52,18 +52,18 @@ TEST(JoystickTest, GetDirection) {
   joysim.SetX(0.5);
   joysim.SetY(0);
   joysim.NotifyNewData();
-  ASSERT_NEAR(wpi::units::radian_t{90_deg}.value(), joy.GetDirection().value(),
+  ASSERT_NEAR(wpi::units::radians<>{90_deg}.value(), joy.GetDirection().value(),
               0.001);
 
   joysim.SetX(0);
   joysim.SetY(-.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(wpi::units::radian_t{0_deg}.value(), joy.GetDirection().value(),
+  ASSERT_NEAR(wpi::units::radians<>{0_deg}.value(), joy.GetDirection().value(),
               0.001);
 
   joysim.SetX(0.5);
   joysim.SetY(-0.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(wpi::units::radian_t{45_deg}.value(), joy.GetDirection().value(),
+  ASSERT_NEAR(wpi::units::radians<>{45_deg}.value(), joy.GetDirection().value(),
               0.001);
 }

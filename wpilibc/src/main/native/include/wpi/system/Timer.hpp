@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi {
 
@@ -18,14 +18,14 @@ namespace wpi {
  *
  * @param seconds Length of time to pause, in seconds.
  */
-void Wait(wpi::units::second_t seconds);
+void Wait(wpi::units::seconds<> seconds);
 
 /**
  * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
-wpi::units::second_t GetTime();
+wpi::units::seconds<> GetTime();
 
 /**
  * A timer class.
@@ -57,7 +57,7 @@ class Timer {
    *
    * @return Current time value for this timer in seconds
    */
-  wpi::units::second_t Get() const;
+  wpi::units::seconds<> Get() const;
 
   /**
    * Reset the timer by setting the time to 0.
@@ -99,7 +99,7 @@ class Timer {
    * @param period The period to check.
    * @return       True if the period has passed.
    */
-  bool HasElapsed(wpi::units::second_t period) const;
+  bool HasElapsed(wpi::units::seconds<> period) const;
 
   /**
    * Check if the period specified has passed and if it has, advance the start
@@ -109,7 +109,7 @@ class Timer {
    * @param period The period to check for.
    * @return       True if the period has passed.
    */
-  bool AdvanceIfElapsed(wpi::units::second_t period);
+  bool AdvanceIfElapsed(wpi::units::seconds<> period);
 
   /**
    * Whether the timer is currently running.
@@ -126,7 +126,7 @@ class Timer {
    *
    * @returns Robot running time in seconds.
    */
-  static wpi::units::second_t GetTimestamp();
+  static wpi::units::seconds<> GetTimestamp();
 
   /**
    * Return the FPGA system clock time in seconds.
@@ -136,7 +136,7 @@ class Timer {
    *
    * @returns Robot running time in seconds.
    */
-  static wpi::units::second_t GetFPGATimestamp();
+  static wpi::units::seconds<> GetFPGATimestamp();
 
   /**
    * Return the approximate match time.
@@ -153,11 +153,11 @@ class Timer {
    *
    * @return Time remaining in current match period (auto or teleop)
    */
-  static wpi::units::second_t GetMatchTime();
+  static wpi::units::seconds<> GetMatchTime();
 
  private:
-  wpi::units::second_t m_startTime = 0_s;
-  wpi::units::second_t m_accumulatedTime = 0_s;
+  wpi::units::seconds<> m_startTime = 0_s;
+  wpi::units::seconds<> m_accumulatedTime = 0_s;
   bool m_running = false;
 };
 

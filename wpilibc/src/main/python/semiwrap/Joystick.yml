@@ -41,6 +41,6 @@ classes:
       GetDirection:
         rename: getDirectionRadians
     inline_code: |
-      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degree_t {
+      .def("getDirectionDegrees", [](const Joystick &self) -> wpi::units::degrees<> {
         return self.GetDirection();
       })

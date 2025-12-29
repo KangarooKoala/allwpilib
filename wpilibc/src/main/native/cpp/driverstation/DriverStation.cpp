@@ -164,7 +164,7 @@ struct Instance {
   wpi::util::mutex opModeMutex;
   wpi::util::DenseMap<int64_t, HAL_OpModeOption> opModes;
 
-  wpi::units::second_t nextMessageTime = 0_s;
+  wpi::units::seconds<> nextMessageTime = 0_s;
 
   std::string OpModeToString(int64_t id) {
     std::scoped_lock lock{opModeMutex};
@@ -769,9 +769,9 @@ std::optional<int> DriverStation::GetLocation() {
   }
 }
 
-wpi::units::second_t DriverStation::GetMatchTime() {
+wpi::units::seconds<> DriverStation::GetMatchTime() {
   int32_t status = 0;
-  return wpi::units::second_t{HAL_GetMatchTime(&status)};
+  return wpi::units::seconds<>{HAL_GetMatchTime(&status)};
 }
 
 double DriverStation::GetBatteryVoltage() {

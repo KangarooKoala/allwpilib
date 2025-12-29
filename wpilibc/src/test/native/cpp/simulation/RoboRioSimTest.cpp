@@ -23,7 +23,7 @@ TEST(RoboRioSimTest, SetVin) {
       voltageCallback.GetCallback(), false);
   constexpr double kTestVoltage = 1.91;
 
-  RoboRioSim::SetVInVoltage(wpi::units::volt_t{kTestVoltage});
+  RoboRioSim::SetVInVoltage(wpi::units::volts<>{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetVInVoltage().value());
@@ -38,7 +38,7 @@ TEST(RoboRioSimTest, SetBrownout) {
       voltageCallback.GetCallback(), false);
   constexpr double kTestVoltage = 1.91;
 
-  RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t{kTestVoltage});
+  RoboRioSim::SetBrownoutVoltage(wpi::units::volts<>{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetBrownoutVoltage().value());
@@ -64,13 +64,13 @@ TEST(RoboRioSimTest, Set3V3) {
   constexpr double kTestCurrent = 174;
   constexpr int kTestFaults = 229;
 
-  RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{kTestVoltage});
+  RoboRioSim::SetUserVoltage3V3(wpi::units::volts<>{kTestVoltage});
   EXPECT_TRUE(voltageCallback.WasTriggered());
   EXPECT_EQ(kTestVoltage, voltageCallback.GetLastValue());
   EXPECT_EQ(kTestVoltage, RoboRioSim::GetUserVoltage3V3().value());
   EXPECT_EQ(kTestVoltage, RobotController::GetVoltage3V3());
 
-  RoboRioSim::SetUserCurrent3V3(wpi::units::ampere_t{kTestCurrent});
+  RoboRioSim::SetUserCurrent3V3(wpi::units::amperes<>{kTestCurrent});
   EXPECT_TRUE(currentCallback.WasTriggered());
   EXPECT_EQ(kTestCurrent, currentCallback.GetLastValue());
   EXPECT_EQ(kTestCurrent, RoboRioSim::GetUserCurrent3V3().value());
@@ -97,7 +97,7 @@ TEST(RoboRioSimTest, SetCPUTemp) {
       RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
   constexpr double kCPUTemp = 100.0;
 
-  RoboRioSim::SetCPUTemp(wpi::units::celsius_t{kCPUTemp});
+  RoboRioSim::SetCPUTemp(wpi::units::celsius<>{kCPUTemp});
   EXPECT_TRUE(callback.WasTriggered());
   EXPECT_EQ(kCPUTemp, callback.GetLastValue());
   EXPECT_EQ(kCPUTemp, RoboRioSim::GetCPUTemp().value());

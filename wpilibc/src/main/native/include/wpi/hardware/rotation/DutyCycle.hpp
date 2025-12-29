@@ -8,8 +8,8 @@
 
 #include "wpi/hal/DutyCycle.h"
 #include "wpi/hal/Types.h"
-#include "wpi/units/frequency.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -44,7 +44,7 @@ class DutyCycle : public wpi::util::Sendable,
    *
    * @return frequency
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Get the output ratio of the duty cycle signal.
@@ -60,7 +60,7 @@ class DutyCycle : public wpi::util::Sendable,
    *
    * @return high time of last pulse
    */
-  wpi::units::second_t GetHighTime() const;
+  wpi::units::seconds<> GetHighTime() const;
 
   /**
    * Get the channel of the source.

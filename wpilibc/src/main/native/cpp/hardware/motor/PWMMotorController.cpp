@@ -30,7 +30,7 @@ void PWMMotorController::Set(double speed) {
   Feed();
 }
 
-void PWMMotorController::SetVoltage(wpi::units::volt_t output) {
+void PWMMotorController::SetVoltage(wpi::units::volts<> output) {
   // NOLINTNEXTLINE(bugprone-integer-division)
   Set(output / RobotController::GetBatteryVoltage());
 }
@@ -39,7 +39,7 @@ double PWMMotorController::Get() const {
   return GetSpeed() * (m_isInverted ? -1.0 : 1.0);
 }
 
-wpi::units::volt_t PWMMotorController::GetVoltage() const {
+wpi::units::volts<> PWMMotorController::GetVoltage() const {
   return Get() * RobotController::GetBatteryVoltage();
 }
 
@@ -109,7 +109,7 @@ void PWMMotorController::InitSendable(wpi::util::SendableBuilder& builder) {
       [=, this](double value) { Set(value); });
 }
 
-wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {
+wpi::units::microseconds<> PWMMotorController::GetMinPositivePwm() const {
   if (m_eliminateDeadband) {
     return m_deadbandMaxPwm;
   } else {
@@ -117,7 +117,7 @@ wpi::units::microsecond_t PWMMotorController::GetMinPositivePwm() const {
   }
 }
 
-wpi::units::microsecond_t PWMMotorController::GetMaxNegativePwm() const {
+wpi::units::microseconds<> PWMMotorController::GetMaxNegativePwm() const {
   if (m_eliminateDeadband) {
     return m_deadbandMinPwm;
   } else {
@@ -125,11 +125,11 @@ wpi::units::microsecond_t PWMMotorController::GetMaxNegativePwm() const {
   }
 }
 
-wpi::units::microsecond_t PWMMotorController::GetPositiveScaleFactor() const {
+wpi::units::microseconds<> PWMMotorController::GetPositiveScaleFactor() const {
   return m_maxPwm - GetMinPositivePwm();
 }
 
-wpi::units::microsecond_t PWMMotorController::GetNegativeScaleFactor() const {
+wpi::units::microseconds<> PWMMotorController::GetNegativeScaleFactor() const {
   return GetMaxNegativePwm() - m_minPwm;
 }
 
@@ -144,15 +144,15 @@ void PWMMotorController::SetSpeed(double speed) {
     m_simSpeed.Set(speed);
   }
 
-  wpi::units::microsecond_t rawValue;
+  wpi::units::microseconds<> rawValue;
   if (speed == 0.0) {
     rawValue = m_centerPwm;
   } else if (speed > 0.0) {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(
+    rawValue = wpi::units::microseconds<>{static_cast<double>(
                    std::lround((speed * GetPositiveScaleFactor()).value()))} +
                GetMinPositivePwm();
   } else {
-    rawValue = wpi::units::microsecond_t{static_cast<double>(
+    rawValue = wpi::units::microseconds<>{static_cast<double>(
                    std::lround((speed * GetNegativeScaleFactor()).value()))} +
                GetMaxNegativePwm();
   }
@@ -161,7 +161,7 @@ void PWMMotorController::SetSpeed(double speed) {
 }
 
 double PWMMotorController::GetSpeed() const {
-  wpi::units::microsecond_t rawValue = m_pwm.GetPulseTime();
+  wpi::units::microseconds<> rawValue = m_pwm.GetPulseTime();
 
   if (rawValue == 0_us) {
     return 0.0;
@@ -180,11 +180,11 @@ double PWMMotorController::GetSpeed() const {
   }
 }
 
-void PWMMotorController::SetBounds(wpi::units::microsecond_t maxPwm,
-                                   wpi::units::microsecond_t deadbandMaxPwm,
-                                   wpi::units::microsecond_t centerPwm,
-                                   wpi::units::microsecond_t deadbandMinPwm,
-                                   wpi::units::microsecond_t minPwm) {
+void PWMMotorController::SetBounds(wpi::units::microseconds<> maxPwm,
+                                   wpi::units::microseconds<> deadbandMaxPwm,
+                                   wpi::units::microseconds<> centerPwm,
+                                   wpi::units::microseconds<> deadbandMinPwm,
+                                   wpi::units::microseconds<> minPwm) {
   m_maxPwm = maxPwm;
   m_deadbandMaxPwm = deadbandMaxPwm;
   m_centerPwm = centerPwm;

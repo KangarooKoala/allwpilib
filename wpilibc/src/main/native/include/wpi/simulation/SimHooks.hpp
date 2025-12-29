@@ -8,7 +8,7 @@
 
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace wpi::sim {
 
@@ -79,13 +79,13 @@ bool IsTimingPaused();
  *
  * @param delta the amount to advance (in seconds)
  */
-void StepTiming(wpi::units::second_t delta);
+void StepTiming(wpi::units::seconds<> delta);
 
 /**
  * Advance the simulator time and return immediately.
  *
  * @param delta the amount to advance (in seconds)
  */
-void StepTimingAsync(wpi::units::second_t delta);
+void StepTimingAsync(wpi::units::seconds<> delta);
 
 }  // namespace wpi::sim

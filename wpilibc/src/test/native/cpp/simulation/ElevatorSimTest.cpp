@@ -14,11 +14,10 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+  EXPECT_LE(wpi::units::abs(val1 - val2), eps)
 
 TEST(ElevatorSimTest, StateSpaceSim) {
   wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
@@ -95,7 +94,7 @@ TEST(ElevatorSimTest, Stability) {
       wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
-  EXPECT_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(
+  EXPECT_NEAR_UNITS(wpi::units::meters<>{system.CalculateX(
                         wpi::math::Vectord<2>{0.0, 0.0},
                         wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
                     sim.GetPosition(), 1_cm);

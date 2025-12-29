@@ -14,9 +14,8 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-#include "wpi/units/current.hpp"
-#include "wpi/units/math.hpp"
-#include "wpi/units/moment_of_inertia.hpp"
+#include <wpi/units/current.h>
+#include <wpi/units/moment_of_inertia.h>
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = wpi::math::DCMotor::NEO(2);
@@ -36,7 +35,7 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
   // Ground truth.
   wpi::math::Vectord<7> groundTruthX = wpi::math::Vectord<7>::Zero();
 
-  wpi::math::TrajectoryConfig config{1_mps, 1_mps_sq};
+  wpi::math::TrajectoryConfig config{1_mps, 1_mps2};
   config.AddConstraint(
       wpi::math::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
@@ -52,8 +51,8 @@ TEST(DifferentialDrivetrainSimTest, Convergence) {
         feedforward.Calculate(wpi::math::Vectord<2>{l.value(), r.value()});
 
     // Sim periodic code.
-    sim.SetInputs(wpi::units::volt_t{voltages(0, 0)},
-                  wpi::units::volt_t{voltages(1, 0)});
+    sim.SetInputs(wpi::units::volts<>{voltages(0, 0)},
+                  wpi::units::volts<>{voltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
@@ -113,5 +112,5 @@ TEST(DifferentialDrivetrainSimTest, ModelStability) {
     sim.Update(20_ms);
   }
 
-  EXPECT_LT(wpi::units::math::abs(sim.GetPose().Translation().Norm()), 100_m);
+  EXPECT_LT(wpi::units::abs(sim.GetPose().Translation().Norm()), 100_m);
 }

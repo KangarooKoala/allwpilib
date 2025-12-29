@@ -18,8 +18,8 @@
 #include "wpi/simulation/PWMSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/units/angular_acceleration.hpp"
-#include "wpi/units/angular_velocity.hpp"
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
 
 TEST(StateSpaceSimTest, FlywheelSim) {
   const wpi::math::LinearSystem<1, 1, 1> plant =
@@ -27,7 +27,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
                                            0.01_V / 1_rad_per_s_sq);
   wpi::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
   wpi::math::PIDController controller{0.2, 0.0, 0.0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radian> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
@@ -39,7 +39,7 @@ TEST(StateSpaceSimTest, FlywheelSim) {
   for (int i = 0; i < 100; i++) {
     // RobotPeriodic runs first
     auto voltageOut = controller.Calculate(encoder.GetRate(), 200.0);
-    motor.SetVoltage(wpi::units::volt_t{voltageOut} +
+    motor.SetVoltage(wpi::units::volts<>{voltageOut} +
                      feedforward.Calculate(200_rad_per_s));
 
     // Then, SimulationPeriodic runs

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "wpi/units/voltage.hpp"
+#include <wpi/units/voltage.h>
 
 namespace wpi {
 
@@ -34,7 +34,7 @@ class MotorController {
    *
    * @param output The voltage to output.
    */
-  virtual void SetVoltage(wpi::units::volt_t output);
+  virtual void SetVoltage(wpi::units::volts<> output);
 
   /**
    * Common interface for getting the current set speed of a motor controller.

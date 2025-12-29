@@ -6,7 +6,7 @@
 
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/range/SharpIR.hpp"
-#include "wpi/units/length.hpp"
+#include <wpi/units/length.h>
 
 namespace wpi {
 
@@ -32,7 +32,7 @@ class SharpIRSim {
    *
    * @param range range of the target returned by the sensor
    */
-  void SetRange(wpi::units::meter_t range);
+  void SetRange(wpi::units::meters<> range);
 
  private:
   wpi::hal::SimDouble m_simRange;

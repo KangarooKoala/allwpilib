@@ -14,7 +14,7 @@
 
 using namespace wpi;
 
-IterativeRobotBase::IterativeRobotBase(wpi::units::second_t period)
+IterativeRobotBase::IterativeRobotBase(wpi::units::seconds<> period)
     : m_period(period),
       m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
 
@@ -90,7 +90,7 @@ void IterativeRobotBase::SetNetworkTablesFlushEnabled(bool enabled) {
   m_ntFlushEnabled = enabled;
 }
 
-wpi::units::second_t IterativeRobotBase::GetPeriod() const {
+wpi::units::seconds<> IterativeRobotBase::GetPeriod() const {
   return m_period;
 }
 

@@ -11,12 +11,12 @@ classes:
         overloads:
           double:
             ignore: true
-          wpi::units::second_t:
+          wpi::units::seconds<>:
       StartPeriodic:
         overloads:
           double:
             ignore: true
-          wpi::units::second_t:
+          wpi::units::seconds<>:
       Stop:
       GetOverrun:
       SetHALThreadPriority:
