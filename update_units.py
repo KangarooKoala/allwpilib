@@ -37,8 +37,9 @@ def process_file(content: str) -> str:
         "(?<=units::)(?:traits::)?is_unit_v", "ConversionFactorType", content
     )
 
-    # Update unit_t
-    content = content.replace("unit_t", "unit")
+    # Update unit_t and is_unit_t_v
+    content = re.sub("(?<=units::)unit_t", "unit", content)
+    content = re.sub("(?<=units::traits::)is_unit_t_v", "is_unit_v", content)
 
     # Update some UDLs
     content = content.replace("_mps_sq", "_mps2")
