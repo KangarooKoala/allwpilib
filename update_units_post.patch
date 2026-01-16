@@ -61,6 +61,39 @@ index ef88d60c4c..2a85140058 100644
    using kv_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
                                              wpi::units::inverse<Velocity>>;
    using ka_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
+diff --git a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
+index 466f3911a3..f75419ec9e 100644
+--- a/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
++++ b/wpimath/src/main/native/include/wpi/math/kinematics/DifferentialDriveKinematics.hpp
+@@ -15,6 +15,7 @@
+ #include "wpi/math/kinematics/Kinematics.hpp"
+ #include "wpi/math/util/MathShared.hpp"
+ #include <wpi/units/angle.h>
++#include <wpi/units/frequency.h>
+ #include <wpi/units/length.h>
+ #include "wpi/util/SymbolExports.hpp"
+ 
+diff --git a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
+index 5d58675230..98ed99dd30 100644
+--- a/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
++++ b/wpimath/src/main/native/include/wpi/math/trajectory/ExponentialProfile.hpp
+@@ -4,6 +4,7 @@
+ 
+ #pragma once
+ 
++#include <wpi/units/frequency.h>
+ #include <wpi/units/time.h>
+ 
+ namespace wpi::math {
+@@ -48,7 +49,7 @@ class ExponentialProfile {
+       wpi::units::compound_conversion_factor<Velocity,
+                                 wpi::units::inverse<wpi::units::seconds_>>;
+   using Input_t = wpi::units::unit<Input>;
+-  using A_t = wpi::units::unit<wpi::units::inverse<wpi::units::seconds_>>;
++  using A_t = wpi::units::hertz<>;
+   using B_t = wpi::units::unit<
+       wpi::units::compound_conversion_factor<Acceleration, wpi::units::inverse<Input>>>;
+   using KV = wpi::units::compound_conversion_factor<Input, wpi::units::inverse<Velocity>>;
 diff --git a/wpimath/src/main/python/pyproject.toml b/wpimath/src/main/python/pyproject.toml
 index 8b98276897..e0b4f12df5 100644
 --- a/wpimath/src/main/python/pyproject.toml
