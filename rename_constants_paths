@@ -1,2 +1,14 @@
-wpiutil/src/main/java/org/wpilib/util/Color.java
-wpiutil/src/main/native/include/wpi/util/Color.hpp
+apriltag
+cscore
+datalog
+fields
+ntcore
+wpimath
+wpinet
+wpinet/src/main/native/thirdparty/tcpsockets/cpp/TCPStream.cpp
+wpiutil
+wpiutil/src/main/native/thirdparty/llvm/cpp/llvm/MemoryBuffer.cpp
+wpiutil/src/main/native/thirdparty/llvm/cpp/llvm/StringExtras.cpp
+wpiutil/src/main/native/thirdparty/llvm/include/wpi/util/MemoryBuffer.hpp
+wpiutil/src/main/native/thirdparty/llvm/include/wpi/util/SmallVectorMemoryBuffer.hpp
+wpiutil/src/main/native/thirdparty/llvm/include/wpi/util/StringExtras.hpp
