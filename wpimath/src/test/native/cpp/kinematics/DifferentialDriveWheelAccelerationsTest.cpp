@@ -10,21 +10,21 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST(DifferentialDriveWheelAccelerationsTest, DefaultConstructor) {
   DifferentialDriveWheelAccelerations wheelAccelerations;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), 0.0, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, ParameterizedConstructor) {
   DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps_sq,
                                                          2.5_mps_sq};
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 1.5, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 2.5, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), 1.5, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 2.5, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Plus) {
@@ -33,8 +33,8 @@ TEST(DifferentialDriveWheelAccelerationsTest, Plus) {
 
   const auto wheelAccelerations = left + right;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 3.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 2.0, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), 3.0, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 2.0, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Minus) {
@@ -43,30 +43,30 @@ TEST(DifferentialDriveWheelAccelerationsTest, Minus) {
 
   const auto wheelAccelerations = left - right;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 0.0, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, UnaryMinus) {
   const auto wheelAccelerations =
       -DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq};
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), -0.5, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), -1.0, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), -0.5, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Multiplication) {
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} * 2.0;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 2.0, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 1.0, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), 2.0, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 1.0, EPSILON);
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, Division) {
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} / 2.0;
 
-  EXPECT_NEAR(wheelAccelerations.left.value(), 0.5, kEpsilon);
-  EXPECT_NEAR(wheelAccelerations.right.value(), 0.25, kEpsilon);
+  EXPECT_NEAR(wheelAccelerations.left.value(), 0.5, EPSILON);
+  EXPECT_NEAR(wheelAccelerations.right.value(), 0.25, EPSILON);
 }

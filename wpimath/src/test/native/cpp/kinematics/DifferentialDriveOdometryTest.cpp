@@ -10,7 +10,7 @@
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 using namespace wpi::math;
 
@@ -20,7 +20,7 @@ TEST(DifferentialDriveOdometryTest, EncoderDistances) {
   const auto& pose =
       odometry.Update(135_deg, 0_m, wpi::units::meter_t{5 * std::numbers::pi});
 
-  EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(pose.X().value(), 5.0, EPSILON);
+  EXPECT_NEAR(pose.Y().value(), 5.0, EPSILON);
+  EXPECT_NEAR(pose.Rotation().Degrees().value(), 90.0, EPSILON);
 }

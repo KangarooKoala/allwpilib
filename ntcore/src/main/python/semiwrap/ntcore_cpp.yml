@@ -30,20 +30,20 @@ functions:
 classes:
   wpi::nt::EventFlags:
     attributes:
-      kNone:
-      kImmediate:
-      kConnected:
-      kDisconnected:
-      kConnection:
-      kPublish:
-      kUnpublish:
-      kProperties:
-      kTopic:
-      kValueRemote:
-      kValueLocal:
-      kValueAll:
-      kLogMessage:
-      kTimeSync:
+      NONE:
+      IMMEDIATE:
+      CONNECTED:
+      DISCONNECTED:
+      CONNECTION:
+      PUBLISH:
+      UNPUBLISH:
+      PROPERTIES:
+      TOPIC:
+      VALUE_REMOTE:
+      VALUE_LOCAL:
+      VALUE_ALL:
+      LOG_MESSAGE:
+      TIME_SYNC:
   wpi::nt::TopicInfo:
     attributes:
       name:
@@ -194,7 +194,7 @@ classes:
   wpi::nt::PubSubOptions:
     force_no_default_constructor: true
     attributes:
-      kDefaultPeriodic:
+      DEFAULT_PERIODIC:
       structSize:
         ignore: true
       pollStorage:
@@ -239,7 +239,7 @@ classes:
       }),
         py::kw_only(),
         py::arg("pollStorage") = 0,
-        py::arg("periodic") = wpi::nt::PubSubOptions::kDefaultPeriodic,
+        py::arg("periodic") = wpi::nt::PubSubOptions::DEFAULT_PERIODIC,
         py::arg("excludePublisher") = std::nullopt,
         py::arg("sendAll") = false,
         py::arg("topicsOnly") = false,

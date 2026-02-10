@@ -9,12 +9,12 @@
 
 int main() {
   wpi::cs::UsbCamera camera{"usbcam", 0};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(wpi::cs::VideoMode::MJPEG, 320, 240, 30);
   wpi::cs::MjpegServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
+  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::MJPEG, 320, 240,
                              30};
   wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8082};
   cvMjpegServer.SetSource(cvsource);

@@ -10,7 +10,7 @@ from wpimath import (
     Translation2d,
 )
 
-kEpsilon = 0.1
+EPSILON = 0.1
 
 
 @pytest.fixture
@@ -34,15 +34,15 @@ def test_straight_line_inverse_kinematics(kinematics_test):
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(5.0, abs=kEpsilon)
+    assert fl.speed == pytest.approx(5.0, abs=EPSILON)
+    assert fr.speed == pytest.approx(5.0, abs=EPSILON)
+    assert bl.speed == pytest.approx(5.0, abs=EPSILON)
+    assert br.speed == pytest.approx(5.0, abs=EPSILON)
 
-    assert fl.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
-    assert bl.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
-    assert br.angle.radians() == pytest.approx(0.0, abs=kEpsilon)
+    assert fl.angle.radians() == pytest.approx(0.0, abs=EPSILON)
+    assert fr.angle.radians() == pytest.approx(0.0, abs=EPSILON)
+    assert bl.angle.radians() == pytest.approx(0.0, abs=EPSILON)
+    assert br.angle.radians() == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_straight_line_forward_kinematics(kinematics_test):
@@ -51,18 +51,18 @@ def test_straight_line_forward_kinematics(kinematics_test):
         (state, state, state, state)
     )
 
-    assert chassis_speeds.vx == pytest.approx(5.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_speeds.vx == pytest.approx(5.0, abs=EPSILON)
+    assert chassis_speeds.vy == pytest.approx(0.0, abs=EPSILON)
+    assert chassis_speeds.omega == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_straight_line_forward_kinematics_with_deltas(kinematics_test):
     delta = SwerveModulePosition(distance=5.0, angle=Rotation2d.fromDegrees(0))
     twist = kinematics_test.m_kinematics.toTwist2d((delta, delta, delta, delta))
 
-    assert twist.dx == pytest.approx(5.0, abs=kEpsilon)
-    assert twist.dy == pytest.approx(0.0, abs=kEpsilon)
-    assert twist.dtheta == pytest.approx(0.0, abs=kEpsilon)
+    assert twist.dx == pytest.approx(5.0, abs=EPSILON)
+    assert twist.dy == pytest.approx(0.0, abs=EPSILON)
+    assert twist.dtheta == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_straight_strafe_inverse_kinematics(kinematics_test):
@@ -71,15 +71,15 @@ def test_straight_strafe_inverse_kinematics(kinematics_test):
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(5.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(5.0, abs=kEpsilon)
+    assert fl.speed == pytest.approx(5.0, abs=EPSILON)
+    assert fr.speed == pytest.approx(5.0, abs=EPSILON)
+    assert bl.speed == pytest.approx(5.0, abs=EPSILON)
+    assert br.speed == pytest.approx(5.0, abs=EPSILON)
 
-    assert fl.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
-    assert fr.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
-    assert bl.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
-    assert br.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
+    assert fl.angle.degrees() == pytest.approx(90.0, abs=EPSILON)
+    assert fr.angle.degrees() == pytest.approx(90.0, abs=EPSILON)
+    assert bl.angle.degrees() == pytest.approx(90.0, abs=EPSILON)
+    assert br.angle.degrees() == pytest.approx(90.0, abs=EPSILON)
 
 
 def test_straight_strafe_forward_kinematics(kinematics_test):
@@ -88,18 +88,18 @@ def test_straight_strafe_forward_kinematics(kinematics_test):
         (state, state, state, state)
     )
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(5.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(0.0, abs=kEpsilon)
+    assert chassis_speeds.vx == pytest.approx(0.0, abs=EPSILON)
+    assert chassis_speeds.vy == pytest.approx(5.0, abs=EPSILON)
+    assert chassis_speeds.omega == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_straight_strafe_forward_kinematics_with_deltas(kinematics_test):
     delta = SwerveModulePosition(distance=5, angle=Rotation2d.fromDegrees(90))
     twist = kinematics_test.m_kinematics.toTwist2d((delta, delta, delta, delta))
 
-    assert twist.dx == pytest.approx(0.0, abs=kEpsilon)
-    assert twist.dy == pytest.approx(5.0, abs=kEpsilon)
-    assert twist.dtheta == pytest.approx(0.0, abs=kEpsilon)
+    assert twist.dx == pytest.approx(0.0, abs=EPSILON)
+    assert twist.dy == pytest.approx(5.0, abs=EPSILON)
+    assert twist.dtheta == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_turn_in_place_inverse_kinematics(kinematics_test):
@@ -108,15 +108,15 @@ def test_turn_in_place_inverse_kinematics(kinematics_test):
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert fr.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert bl.speed == pytest.approx(106.63, abs=kEpsilon)
-    assert br.speed == pytest.approx(106.63, abs=kEpsilon)
+    assert fl.speed == pytest.approx(106.63, abs=EPSILON)
+    assert fr.speed == pytest.approx(106.63, abs=EPSILON)
+    assert bl.speed == pytest.approx(106.63, abs=EPSILON)
+    assert br.speed == pytest.approx(106.63, abs=EPSILON)
 
-    assert fl.angle.degrees() == pytest.approx(135.0, abs=kEpsilon)
-    assert fr.angle.degrees() == pytest.approx(45.0, abs=kEpsilon)
-    assert bl.angle.degrees() == pytest.approx(-135.0, abs=kEpsilon)
-    assert br.angle.degrees() == pytest.approx(-45.0, abs=kEpsilon)
+    assert fl.angle.degrees() == pytest.approx(135.0, abs=EPSILON)
+    assert fr.angle.degrees() == pytest.approx(45.0, abs=EPSILON)
+    assert bl.angle.degrees() == pytest.approx(-135.0, abs=EPSILON)
+    assert br.angle.degrees() == pytest.approx(-45.0, abs=EPSILON)
 
 
 def test_conserve_wheel_angle(kinematics_test):
@@ -126,15 +126,15 @@ def test_conserve_wheel_angle(kinematics_test):
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert bl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert br.speed == pytest.approx(0.0, abs=kEpsilon)
+    assert fl.speed == pytest.approx(0.0, abs=EPSILON)
+    assert fr.speed == pytest.approx(0.0, abs=EPSILON)
+    assert bl.speed == pytest.approx(0.0, abs=EPSILON)
+    assert br.speed == pytest.approx(0.0, abs=EPSILON)
 
-    assert fl.angle.degrees() == pytest.approx(135.0, abs=kEpsilon)
-    assert fr.angle.degrees() == pytest.approx(45.0, abs=kEpsilon)
-    assert bl.angle.degrees() == pytest.approx(-135.0, abs=kEpsilon)
-    assert br.angle.degrees() == pytest.approx(-45.0, abs=kEpsilon)
+    assert fl.angle.degrees() == pytest.approx(135.0, abs=EPSILON)
+    assert fr.angle.degrees() == pytest.approx(45.0, abs=EPSILON)
+    assert bl.angle.degrees() == pytest.approx(-135.0, abs=EPSILON)
+    assert br.angle.degrees() == pytest.approx(-45.0, abs=EPSILON)
 
 
 def test_reset_wheel_angle(kinematics_test):
@@ -147,15 +147,15 @@ def test_reset_wheel_angle(kinematics_test):
 
     fl_mod, fr_mod, bl_mod, br_mod = states
 
-    assert fl_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert bl_mod.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert br_mod.speed == pytest.approx(0.0, abs=kEpsilon)
+    assert fl_mod.speed == pytest.approx(0.0, abs=EPSILON)
+    assert fr_mod.speed == pytest.approx(0.0, abs=EPSILON)
+    assert bl_mod.speed == pytest.approx(0.0, abs=EPSILON)
+    assert br_mod.speed == pytest.approx(0.0, abs=EPSILON)
 
-    assert fl_mod.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
-    assert fr_mod.angle.degrees() == pytest.approx(90.0, abs=kEpsilon)
-    assert bl_mod.angle.degrees() == pytest.approx(180.0, abs=kEpsilon)
-    assert br_mod.angle.degrees() == pytest.approx(-90.0, abs=kEpsilon)
+    assert fl_mod.angle.degrees() == pytest.approx(0.0, abs=EPSILON)
+    assert fr_mod.angle.degrees() == pytest.approx(90.0, abs=EPSILON)
+    assert bl_mod.angle.degrees() == pytest.approx(180.0, abs=EPSILON)
+    assert br_mod.angle.degrees() == pytest.approx(-90.0, abs=EPSILON)
 
 
 def test_turn_in_place_forward_kinematics(kinematics_test):
@@ -166,9 +166,9 @@ def test_turn_in_place_forward_kinematics(kinematics_test):
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert chassis_speeds.vx == pytest.approx(0.0, abs=EPSILON)
+    assert chassis_speeds.vy == pytest.approx(0.0, abs=EPSILON)
+    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=EPSILON)
 
 
 def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
@@ -179,9 +179,9 @@ def test_turn_in_place_forward_kinematics_with_deltas(kinematics_test):
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
-    assert twist.dx == pytest.approx(0.0, abs=kEpsilon)
-    assert twist.dy == pytest.approx(0.0, abs=kEpsilon)
-    assert twist.dtheta == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert twist.dx == pytest.approx(0.0, abs=EPSILON)
+    assert twist.dy == pytest.approx(0.0, abs=EPSILON)
+    assert twist.dtheta == pytest.approx(2 * math.pi, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
@@ -192,15 +192,15 @@ def test_off_center_cor_rotation_inverse_kinematics(kinematics_test):
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.speed == pytest.approx(150.796, abs=kEpsilon)
-    assert bl.speed == pytest.approx(150.796, abs=kEpsilon)
-    assert br.speed == pytest.approx(213.258, abs=kEpsilon)
+    assert fl.speed == pytest.approx(0.0, abs=EPSILON)
+    assert fr.speed == pytest.approx(150.796, abs=EPSILON)
+    assert bl.speed == pytest.approx(150.796, abs=EPSILON)
+    assert br.speed == pytest.approx(213.258, abs=EPSILON)
 
-    assert fl.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
-    assert fr.angle.degrees() == pytest.approx(0.0, abs=kEpsilon)
-    assert bl.angle.degrees() == pytest.approx(-90.0, abs=kEpsilon)
-    assert br.angle.degrees() == pytest.approx(-45.0, abs=kEpsilon)
+    assert fl.angle.degrees() == pytest.approx(0.0, abs=EPSILON)
+    assert fr.angle.degrees() == pytest.approx(0.0, abs=EPSILON)
+    assert bl.angle.degrees() == pytest.approx(-90.0, abs=EPSILON)
+    assert br.angle.degrees() == pytest.approx(-45.0, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
@@ -211,9 +211,9 @@ def test_off_center_cor_rotation_forward_kinematics(kinematics_test):
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(75.398, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(-75.398, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert chassis_speeds.vx == pytest.approx(75.398, abs=EPSILON)
+    assert chassis_speeds.vy == pytest.approx(-75.398, abs=EPSILON)
+    assert chassis_speeds.omega == pytest.approx(2 * math.pi, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test):
@@ -224,9 +224,9 @@ def test_off_center_cor_rotation_forward_kinematics_with_deltas(kinematics_test)
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
-    assert twist.dx == pytest.approx(75.398, abs=kEpsilon)
-    assert twist.dy == pytest.approx(-75.398, abs=kEpsilon)
-    assert twist.dtheta == pytest.approx(2 * math.pi, abs=kEpsilon)
+    assert twist.dx == pytest.approx(75.398, abs=EPSILON)
+    assert twist.dy == pytest.approx(-75.398, abs=EPSILON)
+    assert twist.dtheta == pytest.approx(2 * math.pi, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_test):
@@ -237,15 +237,15 @@ def test_off_center_cor_rotation_and_translation_inverse_kinematics(kinematics_t
 
     fl, fr, bl, br = states
 
-    assert fl.speed == pytest.approx(23.43, abs=kEpsilon)
-    assert fr.speed == pytest.approx(23.43, abs=kEpsilon)
-    assert bl.speed == pytest.approx(54.08, abs=kEpsilon)
-    assert br.speed == pytest.approx(54.08, abs=kEpsilon)
+    assert fl.speed == pytest.approx(23.43, abs=EPSILON)
+    assert fr.speed == pytest.approx(23.43, abs=EPSILON)
+    assert bl.speed == pytest.approx(54.08, abs=EPSILON)
+    assert br.speed == pytest.approx(54.08, abs=EPSILON)
 
-    assert fl.angle.degrees() == pytest.approx(-140.19, abs=kEpsilon)
-    assert fr.angle.degrees() == pytest.approx(-39.81, abs=kEpsilon)
-    assert bl.angle.degrees() == pytest.approx(-109.44, abs=kEpsilon)
-    assert br.angle.degrees() == pytest.approx(-70.56, abs=kEpsilon)
+    assert fl.angle.degrees() == pytest.approx(-140.19, abs=EPSILON)
+    assert fr.angle.degrees() == pytest.approx(-39.81, abs=EPSILON)
+    assert bl.angle.degrees() == pytest.approx(-109.44, abs=EPSILON)
+    assert br.angle.degrees() == pytest.approx(-70.56, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_test):
@@ -256,9 +256,9 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics(kinematics_t
 
     chassis_speeds = kinematics_test.m_kinematics.toChassisSpeeds((fl, fr, bl, br))
 
-    assert chassis_speeds.vx == pytest.approx(0.0, abs=kEpsilon)
-    assert chassis_speeds.vy == pytest.approx(-33.0, abs=kEpsilon)
-    assert chassis_speeds.omega == pytest.approx(1.5, abs=kEpsilon)
+    assert chassis_speeds.vx == pytest.approx(0.0, abs=EPSILON)
+    assert chassis_speeds.vy == pytest.approx(-33.0, abs=EPSILON)
+    assert chassis_speeds.omega == pytest.approx(1.5, abs=EPSILON)
 
 
 def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
@@ -271,9 +271,9 @@ def test_off_center_cor_rotation_and_translation_forward_kinematics_with_deltas(
 
     twist = kinematics_test.m_kinematics.toTwist2d((fl, fr, bl, br))
 
-    assert twist.dx == pytest.approx(0.0, abs=kEpsilon)
-    assert twist.dy == pytest.approx(-33.0, abs=kEpsilon)
-    assert twist.dtheta == pytest.approx(1.5, abs=kEpsilon)
+    assert twist.dx == pytest.approx(0.0, abs=EPSILON)
+    assert twist.dy == pytest.approx(-33.0, abs=EPSILON)
+    assert twist.dtheta == pytest.approx(1.5, abs=EPSILON)
 
 
 def test_desaturate(kinematics_test):
@@ -287,10 +287,10 @@ def test_desaturate(kinematics_test):
 
     k_factor = 5.5 / 7.0
 
-    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=kEpsilon)
+    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=EPSILON)
+    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=EPSILON)
+    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=EPSILON)
+    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=EPSILON)
 
 
 def test_desaturate_smooth(kinematics_test):
@@ -309,10 +309,10 @@ def test_desaturate_smooth(kinematics_test):
 
     k_factor = 5.5 / 7.0
 
-    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=kEpsilon)
+    assert arr[0].speed == pytest.approx(5.0 * k_factor, abs=EPSILON)
+    assert arr[1].speed == pytest.approx(6.0 * k_factor, abs=EPSILON)
+    assert arr[2].speed == pytest.approx(4.0 * k_factor, abs=EPSILON)
+    assert arr[3].speed == pytest.approx(7.0 * k_factor, abs=EPSILON)
 
 
 def test_desaturate_negative_speed(kinematics_test):
@@ -324,7 +324,7 @@ def test_desaturate_negative_speed(kinematics_test):
     arr = [state1, state2, state3, state4]
     arr = kinematics_test.m_kinematics.desaturateWheelSpeeds(arr, 1.0)
 
-    assert arr[0].speed == pytest.approx(0.5, abs=kEpsilon)
-    assert arr[1].speed == pytest.approx(0.5, abs=kEpsilon)
-    assert arr[2].speed == pytest.approx(-1.0, abs=kEpsilon)
-    assert arr[3].speed == pytest.approx(-1.0, abs=kEpsilon)
+    assert arr[0].speed == pytest.approx(0.5, abs=EPSILON)
+    assert arr[1].speed == pytest.approx(0.5, abs=EPSILON)
+    assert arr[2].speed == pytest.approx(-1.0, abs=EPSILON)
+    assert arr[3].speed == pytest.approx(-1.0, abs=EPSILON)

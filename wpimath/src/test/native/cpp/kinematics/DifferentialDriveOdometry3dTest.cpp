@@ -10,7 +10,7 @@
 
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 using namespace wpi::math;
 
@@ -22,10 +22,10 @@ TEST(DifferentialDriveOdometry3dTest, Initialize) {
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
-  EXPECT_NEAR(pose.X().value(), 1, kEpsilon);
-  EXPECT_NEAR(pose.Y().value(), 2, kEpsilon);
-  EXPECT_NEAR(pose.Z().value(), 0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, kEpsilon);
+  EXPECT_NEAR(pose.X().value(), 1, EPSILON);
+  EXPECT_NEAR(pose.Y().value(), 2, EPSILON);
+  EXPECT_NEAR(pose.Z().value(), 0, EPSILON);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, EPSILON);
 }
 
 TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
@@ -36,8 +36,8 @@ TEST(DifferentialDriveOdometry3dTest, EncoderDistances) {
       odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg}, 0_m,
                       wpi::units::meter_t{5 * std::numbers::pi});
 
-  EXPECT_NEAR(pose.X().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Y().value(), 5.0, kEpsilon);
-  EXPECT_NEAR(pose.Z().value(), 0.0, kEpsilon);
-  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, kEpsilon);
+  EXPECT_NEAR(pose.X().value(), 5.0, EPSILON);
+  EXPECT_NEAR(pose.Y().value(), 5.0, EPSILON);
+  EXPECT_NEAR(pose.Z().value(), 0.0, EPSILON);
+  EXPECT_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, EPSILON);
 }

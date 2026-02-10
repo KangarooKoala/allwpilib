@@ -12,10 +12,10 @@
 
 int main() {
   wpi::cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};
-  camera.SetVideoMode(wpi::cs::VideoMode::kMJPEG, 320, 240, 30);
+  camera.SetVideoMode(wpi::cs::VideoMode::MJPEG, 320, 240, 30);
   wpi::cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
-  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::kMJPEG, 320, 240,
+  wpi::cs::CvSource cvsource{"cvsource", wpi::cs::VideoMode::MJPEG, 320, 240,
                              30};
   wpi::cs::MjpegServer cvMjpegServer{"cvhttpserver", 8083};
   cvMjpegServer.SetSource(cvsource);

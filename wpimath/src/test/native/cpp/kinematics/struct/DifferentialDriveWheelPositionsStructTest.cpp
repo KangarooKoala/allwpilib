@@ -12,17 +12,17 @@ namespace {
 
 using StructType =
     wpi::util::Struct<wpi::math::DifferentialDriveWheelPositions>;
-const DifferentialDriveWheelPositions kExpectedData{
+const DifferentialDriveWheelPositions EXPECTED_DATA{
     DifferentialDriveWheelPositions{1.74_m, 35.04_m}};
 }  // namespace
 
 TEST(DifferentialDriveWheelPositionsStructTest, Roundtrip) {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialDriveWheelPositions unpacked_data = StructType::Unpack(buffer);
 
-  EXPECT_EQ(kExpectedData.left.value(), unpacked_data.left.value());
-  EXPECT_EQ(kExpectedData.right.value(), unpacked_data.right.value());
+  EXPECT_EQ(EXPECTED_DATA.left.value(), unpacked_data.left.value());
+  EXPECT_EQ(EXPECTED_DATA.right.value(), unpacked_data.right.value());
 }

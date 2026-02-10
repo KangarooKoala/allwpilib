@@ -16,7 +16,7 @@ classes:
 
       Initialization::
 
-        constraints = TrapezoidProfile.Constraints(kMaxV, kMaxA)
+        constraints = TrapezoidProfile.Constraints(MAX_V, MAX_A)
         previousProfiledReference = initialReference
 
       Run on update::

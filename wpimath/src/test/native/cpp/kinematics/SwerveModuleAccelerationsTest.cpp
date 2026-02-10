@@ -11,20 +11,20 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST(SwerveModuleAccelerationsTest, DefaultConstructor) {
   SwerveModuleAcceleration moduleAccelerations;
 
-  EXPECT_NEAR(moduleAccelerations.acceleration.value(), 0.0, kEpsilon);
-  EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 0.0, kEpsilon);
+  EXPECT_NEAR(moduleAccelerations.acceleration.value(), 0.0, EPSILON);
+  EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 0.0, EPSILON);
 }
 
 TEST(SwerveModuleAccelerationsTest, ParameterizedConstructor) {
   SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq, Rotation2d{1.5_rad}};
 
-  EXPECT_NEAR(moduleAccelerations.acceleration.value(), 2.5, kEpsilon);
-  EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, kEpsilon);
+  EXPECT_NEAR(moduleAccelerations.acceleration.value(), 2.5, EPSILON);
+  EXPECT_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, EPSILON);
 }
 
 TEST(SwerveModuleAccelerationsTest, Equals) {

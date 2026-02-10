@@ -155,7 +155,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
       }
 
       if constexpr (std::same_as<T, ClientMessageHandler>) {
-        if (*method == PublishMsg::kMethodStr) {
+        if (*method == PublishMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -200,7 +200,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientPublish(pubuid, *name, *typeStr, *properties, {});
           rv = true;
-        } else if (*method == UnpublishMsg::kMethodStr) {
+        } else if (*method == UnpublishMsg::METHOD_STR) {
           // pubuid
           int64_t pubuid;
           if (!ObjGetNumber(*params, "pubuid", &error, &pubuid)) {
@@ -217,7 +217,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientUnpublish(pubuid);
           rv = true;
-        } else if (*method == SetPropertiesMsg::kMethodStr) {
+        } else if (*method == SetPropertiesMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -238,7 +238,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ClientSetProperties(*name, *update);
-        } else if (*method == SubscribeMsg::kMethodStr) {
+        } else if (*method == SubscribeMsg::METHOD_STR) {
           // subuid
           int64_t subuid;
           if (!ObjGetNumber(*params, "subuid", &error, &subuid)) {
@@ -318,7 +318,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           // complete
           out.ClientSubscribe(subuid, topicNames, options);
           rv = true;
-        } else if (*method == UnsubscribeMsg::kMethodStr) {
+        } else if (*method == UnsubscribeMsg::METHOD_STR) {
           // subuid
           int64_t subuid;
           if (!ObjGetNumber(*params, "subuid", &error, &subuid)) {
@@ -340,7 +340,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
           goto err;
         }
       } else if constexpr (std::same_as<T, ServerMessageHandler>) {
-        if (*method == AnnounceMsg::kMethodStr) {
+        if (*method == AnnounceMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -400,7 +400,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ServerAnnounce(*name, id, *typeStr, *properties, pubuid);
-        } else if (*method == UnannounceMsg::kMethodStr) {
+        } else if (*method == UnannounceMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {
@@ -422,7 +422,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
 
           // complete
           out.ServerUnannounce(*name, id);
-        } else if (*method == PropertiesUpdateMsg::kMethodStr) {
+        } else if (*method == PropertiesUpdateMsg::METHOD_STR) {
           // name
           auto name = ObjGetString(*params, "name", &error);
           if (!name) {

@@ -44,12 +44,12 @@ def test_swerve4_normalize():
 
     states = SwerveDrive4Kinematics.desaturateWheelSpeeds((s1, s2, s3, s4), 5.5)
 
-    kFactor = 5.5 / 7.0
+    FACTOR = 5.5 / 7.0
 
-    assert states[0].speed == pytest.approx(5.0 * kFactor)
-    assert states[1].speed == pytest.approx(6.0 * kFactor)
-    assert states[2].speed == pytest.approx(4.0 * kFactor)
-    assert states[3].speed == pytest.approx(7.0 * kFactor)
+    assert states[0].speed == pytest.approx(5.0 * FACTOR)
+    assert states[1].speed == pytest.approx(6.0 * FACTOR)
+    assert states[2].speed == pytest.approx(4.0 * FACTOR)
+    assert states[3].speed == pytest.approx(7.0 * FACTOR)
 
 
 def test_swerve4_odometry(s4: SwerveDrive4Kinematics):

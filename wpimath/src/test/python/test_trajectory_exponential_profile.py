@@ -6,8 +6,8 @@ import pytest
 
 from wpimath import ExponentialProfileMeterVolts, SimpleMotorFeedforwardMeters
 
-kDt = 0.01
-feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, kDt)
+DT = 0.01
+feedforward = SimpleMotorFeedforwardMeters(0, 2.5629, 0.43277, DT)
 constraints = ExponentialProfileMeterVolts.Constraints.fromCharacteristics(
     12, 2.5629, 0.43277
 )
@@ -29,7 +29,7 @@ def check_dynamics(
     current: ExponentialProfileMeterVolts.State,
     goal: ExponentialProfileMeterVolts.State,
 ):
-    next_state = profile.calculate(kDt, current, goal)
+    next_state = profile.calculate(DT, current, goal)
 
     signal = feedforward.calculate(current.velocity, next_state.velocity)
 

@@ -20,7 +20,7 @@
 
 using namespace wpi::cs;
 
-static constexpr size_t kMaxImagesAvail = 32;
+static constexpr size_t MAX_IMAGES_AVAIL = 32;
 
 SourceImpl::SourceImpl(std::string_view name, wpi::util::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
@@ -199,21 +199,21 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
     try {
       auto str = config.at("pixel format").get<std::string>();
       if (wpi::util::equals_lower(str, "mjpeg")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kMJPEG;
+        mode.pixelFormat = wpi::cs::VideoMode::MJPEG;
       } else if (wpi::util::equals_lower(str, "yuyv")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kYUYV;
+        mode.pixelFormat = wpi::cs::VideoMode::YUYV;
       } else if (wpi::util::equals_lower(str, "rgb565")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kRGB565;
+        mode.pixelFormat = wpi::cs::VideoMode::RGB565;
       } else if (wpi::util::equals_lower(str, "bgr")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kBGR;
+        mode.pixelFormat = wpi::cs::VideoMode::BGR;
       } else if (wpi::util::equals_lower(str, "bgra")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kBGRA;
+        mode.pixelFormat = wpi::cs::VideoMode::BGRA;
       } else if (wpi::util::equals_lower(str, "gray")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kGray;
+        mode.pixelFormat = wpi::cs::VideoMode::GRAY;
       } else if (wpi::util::equals_lower(str, "y16")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kY16;
+        mode.pixelFormat = wpi::cs::VideoMode::Y16;
       } else if (wpi::util::equals_lower(str, "uyvy")) {
-        mode.pixelFormat = wpi::cs::VideoMode::kUYVY;
+        mode.pixelFormat = wpi::cs::VideoMode::UYVY;
       } else {
         SWARNING("SetConfigJson: could not understand pixel format value '{}'",
                  str);
@@ -251,7 +251,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
   }
 
   // if all of video mode is set, use SetVideoMode, otherwise piecemeal it
-  if (mode.pixelFormat != VideoMode::kUnknown && mode.width != 0 &&
+  if (mode.pixelFormat != VideoMode::UNKNOWN && mode.width != 0 &&
       mode.height != 0 && mode.fps != 0) {
     SINFO(
         "SetConfigJson: setting video mode to pixelFormat {}, width {}, height "
@@ -259,7 +259,7 @@ bool SourceImpl::SetConfigJson(const wpi::util::json& config,
         mode.pixelFormat, mode.width, mode.height, mode.fps);
     SetVideoMode(mode, status);
   } else {
-    if (mode.pixelFormat != wpi::cs::VideoMode::kUnknown) {
+    if (mode.pixelFormat != wpi::cs::VideoMode::UNKNOWN) {
       SINFO("SetConfigJson: setting pixelFormat {}", mode.pixelFormat);
       SetPixelFormat(
           static_cast<wpi::cs::VideoMode::PixelFormat>(mode.pixelFormat),
@@ -362,28 +362,28 @@ wpi::util::json SourceImpl::GetConfigJsonObject(CS_Status* status) {
   // pixel format
   std::string_view pixelFormat;
   switch (m_mode.pixelFormat) {
-    case VideoMode::kMJPEG:
+    case VideoMode::MJPEG:
       pixelFormat = "mjpeg";
       break;
-    case VideoMode::kYUYV:
+    case VideoMode::YUYV:
       pixelFormat = "yuyv";
       break;
-    case VideoMode::kRGB565:
+    case VideoMode::RGB565:
       pixelFormat = "rgb565";
       break;
-    case VideoMode::kBGR:
+    case VideoMode::BGR:
       pixelFormat = "bgr";
       break;
-    case VideoMode::kBGRA:
+    case VideoMode::BGRA:
       pixelFormat = "bgra";
       break;
-    case VideoMode::kGray:
+    case VideoMode::GRAY:
       pixelFormat = "gray";
       break;
-    case VideoMode::kY16:
+    case VideoMode::Y16:
       pixelFormat = "y16";
       break;
-    case VideoMode::kUYVY:
+    case VideoMode::UYVY:
       pixelFormat = "uyvy";
       break;
     default:
@@ -467,7 +467,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                           int height, std::string_view data, Frame::Time time,
                           WPI_TimestampSource timeSrc) {
-  if (pixelFormat == VideoMode::PixelFormat::kBGRA) {
+  if (pixelFormat == VideoMode::PixelFormat::BGRA) {
     // Write BGRA as BGR to save a copy
     auto image =
         CreateImageFromBGRA(this, width, height, width * 4,
@@ -556,7 +556,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
   if (it != m_imagesAvail.end()) {
     *it = std::move(image);
-  } else if (m_imagesAvail.size() > kMaxImagesAvail) {
+  } else if (m_imagesAvail.size() > MAX_IMAGES_AVAIL) {
     // Replace smallest buffer; don't need to check for null because the above
     // find would have found it.
     auto it2 = std::min_element(

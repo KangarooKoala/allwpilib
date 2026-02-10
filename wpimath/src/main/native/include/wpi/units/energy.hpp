@@ -44,7 +44,7 @@ UNIT_ADD_WITH_METRIC_PREFIXES(
     unit<std::ratio<1>, wpi::units::category::energy_unit>)
 UNIT_ADD_WITH_METRIC_PREFIXES(energy, calorie, calories, cal,
                               unit<std::ratio<4184, 1000>, joules>)
-UNIT_ADD(energy, kilowatt_hour, kilowatt_hours, kWh,
+UNIT_ADD(energy, kilowatt_hour, kilowatt_hours, WH,
          unit<std::ratio<36, 10>, megajoules>)
 UNIT_ADD(energy, watt_hour, watt_hours, Wh,
          unit<std::ratio<1, 1000>, kilowatt_hours>)

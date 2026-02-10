@@ -14,7 +14,7 @@
 
 using namespace wpi::math;
 
-const Trajectory TrajectoryGenerator::kDoNothingTrajectory(
+const Trajectory TrajectoryGenerator::DO_NOTHING_TRAJECTORY(
     std::vector<Trajectory::State>{Trajectory::State()});
 std::function<void(const char*)> TrajectoryGenerator::s_errorFunc;
 
@@ -48,7 +48,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
             initial, interiorWaypoints, end));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the
@@ -92,7 +92,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
         SplineHelper::QuinticSplinesFromControlVectors(controlVectors));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the
@@ -125,7 +125,7 @@ Trajectory TrajectoryGenerator::GenerateTrajectory(
         SplineHelper::QuinticSplinesFromWaypoints(newWaypoints)));
   } catch (SplineParameterizer::MalformedSplineException& e) {
     ReportError(e.what());
-    return kDoNothingTrajectory;
+    return DO_NOTHING_TRAJECTORY;
   }
 
   // After trajectory generation, flip theta back so it's relative to the

@@ -22,7 +22,7 @@ public class MecanumDriveWheelAccelerationsStruct
 
   @Override
   public int getSize() {
-    return kSizeDouble * 4;
+    return SIZE_DOUBLE * 4;
   }
 
   @Override

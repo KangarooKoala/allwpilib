@@ -112,12 +112,12 @@ using ProtoType = wpi::util::Protobuf<TestProto>;
 }  // namespace
 
 TEST(TestProtoTest, RoundtripNanopb) {
-  const TestProto kExpectedData = TestProto{};
+  const TestProto EXPECTED_DATA = TestProto{};
 
   wpi::util::ProtobufMessage<TestProto> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  ASSERT_TRUE(message.Pack(buf, EXPECTED_DATA));
   std::optional<TestProto> unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
   ASSERT_TRUE(unpacked_data.has_value());

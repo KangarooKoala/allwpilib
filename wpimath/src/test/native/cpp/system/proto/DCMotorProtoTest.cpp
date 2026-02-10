@@ -11,27 +11,27 @@ using namespace wpi::math;
 
 using ProtoType = wpi::util::Protobuf<wpi::math::DCMotor>;
 
-inline constexpr DCMotor kExpectedData =
+inline constexpr DCMotor EXPECTED_DATA =
     DCMotor{1.91_V, 19.1_Nm, 1.74_A, 2.29_A, 2.2_rad_per_s, 2};
 
 TEST(DCMotorProtoTest, Roundtrip) {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  ASSERT_TRUE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.nominalVoltage.value(),
+  EXPECT_EQ(EXPECTED_DATA.nominalVoltage.value(),
             unpacked_data->nominalVoltage.value());
-  EXPECT_EQ(kExpectedData.stallTorque.value(),
+  EXPECT_EQ(EXPECTED_DATA.stallTorque.value(),
             unpacked_data->stallTorque.value());
-  EXPECT_EQ(kExpectedData.stallCurrent.value(),
+  EXPECT_EQ(EXPECTED_DATA.stallCurrent.value(),
             unpacked_data->stallCurrent.value());
-  EXPECT_EQ(kExpectedData.freeCurrent.value(),
+  EXPECT_EQ(EXPECTED_DATA.freeCurrent.value(),
             unpacked_data->freeCurrent.value());
-  EXPECT_EQ(kExpectedData.freeSpeed.value(), unpacked_data->freeSpeed.value());
-  EXPECT_EQ(kExpectedData.R.value(), unpacked_data->R.value());
-  EXPECT_EQ(kExpectedData.Kv.value(), unpacked_data->Kv.value());
-  EXPECT_EQ(kExpectedData.Kt.value(), unpacked_data->Kt.value());
+  EXPECT_EQ(EXPECTED_DATA.freeSpeed.value(), unpacked_data->freeSpeed.value());
+  EXPECT_EQ(EXPECTED_DATA.R.value(), unpacked_data->R.value());
+  EXPECT_EQ(EXPECTED_DATA.Kv.value(), unpacked_data->Kv.value());
+  EXPECT_EQ(EXPECTED_DATA.Kt.value(), unpacked_data->Kt.value());
 }

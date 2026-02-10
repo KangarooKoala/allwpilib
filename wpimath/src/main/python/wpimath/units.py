@@ -7,11 +7,11 @@ from __future__ import annotations
 import math
 import typing
 
-kInchesPerFoot = 12.0
-kMetersPerInch = 0.0254
-kSecondsPerMinute = 60
-kMillisecondsPerSecond = 1000
-kKilogramsPerLb = 0.453592
+INCHES_PER_FOOT = 12.0
+METERS_PER_INCH = 0.0254
+SECONDS_PER_MINUTE = 60
+MILLISECONDS_PER_SECOND = 1000
+KILOGRAMS_PER_LB = 0.453592
 
 
 def metersToFeet(m: meters) -> feet:
@@ -21,7 +21,7 @@ def metersToFeet(m: meters) -> feet:
 
     :returns: Feet converted from meters.
     """
-    return metersToInches(m) / kInchesPerFoot
+    return metersToInches(m) / INCHES_PER_FOOT
 
 
 def feetToMeters(ft: feet) -> meters:
@@ -31,7 +31,7 @@ def feetToMeters(ft: feet) -> meters:
 
     :returns: Meters converted from feet.
     """
-    return inchesToMeters(ft * kInchesPerFoot)
+    return inchesToMeters(ft * INCHES_PER_FOOT)
 
 
 def metersToInches(m: meters) -> inches:
@@ -41,7 +41,7 @@ def metersToInches(m: meters) -> inches:
 
     :returns: Inches converted from meters.
     """
-    return m / kMetersPerInch
+    return m / METERS_PER_INCH
 
 
 def inchesToMeters(i: inches) -> meters:
@@ -51,7 +51,7 @@ def inchesToMeters(i: inches) -> meters:
 
     :returns: Meters converted from inches.
     """
-    return i * kMetersPerInch
+    return i * METERS_PER_INCH
 
 
 # Converts given degrees to radians.
@@ -110,7 +110,7 @@ def rotationsPerMinuteToRadiansPerSecond(
 
     :returns: Radians per second converted from rotations per minute.
     """
-    return (rpm / kSecondsPerMinute) * math.tau
+    return (rpm / SECONDS_PER_MINUTE) * math.tau
 
 
 def radiansPerSecondToRotationsPerMinute(
@@ -122,7 +122,7 @@ def radiansPerSecondToRotationsPerMinute(
 
     :returns: Rotations per minute converted from radians per second.
     """
-    return (rps * kSecondsPerMinute) / math.tau
+    return (rps * SECONDS_PER_MINUTE) / math.tau
 
 
 def millisecondsToSeconds(ms: milliseconds) -> seconds:
@@ -132,7 +132,7 @@ def millisecondsToSeconds(ms: milliseconds) -> seconds:
 
     :returns: Seconds converted from milliseconds.
     """
-    return ms / kMillisecondsPerSecond
+    return ms / MILLISECONDS_PER_SECOND
 
 
 def secondsToMilliseconds(s: seconds) -> milliseconds:
@@ -142,7 +142,7 @@ def secondsToMilliseconds(s: seconds) -> milliseconds:
 
     :returns: Milliseconds converted from seconds.
     """
-    return s * kMillisecondsPerSecond
+    return s * MILLISECONDS_PER_SECOND
 
 
 def kilogramsToLbs(kg: kilograms) -> pounds:
@@ -152,7 +152,7 @@ def kilogramsToLbs(kg: kilograms) -> pounds:
 
     :returns: Lbs (pound-mass) converted from kilograms.
     """
-    return kg / kKilogramsPerLb
+    return kg / KILOGRAMS_PER_LB
 
 
 def lbsToKilograms(lbs: pounds) -> kilograms:
@@ -162,7 +162,7 @@ def lbsToKilograms(lbs: pounds) -> kilograms:
 
     :returns: Kilograms converted from lbs (pound-mass).
     """
-    return lbs * kKilogramsPerLb
+    return lbs * KILOGRAMS_PER_LB
 
 
 #

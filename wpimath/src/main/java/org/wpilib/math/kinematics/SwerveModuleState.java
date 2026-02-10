@@ -25,7 +25,7 @@ public class SwerveModuleState
   public double speed;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.kZero;
+  public Rotation2d angle = Rotation2d.ZERO;
 
   /** SwerveModuleState protobuf for serialization. */
   public static final SwerveModuleStateProto proto = new SwerveModuleStateProto();
@@ -97,7 +97,7 @@ public class SwerveModuleState
     var delta = angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       speed *= -1;
-      angle = angle.rotateBy(Rotation2d.kPi);
+      angle = angle.rotateBy(Rotation2d.PI);
     }
   }
 
@@ -117,7 +117,7 @@ public class SwerveModuleState
     var delta = desiredState.angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
       return new SwerveModuleState(
-          -desiredState.speed, desiredState.angle.rotateBy(Rotation2d.kPi));
+          -desiredState.speed, desiredState.angle.rotateBy(Rotation2d.PI));
     } else {
       return new SwerveModuleState(desiredState.speed, desiredState.angle);
     }

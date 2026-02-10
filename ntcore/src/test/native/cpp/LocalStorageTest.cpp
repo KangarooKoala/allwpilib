@@ -42,8 +42,8 @@ namespace wpi::nt {
 }
 
 ::testing::Matcher<const PubSubOptionsImpl&> IsDefaultPubSubOptions() {
-  static constexpr PubSubOptionsImpl kDefaultPubSubOptionsImpl;
-  return IsPubSubOptions(kDefaultPubSubOptionsImpl);
+  static constexpr PubSubOptionsImpl DEFAULT_PUB_SUB_OPTIONS_IMPL;
+  return IsPubSubOptions(DEFAULT_PUB_SUB_OPTIONS_IMPL);
 }
 
 class LocalStorageTest : public ::testing::Test {
@@ -979,7 +979,7 @@ TEST_F(LocalStorageTest, ReadQueueLocalRemote) {
   EXPECT_CALL(network, ClientPublish(_, _, _, _, _)).Times(1);
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =
@@ -1061,7 +1061,7 @@ TEST_F(LocalStorageTest, ReadQueueInitialLocal) {
   storage.SetEntryValue(pub, Value::MakeDouble(1.0, 50));
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =
@@ -1082,7 +1082,7 @@ TEST_F(LocalStorageTest, ReadQueueInitialRemote) {
   storage.ServerSetValue(remoteTopic, Value::MakeDouble(2.0, 60));
 
   auto subBoth =
-      storage.Subscribe(fooTopic, NT_DOUBLE, "double", kDefaultPubSubOptions);
+      storage.Subscribe(fooTopic, NT_DOUBLE, "double", DEFAULT_PUB_SUB_OPTIONS);
   auto subLocal =
       storage.Subscribe(fooTopic, NT_DOUBLE, "double", {.disableRemote = true});
   auto subRemote =

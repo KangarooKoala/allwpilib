@@ -22,7 +22,7 @@ namespace wpi::math {
  *
  * Initialization:
  * @code{.cpp}
- * TrapezoidProfile::Constraints constraints{kMaxV, kMaxA};
+ * TrapezoidProfile::Constraints constraints{MAX_V, MAX_A};
  * double previousProfiledReference = initialReference;
  * TrapezoidProfile profile{constraints};
  * @endcode

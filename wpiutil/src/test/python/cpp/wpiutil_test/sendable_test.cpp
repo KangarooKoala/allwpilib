@@ -136,7 +136,7 @@ public:
       std::function<void(std::span<const uint8_t>)> setter) override {}
 
   wpi::util::SendableBuilder::BackendKind GetBackendKind() const override {
-    return wpi::util::SendableBuilder::BackendKind::kUnknown;
+    return wpi::util::SendableBuilder::BackendKind::UNKNOWN;
   }
 
   bool IsPublished() const override { return false; }

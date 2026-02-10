@@ -19,7 +19,7 @@ namespace wpi::math {
  *
  * Initialization:
  * @code{.cpp}
- * ExponentialProfile::Constraints constraints{kMaxV, kV, kA};
+ * ExponentialProfile::Constraints constraints{MAX_V, kV, kA};
  * State previousProfiledReference = {initialReference, 0_mps};
  * @endcode
  *
@@ -53,10 +53,10 @@ class ExponentialProfile {
   using B_t = wpi::units::unit_t<
       wpi::units::compound_unit<Acceleration, wpi::units::inverse<Input>>>;
   using KV = wpi::units::compound_unit<Input, wpi::units::inverse<Velocity>>;
-  using kV_t = wpi::units::unit_t<KV>;
+  using V_T = wpi::units::unit_t<KV>;
   using KA =
       wpi::units::compound_unit<Input, wpi::units::inverse<Acceleration>>;
-  using kA_t = wpi::units::unit_t<KA>;
+  using A_T = wpi::units::unit_t<KA>;
 
   /**
    * Profile timing.
@@ -102,7 +102,7 @@ class ExponentialProfile {
      * @param kV The velocity gain.
      * @param kA The acceleration gain.
      */
-    constexpr Constraints(Input_t maxInput, kV_t kV, kA_t kA)
+    constexpr Constraints(Input_t maxInput, V_T kV, A_T kA)
         : maxInput{maxInput}, A{-kV / kA}, B{1 / kA} {}
 
     /**

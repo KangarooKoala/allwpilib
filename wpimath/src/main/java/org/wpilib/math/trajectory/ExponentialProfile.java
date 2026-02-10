@@ -19,7 +19,7 @@ import org.wpilib.util.struct.StructSerializable;
  *
  * <pre><code>
  * ExponentialProfile.Constraints constraints =
- *   ExponentialProfile.Constraints.fromCharacteristics(kMaxV, kV, kA);
+ *   ExponentialProfile.Constraints.fromCharacteristics(MAX_V, kV, kA);
  * ExponentialProfile.State previousProfiledReference =
  *   new ExponentialProfile.State(initialReference, 0.0);
  * ExponentialProfile profile = new ExponentialProfile(constraints);

@@ -34,7 +34,7 @@ TEST_F(DebouncerTest, DebounceRising) {
 
 TEST_F(DebouncerTest, DebounceFalling) {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kFalling};
+                                 wpi::math::Debouncer::DebounceType::FALLING};
 
   debouncer.Calculate(true);
   EXPECT_TRUE(debouncer.Calculate(false));
@@ -46,7 +46,7 @@ TEST_F(DebouncerTest, DebounceFalling) {
 
 TEST_F(DebouncerTest, DebounceBoth) {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kBoth};
+                                 wpi::math::Debouncer::DebounceType::BOTH};
 
   debouncer.Calculate(false);
   EXPECT_FALSE(debouncer.Calculate(true));
@@ -63,20 +63,20 @@ TEST_F(DebouncerTest, DebounceBoth) {
 
 TEST_F(DebouncerTest, DebounceParams) {
   wpi::math::Debouncer debouncer{20_ms,
-                                 wpi::math::Debouncer::DebounceType::kBoth};
+                                 wpi::math::Debouncer::DebounceType::BOTH};
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              wpi::math::Debouncer::DebounceType::kBoth);
+              wpi::math::Debouncer::DebounceType::BOTH);
 
   debouncer.SetDebounceTime(100_ms);
 
   EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
 
-  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::kFalling);
+  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::FALLING);
 
   EXPECT_TRUE(debouncer.GetDebounceType() ==
-              wpi::math::Debouncer::DebounceType::kFalling);
+              wpi::math::Debouncer::DebounceType::FALLING);
 
   EXPECT_TRUE(debouncer.Calculate(false));
 }

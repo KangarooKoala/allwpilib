@@ -250,7 +250,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
         m_odometryPoseBuffer.GetInternalBuffer().front().first -
-                kBufferDuration >
+                BUFFER_DURATION >
             timestamp) {
       return;
     }
@@ -442,14 +442,14 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
   };
 
-  static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
+  static constexpr wpi::units::second_t BUFFER_DURATION = 1.5_s;
 
   Odometry3d<WheelPositions, WheelSpeeds, WheelAccelerations>& m_odometry;
   wpi::util::array<double, 4> m_q{wpi::util::empty_array};
   wpi::math::Matrixd<6, 6> m_visionK = wpi::math::Matrixd<6, 6>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
-  TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{kBufferDuration};
+  TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{BUFFER_DURATION};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset

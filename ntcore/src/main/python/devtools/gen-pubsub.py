@@ -28,7 +28,7 @@ if __name__ == "__main__":
                     )
                 else:
                     v = f.value.format()
-                    if v == "kDefaultPeriodic":
+                    if v == "DEFAULT_PERIODIC":
                         v = f"nt::PubSubOptions::{v}"
                     params.append((f.type, f.name, f.name, v))
 

@@ -19,7 +19,7 @@ public interface NTSendable extends Sendable {
 
   @Override
   default void initSendable(SendableBuilder builder) {
-    if (builder.getBackendKind() == SendableBuilder.BackendKind.kNetworkTables) {
+    if (builder.getBackendKind() == SendableBuilder.BackendKind.NETWORK_TABLES) {
       initSendable((NTSendableBuilder) builder);
     }
   }

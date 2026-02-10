@@ -120,7 +120,7 @@ class WPILIB_DLLEXPORT TrajectoryGenerator {
  private:
   static void ReportError(const char* error);
 
-  static const Trajectory kDoNothingTrajectory;
+  static const Trajectory DO_NOTHING_TRAJECTORY;
   static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace wpi::math

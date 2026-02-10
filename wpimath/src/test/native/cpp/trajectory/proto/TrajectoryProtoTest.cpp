@@ -13,7 +13,7 @@ namespace {
 
 using ProtoType = wpi::util::Protobuf<wpi::math::Trajectory>;
 
-const Trajectory kExpectedData =
+const Trajectory EXPECTED_DATA =
     Trajectory{std::vector<wpi::math::Trajectory::State>{
         Trajectory::State{
             1.1_s, 2.2_mps, 3.3_mps_sq,
@@ -30,11 +30,11 @@ const Trajectory kExpectedData =
 }  // namespace
 
 TEST(TrajectoryProtoTest, Roundtrip) {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  ASSERT_TRUE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   ASSERT_TRUE(unpacked_data.has_value());
-  EXPECT_EQ(kExpectedData.States(), unpacked_data->States());
+  EXPECT_EQ(EXPECTED_DATA.States(), unpacked_data->States());
 }

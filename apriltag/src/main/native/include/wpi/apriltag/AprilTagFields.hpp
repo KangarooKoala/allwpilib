@@ -15,21 +15,21 @@ namespace wpi::apriltag {
  */
 enum class AprilTagField {
   /// 2022 Rapid React.
-  k2022RapidReact,
+  RAPID_REACT_2022,
   /// 2023 Charged Up.
-  k2023ChargedUp,
+  CHARGED_UP_2023,
   /// 2024 Crescendo.
-  k2024Crescendo,
+  CRESCENDO_2024,
   /// 2025 Reefscape AndyMark (see TU12).
-  k2025ReefscapeAndyMark,
+  REEFSCAPE_ANDYMARK_2025,
   /// 2025 Reefscape Welded (see TU12).
-  k2025ReefscapeWelded,
+  REEFSCAPE_WELDED_2025,
   /// Alias to the current game.
-  kDefaultField = k2025ReefscapeWelded,
+  DEFAULT_FIELD = REEFSCAPE_WELDED_2025,
 
   // This is a placeholder for denoting the last supported field. This should
   // always be the last entry in the enum and should not be used by users
-  kNumFields,
+  NUM_FIELDS,
 };
 
 }  // namespace wpi::apriltag

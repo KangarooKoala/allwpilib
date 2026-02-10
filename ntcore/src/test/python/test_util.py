@@ -44,7 +44,7 @@ def test_ntproperty(nt: NetworkTableInstance):
             "/SmartDashboard/testFloatArray",
             [1.1, 1.2, 1.3],
             writeDefault=True,
-            type=NetworkTableType.kFloatArray,
+            type=NetworkTableType.FLOAT_ARRAY,
             inst=nt,
         )
 
