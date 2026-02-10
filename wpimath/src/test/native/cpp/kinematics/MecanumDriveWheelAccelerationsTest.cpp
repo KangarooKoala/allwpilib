@@ -5,7 +5,6 @@
 #include "wpi/math/kinematics/MecanumDriveWheelAccelerations.hpp"
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/acceleration.h>
 
 using namespace wpi::math;
@@ -60,8 +59,8 @@ TEST(MecanumDriveWheelAccelerationsTest, Minus) {
 }
 
 TEST(MecanumDriveWheelAccelerationsTest, UnaryMinus) {
-  const auto wheelAccelerations = -MecanumDriveWheelAccelerations{
-      1.0_mps2, -2.0_mps2, 3.0_mps2, -4.0_mps2};
+  const auto wheelAccelerations =
+      -MecanumDriveWheelAccelerations{1.0_mps2, -2.0_mps2, 3.0_mps2, -4.0_mps2};
 
   EXPECT_NEAR(wheelAccelerations.frontLeft.value(), -1.0, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.frontRight.value(), 2.0, kEpsilon);
@@ -71,8 +70,7 @@ TEST(MecanumDriveWheelAccelerationsTest, UnaryMinus) {
 
 TEST(MecanumDriveWheelAccelerationsTest, Multiplication) {
   const auto wheelAccelerations =
-      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 3.0_mps2,
-                                     3.5_mps2} *
+      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 3.0_mps2, 3.5_mps2} *
       2.0;
 
   EXPECT_NEAR(wheelAccelerations.frontLeft.value(), 4.0, kEpsilon);
@@ -83,8 +81,7 @@ TEST(MecanumDriveWheelAccelerationsTest, Multiplication) {
 
 TEST(MecanumDriveWheelAccelerationsTest, Division) {
   const auto wheelAccelerations =
-      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 1.5_mps2,
-                                     1.0_mps2} /
+      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 1.5_mps2, 1.0_mps2} /
       2.0;
 
   EXPECT_NEAR(wheelAccelerations.frontLeft.value(), 1.0, kEpsilon);

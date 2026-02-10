@@ -2,15 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/length.h>
-#include <wpi/units/velocity.h>
-#include <wpi/units/voltage.h>
 
 /**
  * wpi::math::ProfiledPIDController with feedforward snippets for frc-docs.

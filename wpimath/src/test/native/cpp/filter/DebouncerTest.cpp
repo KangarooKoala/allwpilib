@@ -5,8 +5,8 @@
 #include "wpi/math/filter/Debouncer.hpp"
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/time.h>
+
 #include "wpi/util/timestamp.h"
 
 static wpi::units::seconds<> now = 0_s;

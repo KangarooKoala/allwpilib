@@ -5,11 +5,11 @@
 #pragma once
 
 #include <Eigen/QR>
+#include <wpi/units/time.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::math {
 

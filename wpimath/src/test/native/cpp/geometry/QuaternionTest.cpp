@@ -7,7 +7,6 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/angle.h>
 
 using namespace wpi::math;

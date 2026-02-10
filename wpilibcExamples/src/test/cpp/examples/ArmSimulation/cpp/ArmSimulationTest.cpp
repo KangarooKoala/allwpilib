@@ -6,6 +6,8 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
 
 #include "Constants.hpp"
 #include "Robot.hpp"
@@ -15,8 +17,6 @@
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
-#include <wpi/units/length.h>
-#include <wpi/units/time.h>
 #include "wpi/util/Preferences.hpp"
 
 class ArmSimulationTest : public testing::TestWithParam<wpi::units::degrees<>> {

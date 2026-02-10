@@ -7,9 +7,6 @@
 #include <stdexcept>
 
 #include <gcem.hpp>
-
-#include "wpi/math/system/DCMotor.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
@@ -17,6 +14,9 @@
 #include <wpi/units/moment_of_inertia.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -30,10 +30,11 @@ class WPILIB_DLLEXPORT Models {
       Distance, wpi::units::inverse<wpi::units::seconds_>>>;
 
   template <typename Distance>
-  using Acceleration_t = wpi::units::unit<wpi::units::compound_conversion_factor<
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>,
-      wpi::units::inverse<wpi::units::seconds_>>>;
+  using Acceleration_t =
+      wpi::units::unit<wpi::units::compound_conversion_factor<
+          wpi::units::compound_conversion_factor<
+              Distance, wpi::units::inverse<wpi::units::seconds_>>,
+          wpi::units::inverse<wpi::units::seconds_>>>;
 
   /**
    * Creates a flywheel state-space model from physical constants.
@@ -247,9 +248,9 @@ class WPILIB_DLLEXPORT Models {
    *         gearing <= 0.
    */
   static constexpr LinearSystem<2, 2, 2> DifferentialDriveFromPhysicalConstants(
-      const DCMotor& motor, wpi::units::kilograms<> mass, wpi::units::meters<> r,
-      wpi::units::meters<> rb, wpi::units::kilogram_square_meters<> J,
-      double gearing) {
+      const DCMotor& motor, wpi::units::kilograms<> mass,
+      wpi::units::meters<> r, wpi::units::meters<> rb,
+      wpi::units::kilogram_square_meters<> J, double gearing) {
     if (mass <= 0_kg) {
       throw std::domain_error("mass must be greater than zero.");
     }
@@ -270,16 +271,14 @@ class WPILIB_DLLEXPORT Models {
               (motor.Kv * motor.R * wpi::units::pow<2>(r));
     auto C2 = gearing * motor.Kt / (motor.R * r);
 
-    Matrixd<2, 2> A{
-        {((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value(),
-         ((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value()},
-        {((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value(),
-         ((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value()}};
-    Matrixd<2, 2> B{
-        {((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value(),
-         ((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value()},
-        {((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value(),
-         ((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value()}};
+    Matrixd<2, 2> A{{((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value(),
+                     ((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value()},
+                    {((1 / mass - wpi::units::pow<2>(rb) / J) * C1).value(),
+                     ((1 / mass + wpi::units::pow<2>(rb) / J) * C1).value()}};
+    Matrixd<2, 2> B{{((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value(),
+                     ((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value()},
+                    {((1 / mass - wpi::units::pow<2>(rb) / J) * C2).value(),
+                     ((1 / mass + wpi::units::pow<2>(rb) / J) * C2).value()}};
     Matrixd<2, 2> C{{1.0, 0.0}, {0.0, 1.0}};
     Matrixd<2, 2> D{{0.0, 0.0}, {0.0, 0.0}};
 

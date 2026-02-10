@@ -66,7 +66,7 @@ wpi::units::radians_per_second_squared<> DCMotorSim::GetAngularAcceleration()
 
 wpi::units::newton_meters<> DCMotorSim::GetTorque() const {
   return wpi::units::newton_meters<>{GetAngularAcceleration().value() *
-                                    m_j.value()};
+                                     m_j.value()};
 }
 
 wpi::units::amperes<> DCMotorSim::GetCurrentDraw() const {

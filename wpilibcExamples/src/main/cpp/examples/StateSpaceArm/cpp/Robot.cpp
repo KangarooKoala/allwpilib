@@ -4,6 +4,9 @@
 
 #include <numbers>
 
+#include <wpi/units/angle.h>
+#include <wpi/units/moment_of_inertia.h>
+
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -14,8 +17,6 @@
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/moment_of_inertia.h>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller

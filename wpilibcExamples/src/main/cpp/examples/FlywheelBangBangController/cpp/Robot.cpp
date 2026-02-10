@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/units/moment_of_inertia.h>
+
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -12,7 +14,6 @@
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/simulation/FlywheelSim.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include <wpi/units/moment_of_inertia.h>
 
 /**
  * This is a sample program to demonstrate the use of a
@@ -25,8 +26,8 @@ class Robot : public wpi::TimedRobot {
    */
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
-    wpi::units::radians_per_second<> setpoint = wpi::units::max(
-        0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
+    wpi::units::radians_per_second<> setpoint =
+        wpi::units::max(0_rpm, m_joystick.GetRawAxis(0) * kMaxSetpointValue);
 
     // Set setpoint and measurement of the bang-bang controller
     wpi::units::volts<> bangOutput =

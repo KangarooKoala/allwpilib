@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "wpi/commands2/SubsystemBase.hpp"
-#include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/hardware/rotation/Encoder.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angle.h>
 #include <wpi/units/length.h>
+
+#include "wpi/commands2/SubsystemBase.hpp"
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/xrp/XRPGyro.hpp"
 #include "wpi/xrp/XRPMotor.hpp"
 

@@ -58,11 +58,13 @@ void ElevatorSim::SetState(wpi::units::meters<> position,
                                  velocity});
 }
 
-bool ElevatorSim::WouldHitLowerLimit(wpi::units::meters<> elevatorHeight) const {
+bool ElevatorSim::WouldHitLowerLimit(
+    wpi::units::meters<> elevatorHeight) const {
   return elevatorHeight <= m_minHeight;
 }
 
-bool ElevatorSim::WouldHitUpperLimit(wpi::units::meters<> elevatorHeight) const {
+bool ElevatorSim::WouldHitUpperLimit(
+    wpi::units::meters<> elevatorHeight) const {
   return elevatorHeight >= m_maxHeight;
 }
 

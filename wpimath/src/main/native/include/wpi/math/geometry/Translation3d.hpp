@@ -9,11 +9,11 @@
 #include <span>
 
 #include <Eigen/Core>
+#include <wpi/units/area.h>
+#include <wpi/units/length.h>
 
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/area.h>
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -94,8 +94,8 @@ class WPILIB_DLLEXPORT Translation3d {
    */
   constexpr wpi::units::meters<> Distance(const Translation3d& other) const {
     return wpi::units::sqrt(wpi::units::pow<2>(other.m_x - m_x) +
-                                  wpi::units::pow<2>(other.m_y - m_y) +
-                                  wpi::units::pow<2>(other.m_z - m_z));
+                            wpi::units::pow<2>(other.m_y - m_y) +
+                            wpi::units::pow<2>(other.m_z - m_z));
   }
 
   /**

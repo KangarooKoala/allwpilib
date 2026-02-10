@@ -6,6 +6,7 @@
 
 #include <wpi/units/angle.h>
 #include <wpi/units/length.h>
+
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

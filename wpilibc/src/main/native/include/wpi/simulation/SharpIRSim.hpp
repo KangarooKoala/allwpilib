@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/range/SharpIR.hpp"
-#include <wpi/units/length.h>
 
 namespace wpi {
 

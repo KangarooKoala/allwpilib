@@ -6,13 +6,14 @@
 
 #include <functional>
 
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/estimator/KalmanFilter.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include <wpi/units/time.h>
-#include <wpi/units/voltage.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

@@ -8,13 +8,13 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/geometry/Translation3d.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 
 #define EXPECT_UNITS_EQ(a, b) EXPECT_DOUBLE_EQ((a).value(), (b).value())
 

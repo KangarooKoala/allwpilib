@@ -5,7 +5,6 @@
 #pragma once
 
 #include <Eigen/Core>
-
 #include <wpi/units/time.h>
 #include <wpi/units/voltage.h>
 

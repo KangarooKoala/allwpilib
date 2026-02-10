@@ -8,11 +8,12 @@
 #include <limits>
 #include <utility>
 
+#include <wpi/units/length.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include <wpi/units/length.h>
-#include <wpi/units/voltage.h>
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -88,12 +89,10 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     if (speed == 0_mps) {
       maxChassisAcceleration =
           maxWheelAcceleration /
-          (1 + m_kinematics.trackwidth * wpi::units::abs(curvature) /
-                   (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::abs(curvature) / (2_rad));
       minChassisAcceleration =
           minWheelAcceleration /
-          (1 + m_kinematics.trackwidth * wpi::units::abs(curvature) /
-                   (2_rad));
+          (1 + m_kinematics.trackwidth * wpi::units::abs(curvature) / (2_rad));
     } else {
       maxChassisAcceleration =
           maxWheelAcceleration /
@@ -111,8 +110,7 @@ class WPILIB_DLLEXPORT DifferentialDriveVoltageConstraint
     // wheel when this happens. We can accurately account for this by simply
     // negating the inner wheel.
 
-    if ((m_kinematics.trackwidth / 2) >
-        1_rad / wpi::units::abs(curvature)) {
+    if ((m_kinematics.trackwidth / 2) > 1_rad / wpi::units::abs(curvature)) {
       if (speed > 0_mps) {
         minChassisAcceleration = -minChassisAcceleration;
       } else if (speed < 0_mps) {

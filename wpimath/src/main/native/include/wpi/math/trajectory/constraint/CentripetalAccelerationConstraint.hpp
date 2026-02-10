@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/curvature.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -42,7 +43,7 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     // The units library defines a unit for radians although it is technically
     // unitless.
     return wpi::units::sqrt(m_maxCentripetalAcceleration /
-                                  wpi::units::abs(curvature) * 1_rad);
+                            wpi::units::abs(curvature) * 1_rad);
   }
 
   constexpr MinMax MinMaxAcceleration(

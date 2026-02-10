@@ -6,9 +6,10 @@
 
 #include <memory>
 
+#include <wpi/units/pressure.h>
+
 #include "PneumaticsBase.hpp"
 #include "wpi/hal/Types.h"
-#include <wpi/units/pressure.h>
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 

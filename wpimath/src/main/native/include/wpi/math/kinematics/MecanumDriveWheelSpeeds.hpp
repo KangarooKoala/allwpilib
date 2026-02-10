@@ -8,6 +8,7 @@
 #include <array>
 
 #include <wpi/units/velocity.h>
+
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -52,12 +53,11 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelSpeeds {
       wpi::units::meters_per_second<> attainableMaxSpeed) const {
     std::array<wpi::units::meters_per_second<>, 4> wheelSpeeds{
         frontLeft, frontRight, rearLeft, rearRight};
-    wpi::units::meters_per_second<> realMaxSpeed =
-        wpi::units::abs(*std::max_element(
-            wheelSpeeds.begin(), wheelSpeeds.end(),
-            [](const auto& a, const auto& b) {
-              return wpi::units::abs(a) < wpi::units::abs(b);
-            }));
+    wpi::units::meters_per_second<> realMaxSpeed = wpi::units::abs(
+        *std::max_element(wheelSpeeds.begin(), wheelSpeeds.end(),
+                          [](const auto& a, const auto& b) {
+                            return wpi::units::abs(a) < wpi::units::abs(b);
+                          }));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (int i = 0; i < 4; ++i) {

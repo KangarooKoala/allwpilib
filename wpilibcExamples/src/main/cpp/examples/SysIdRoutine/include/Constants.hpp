@@ -35,7 +35,8 @@ inline constexpr wpi::units::meters<> kEncoderDistancePerPulse =
 namespace shooter {
 
 using kv_unit = wpi::units::compound_conversion_factor<
-    wpi::units::compound_conversion_factor<wpi::units::volts_, wpi::units::seconds_>,
+    wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                           wpi::units::seconds_>,
     wpi::units::inverse<wpi::units::turns_>>;
 using kv_unit_t = wpi::units::unit<kv_unit>;
 

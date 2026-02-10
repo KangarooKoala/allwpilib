@@ -9,11 +9,11 @@
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
+#include <wpi/units/moment_of_inertia.h>
+#include <wpi/units/time.h>
 
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/Models.hpp"
-#include <wpi/units/moment_of_inertia.h>
-#include <wpi/units/time.h>
 
 TEST(KalmanFilterTest, Flywheel) {
   auto motor = wpi::math::DCMotor::NEO();

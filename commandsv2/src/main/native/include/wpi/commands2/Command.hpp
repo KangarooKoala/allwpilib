@@ -9,9 +9,10 @@
 #include <optional>
 #include <string>
 
+#include <wpi/units/time.h>
+
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/Subsystem.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/Demangle.hpp"
 #include "wpi/util/SmallSet.hpp"
 #include "wpi/util/StackTrace.hpp"

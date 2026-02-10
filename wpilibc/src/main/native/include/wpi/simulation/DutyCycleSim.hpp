@@ -6,8 +6,9 @@
 
 #include <memory>
 
-#include "wpi/simulation/CallbackStore.hpp"
 #include <wpi/units/frequency.h>
+
+#include "wpi/simulation/CallbackStore.hpp"
 
 namespace wpi {
 

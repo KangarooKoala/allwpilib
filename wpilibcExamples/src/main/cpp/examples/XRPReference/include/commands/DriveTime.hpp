@@ -4,11 +4,12 @@
 
 #pragma once
 
+#include <wpi/units/time.h>
+
 #include "subsystems/Drivetrain.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/system/Timer.hpp"
-#include <wpi/units/time.h>
 
 class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
  public:

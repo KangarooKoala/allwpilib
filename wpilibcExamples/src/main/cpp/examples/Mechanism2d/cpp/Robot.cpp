@@ -2,6 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/units/angle.h>
+
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -11,7 +13,6 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
 

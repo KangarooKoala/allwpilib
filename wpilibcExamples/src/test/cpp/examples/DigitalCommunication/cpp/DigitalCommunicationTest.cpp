@@ -6,13 +6,13 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
 
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/simulation/DIOSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
-#include <wpi/units/time.h>
 
 template <typename T>
 class DigitalCommunicationTest : public testing::TestWithParam<T> {

@@ -8,10 +8,11 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/DriverStation.h"
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/Synchronization.h"
 
 namespace wpi::log {

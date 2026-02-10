@@ -13,9 +13,10 @@
 #include <thread>
 #include <utility>
 
-#include "wpi/hal/Types.h"
 #include <wpi/units/frequency.h>
 #include <wpi/units/time.h>
+
+#include "wpi/hal/Types.h"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi {

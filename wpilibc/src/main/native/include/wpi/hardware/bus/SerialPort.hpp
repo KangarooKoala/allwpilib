@@ -7,9 +7,10 @@
 #include <string>
 #include <string_view>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/SerialPort.h"
 #include "wpi/hal/Types.h"
-#include <wpi/units/time.h>
 
 namespace wpi {
 

@@ -6,6 +6,10 @@
 
 #include <numbers>
 
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
+
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -18,9 +22,6 @@
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include <wpi/units/angular_velocity.h>
-#include <wpi/units/length.h>
-#include <wpi/units/velocity.h>
 
 /**
  * Represents a differential drive style drivetrain.

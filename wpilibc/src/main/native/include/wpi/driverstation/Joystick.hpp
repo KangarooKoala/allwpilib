@@ -6,8 +6,9 @@
 
 #include <array>
 
-#include "wpi/driverstation/GenericHID.hpp"
 #include <wpi/units/angle.h>
+
+#include "wpi/driverstation/GenericHID.hpp"
 
 namespace wpi {
 

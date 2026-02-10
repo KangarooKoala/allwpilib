@@ -5,6 +5,7 @@
 #pragma once
 
 #include <wpi/units/velocity.h>
+
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -36,8 +37,8 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelSpeeds {
    */
   constexpr void Desaturate(
       wpi::units::meters_per_second<> attainableMaxSpeed) {
-    auto realMaxSpeed = wpi::units::max(wpi::units::abs(left),
-                                              wpi::units::abs(right));
+    auto realMaxSpeed =
+        wpi::units::max(wpi::units::abs(left), wpi::units::abs(right));
 
     if (realMaxSpeed > attainableMaxSpeed) {
       left = left / realMaxSpeed * attainableMaxSpeed;

@@ -6,9 +6,10 @@
 
 #include <memory>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hardware/discrete/DigitalInput.hpp"
 #include "wpi/hardware/discrete/DigitalOutput.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::xrp {
 

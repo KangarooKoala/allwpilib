@@ -4,12 +4,13 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Odometry3d.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

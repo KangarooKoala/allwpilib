@@ -7,13 +7,13 @@
 #include <chrono>
 
 #include <gtest/gtest.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/spline/SplineHelper.hpp"
 #include "wpi/math/spline/SplineParameterizer.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
 
 using namespace wpi::math;
 

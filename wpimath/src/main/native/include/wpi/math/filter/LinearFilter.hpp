@@ -13,10 +13,10 @@
 
 #include <Eigen/QR>
 #include <gcem.hpp>
+#include <wpi/units/time.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/array.hpp"
 #include "wpi/util/circular_buffer.hpp"
 
@@ -258,7 +258,8 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static LinearFilter<T> BackwardFiniteDifference(wpi::units::seconds<> period) {
+  static LinearFilter<T> BackwardFiniteDifference(
+      wpi::units::seconds<> period) {
     // Generate stencil points from -(samples - 1) to 0
     wpi::util::array<int, Samples> stencil{wpi::util::empty_array};
     for (int i = 0; i < Samples; ++i) {

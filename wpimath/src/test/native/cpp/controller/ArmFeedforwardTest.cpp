@@ -8,13 +8,13 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/system/NumericalIntegration.hpp"
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
 #include <wpi/units/time.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/NumericalIntegration.hpp"
 
 namespace {
 

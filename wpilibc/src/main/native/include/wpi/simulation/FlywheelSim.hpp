@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "wpi/math/system/DCMotor.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/simulation/LinearSystemSim.hpp"
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
 #include <wpi/units/moment_of_inertia.h>
 #include <wpi/units/torque.h>
+
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/simulation/LinearSystemSim.hpp"
 
 namespace wpi::sim {
 /**

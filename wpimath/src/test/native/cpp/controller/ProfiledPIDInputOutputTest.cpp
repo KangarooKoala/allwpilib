@@ -5,11 +5,11 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/controller/ProfiledPIDController.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
+
+#include "wpi/math/controller/ProfiledPIDController.hpp"
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
@@ -26,9 +26,8 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput1) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
-      180_deg);
+  EXPECT_LT(wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
+            180_deg);
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
@@ -47,9 +46,8 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput2) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
-      wpi::units::radians<>{std::numbers::pi});
+  EXPECT_LT(wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
+            wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
@@ -68,9 +66,8 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput3) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
-      wpi::units::radians<>{std::numbers::pi});
+  EXPECT_LT(wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
+            wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
@@ -89,9 +86,8 @@ TEST(ProfiledPIDInputOutputTest, ContinuousInput4) {
   EXPECT_LT(controller.Calculate(kMeasurement, kGoal), 0.0);
 
   // Error must be less than half the input range at all times
-  EXPECT_LT(
-      wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
-      wpi::units::radians<>{std::numbers::pi});
+  EXPECT_LT(wpi::units::abs(controller.GetSetpoint().position - kMeasurement),
+            wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST(ProfiledPIDInputOutputTest, ProportionalGainOutput) {

@@ -5,6 +5,8 @@
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/current.h>
+#include <wpi/units/moment_of_inertia.h>
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
@@ -14,8 +16,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-#include <wpi/units/current.h>
-#include <wpi/units/moment_of_inertia.h>
 
 TEST(DifferentialDrivetrainSimTest, Convergence) {
   auto motor = wpi::math::DCMotor::NEO(2);

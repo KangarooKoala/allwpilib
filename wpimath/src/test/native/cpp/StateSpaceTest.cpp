@@ -6,6 +6,7 @@
 #include <random>
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
 
 #include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
@@ -15,7 +16,6 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::math {
 

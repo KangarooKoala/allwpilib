@@ -6,11 +6,12 @@
 
 #include <array>
 
-#include "wpi/math/system/DCMotor.hpp"
-#include "wpi/simulation/LinearSystemSim.hpp"
 #include <wpi/units/length.h>
 #include <wpi/units/mass.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/simulation/LinearSystemSim.hpp"
 
 namespace wpi::sim {
 /**
@@ -23,10 +24,11 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
       Distance, wpi::units::inverse<wpi::units::seconds_>>>;
 
   template <typename Distance>
-  using Acceleration_t = wpi::units::unit<wpi::units::compound_conversion_factor<
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>,
-      wpi::units::inverse<wpi::units::seconds_>>>;
+  using Acceleration_t =
+      wpi::units::unit<wpi::units::compound_conversion_factor<
+          wpi::units::compound_conversion_factor<
+              Distance, wpi::units::inverse<wpi::units::seconds_>>,
+          wpi::units::inverse<wpi::units::seconds_>>>;
 
   /**
    * Constructs a simulated elevator mechanism.

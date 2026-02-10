@@ -9,12 +9,13 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/units/frequency.h>
+#include <wpi/units/time.h>
+
 #include "wpi/framework/IterativeRobotBase.hpp"
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
 #include "wpi/system/RobotController.hpp"
-#include <wpi/units/frequency.h>
-#include <wpi/units/time.h>
 #include "wpi/util/priority_queue.hpp"
 
 namespace wpi {

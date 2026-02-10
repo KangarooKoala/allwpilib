@@ -20,7 +20,8 @@ ElevatorSim::ElevatorSim(double Ks, double Kv, double Ka, double Kg,
   Reset(initialPosition, initialVelocity);
 }
 
-void ElevatorSim::Update(wpi::units::volts<> voltage, wpi::units::seconds<> dt) {
+void ElevatorSim::Update(wpi::units::volts<> voltage,
+                         wpi::units::seconds<> dt) {
   Eigen::Vector<double, 1> u{voltage.value()};
 
   // Given dx/dt = Ax + Bu + c sgn(x) + d,

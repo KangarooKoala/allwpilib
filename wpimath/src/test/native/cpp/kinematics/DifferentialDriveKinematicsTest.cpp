@@ -7,12 +7,12 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/kinematics/ChassisAccelerations.hpp"
-#include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include <wpi/units/angular_velocity.h>
 #include <wpi/units/length.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
+#include "wpi/math/kinematics/ChassisSpeeds.hpp"
 
 using namespace wpi::math;
 

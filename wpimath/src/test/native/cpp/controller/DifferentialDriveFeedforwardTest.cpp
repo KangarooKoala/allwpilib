@@ -6,11 +6,11 @@
 
 #include <Eigen/Core>
 #include <gtest/gtest.h>
-
-#include "wpi/math/system/Models.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
+
+#include "wpi/math/system/Models.hpp"
 
 TEST(DifferentialDriveFeedforwardTest, CalculateWithTrackwidth) {
   constexpr auto kVLinear = 1_V / 1_mps;

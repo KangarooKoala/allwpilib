@@ -7,11 +7,12 @@
 #include <memory>
 #include <string>
 
-#include "wpi/simulation/CallbackStore.hpp"
-#include "wpi/system/RobotController.hpp"
 #include <wpi/units/current.h>
 #include <wpi/units/temperature.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/simulation/CallbackStore.hpp"
+#include "wpi/system/RobotController.hpp"
 
 namespace wpi::sim {
 

@@ -6,13 +6,14 @@
 
 #include <cmath>
 
+#include <wpi/units/acceleration.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/sysid/analysis/FeedbackControllerPreset.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/velocity.h>
-#include <wpi/units/voltage.h>
 
 using namespace sysid;
 

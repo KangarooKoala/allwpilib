@@ -7,10 +7,10 @@
 #include <functional>
 
 #include <Eigen/QR>
+#include <wpi/units/time.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::math {
 

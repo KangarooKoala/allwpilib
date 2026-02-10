@@ -17,8 +17,8 @@
   EXPECT_LE(wpi::units::abs(val1 - val2), eps)
 
 static constexpr wpi::units::meters<> kTolerance{1 / 12.0};
-static constexpr wpi::units::radians<> kAngularTolerance{2.0 * std::numbers::pi /
-                                                        180.0};
+static constexpr wpi::units::radians<> kAngularTolerance{
+    2.0 * std::numbers::pi / 180.0};
 
 /**
  * States of the drivetrain system.

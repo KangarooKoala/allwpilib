@@ -6,10 +6,11 @@
 
 #include <cmath>
 
+#include <wpi/units/voltage.h>
+
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/system/RobotController.hpp"
-#include <wpi/units/voltage.h>
 #include "wpi/util/MathExtras.hpp"
 
 using namespace wpi;

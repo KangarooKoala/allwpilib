@@ -5,6 +5,7 @@
 #pragma once
 
 #include <wpi/units/length.h>
+
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 

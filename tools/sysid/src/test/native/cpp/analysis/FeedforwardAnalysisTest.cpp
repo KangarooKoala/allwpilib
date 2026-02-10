@@ -11,14 +11,14 @@
 #include <span>
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/sysid/analysis/ArmSim.hpp"
 #include "wpi/sysid/analysis/ElevatorSim.hpp"
 #include "wpi/sysid/analysis/SimpleMotorSim.hpp"
-#include <wpi/units/time.h>
-#include <wpi/units/voltage.h>
 
 namespace {
 

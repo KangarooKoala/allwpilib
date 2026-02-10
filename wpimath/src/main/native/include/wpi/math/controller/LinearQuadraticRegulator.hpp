@@ -9,6 +9,7 @@
 
 #include <Eigen/Cholesky>
 #include <unsupported/Eigen/MatrixFunctions>
+#include <wpi/units/time.h>
 
 #include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/DARE.hpp"
@@ -17,7 +18,6 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

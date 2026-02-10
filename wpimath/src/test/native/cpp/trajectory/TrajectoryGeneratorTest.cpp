@@ -28,8 +28,7 @@ TEST(TrajectoryGenerationTest, ObeysConstraints) {
     time += dt;
 
     EXPECT_TRUE(wpi::units::abs(point.velocity) <= 12_fps + 0.01_fps);
-    EXPECT_TRUE(wpi::units::abs(point.acceleration) <=
-                12_fps2 + 0.01_fps2);
+    EXPECT_TRUE(wpi::units::abs(point.acceleration) <= 12_fps2 + 0.01_fps2);
   }
 }
 

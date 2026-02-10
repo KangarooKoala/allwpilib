@@ -12,6 +12,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 #include "wpi/apriltag/AprilTagDetection.hpp"
 #include "wpi/apriltag/AprilTagDetector.hpp"
@@ -21,8 +23,6 @@
 #include "wpi/math/geometry/Transform3d.hpp"
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
 
 /**
  * This is a demo program showing the detection of AprilTags.

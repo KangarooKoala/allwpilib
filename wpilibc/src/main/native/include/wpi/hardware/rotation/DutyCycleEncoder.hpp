@@ -6,10 +6,11 @@
 
 #include <memory>
 
-#include "wpi/hal/SimDevice.h"
-#include "wpi/hal/Types.h"
 #include <wpi/units/frequency.h>
 #include <wpi/units/time.h>
+
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/Types.h"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

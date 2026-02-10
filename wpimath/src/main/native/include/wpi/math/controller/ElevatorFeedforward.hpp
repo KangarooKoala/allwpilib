@@ -4,14 +4,15 @@
 
 #pragma once
 
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 namespace wpi::math {
@@ -24,10 +25,12 @@ class ElevatorFeedforward {
   using Distance = wpi::units::meters_;
   using Velocity = wpi::units::meters_per_second_;
   using Acceleration = wpi::units::meters_per_second_squared_;
-  using kv_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                            wpi::units::inverse<Velocity>>;
-  using ka_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                            wpi::units::inverse<Acceleration>>;
+  using kv_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Velocity>>;
+  using ka_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new ElevatorFeedforward with the specified gains.

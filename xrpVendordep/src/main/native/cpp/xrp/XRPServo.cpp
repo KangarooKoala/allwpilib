@@ -9,8 +9,9 @@
 #include <set>
 #include <string>
 
-#include "wpi/system/Errors.hpp"
 #include <wpi/units/angle.h>
+
+#include "wpi/system/Errors.hpp"
 
 using namespace wpi::xrp;
 

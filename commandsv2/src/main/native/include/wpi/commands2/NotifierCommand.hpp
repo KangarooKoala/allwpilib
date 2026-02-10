@@ -6,11 +6,12 @@
 
 #include <functional>
 
+#include <wpi/units/time.h>
+
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/system/Notifier.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::cmd {
 /**

@@ -5,7 +5,6 @@ import os.path
 import re
 import sys
 import time
-
 from pathlib import Path
 
 
@@ -101,8 +100,12 @@ def process_file(content: str) -> str:
         else:
             assert re.escape(new_plural) == new_plural
         # Update unit/conversion factor
-        content = re.sub(f"(?<=units::){plural}(?![a-zA-Z0-9_])", f"{new_plural}_", content)
-        content = re.sub(f"(?<=units::){sing}(?![a-zA-Z0-9_])", f"{new_plural}_", content)
+        content = re.sub(
+            f"(?<=units::){plural}(?![a-zA-Z0-9_])", f"{new_plural}_", content
+        )
+        content = re.sub(
+            f"(?<=units::){sing}(?![a-zA-Z0-9_])", f"{new_plural}_", content
+        )
         # Update unit_t/unit
         # TODO Use CTAD for variables (e.g., wpi::units::seconds x;)
         #   Note that the CTAD will misbehave when using ints

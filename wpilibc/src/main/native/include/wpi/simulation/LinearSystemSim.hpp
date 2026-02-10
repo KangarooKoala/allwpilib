@@ -6,11 +6,12 @@
 
 #include <array>
 
+#include <wpi/units/time.h>
+
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::sim {
 /**

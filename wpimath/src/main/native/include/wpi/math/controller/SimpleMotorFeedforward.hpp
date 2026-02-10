@@ -5,12 +5,12 @@
 #pragma once
 
 #include <gcem.hpp>
-
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 namespace wpi::math {
@@ -23,16 +23,16 @@ template <class Distance>
   requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
 class SimpleMotorFeedforward {
  public:
-  using Velocity =
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>;
-  using Acceleration =
-      wpi::units::compound_conversion_factor<Velocity,
-                                wpi::units::inverse<wpi::units::seconds_>>;
-  using kv_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                            wpi::units::inverse<Velocity>>;
-  using ka_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                            wpi::units::inverse<Acceleration>>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using kv_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Velocity>>;
+  using ka_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.

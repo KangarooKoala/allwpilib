@@ -7,10 +7,11 @@
 #include <limits>
 #include <type_traits>
 
+#include <wpi/units/time.h>
+
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -32,13 +33,11 @@ class ProfiledPIDController
       public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
  public:
   using Distance_t = wpi::units::unit<Distance>;
-  using Velocity =
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
   using Velocity_t = wpi::units::unit<Velocity>;
-  using Acceleration =
-      wpi::units::compound_conversion_factor<Velocity,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
   using Acceleration_t = wpi::units::unit<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;

@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_velocity.h>
+
+#include "wpi/hal/SimDevice.h"
 
 namespace wpi::romi {
 

@@ -5,10 +5,10 @@
 #include "wpi/math/filter/SlewRateLimiter.hpp"
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
 #include "wpi/util/timestamp.h"
 
 static wpi::units::seconds<> now = 0_s;

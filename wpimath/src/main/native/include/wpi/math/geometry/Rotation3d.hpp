@@ -8,11 +8,11 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
+#include <wpi/units/angle.h>
 
 #include "wpi/math/geometry/Quaternion.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/linalg/ct_matrix.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 

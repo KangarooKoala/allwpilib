@@ -6,6 +6,10 @@
 
 #include <type_traits>
 
+#include <wpi/units/angle.h>
+#include <wpi/units/frequency.h>
+#include <wpi/units/length.h>
+
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
@@ -14,9 +18,6 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelSpeeds.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/frequency.h>
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -41,7 +42,8 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    * empirical value may be larger than the physical measured value due to
    * scrubbing effects.
    */
-  constexpr explicit DifferentialDriveKinematics(wpi::units::meters<> trackwidth)
+  constexpr explicit DifferentialDriveKinematics(
+      wpi::units::meters<> trackwidth)
       : trackwidth(trackwidth) {
     if (!std::is_constant_evaluated()) {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
@@ -105,8 +107,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   constexpr ChassisAccelerations ToChassisAccelerations(
       const DifferentialDriveWheelAccelerations& wheelAccelerations)
       const override {
-    return {(wheelAccelerations.left + wheelAccelerations.right) / 2.0,
-            0_mps2,
+    return {(wheelAccelerations.left + wheelAccelerations.right) / 2.0, 0_mps2,
             (wheelAccelerations.right - wheelAccelerations.left) / trackwidth *
                 1_rad};
   }

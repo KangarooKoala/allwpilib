@@ -5,6 +5,7 @@
 #include "wpi/simulation/ElevatorSim.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
 
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -14,7 +15,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include <wpi/units/time.h>
 
 #define EXPECT_NEAR_UNITS(val1, val2, eps) \
   EXPECT_LE(wpi::units::abs(val1 - val2), eps)

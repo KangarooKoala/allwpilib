@@ -6,10 +6,11 @@
 
 #include <memory>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/Types.h"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

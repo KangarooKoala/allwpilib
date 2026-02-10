@@ -11,8 +11,9 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/apriltag/AprilTagDetection.hpp"
 #include <wpi/units/angle.h>
+
+#include "wpi/apriltag/AprilTagDetection.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/SymbolExports.hpp"
 

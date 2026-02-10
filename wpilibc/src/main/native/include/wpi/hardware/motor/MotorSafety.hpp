@@ -6,8 +6,9 @@
 
 #include <string>
 
-#include "wpi/system/Timer.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/system/Timer.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi {

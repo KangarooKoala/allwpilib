@@ -6,6 +6,9 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
+#include <wpi/units/time.h>
 
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
@@ -18,9 +21,6 @@
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/system/RobotController.hpp"
-#include <wpi/units/length.h>
-#include <wpi/units/mass.h>
-#include <wpi/units/time.h>
 
 class PotentiometerPIDTest : public testing::Test {
   wpi::math::DCMotor m_elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);

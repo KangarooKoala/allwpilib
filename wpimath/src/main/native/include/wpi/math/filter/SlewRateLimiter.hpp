@@ -6,8 +6,9 @@
 
 #include <algorithm>
 
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/math/util/MathShared.hpp"
 
 namespace wpi::math {
 /**
@@ -23,8 +24,8 @@ template <class Unit>
 class SlewRateLimiter {
  public:
   using Unit_t = wpi::units::unit<Unit>;
-  using Rate =
-      wpi::units::compound_conversion_factor<Unit, wpi::units::inverse<wpi::units::seconds_>>;
+  using Rate = wpi::units::compound_conversion_factor<
+      Unit, wpi::units::inverse<wpi::units::seconds_>>;
   using Rate_t = wpi::units::unit<Rate>;
 
   /**

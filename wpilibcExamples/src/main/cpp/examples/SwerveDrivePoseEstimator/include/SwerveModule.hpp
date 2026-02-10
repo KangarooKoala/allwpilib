@@ -6,6 +6,12 @@
 
 #include <numbers>
 
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
@@ -13,11 +19,6 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
-#include <wpi/units/angular_acceleration.h>
-#include <wpi/units/angular_velocity.h>
-#include <wpi/units/time.h>
-#include <wpi/units/velocity.h>
-#include <wpi/units/voltage.h>
 
 class SwerveModule {
  public:

@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -24,8 +25,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
   using Acceleration = wpi::units::radians_per_second_squared_;
   using kv_unit = wpi::units::compound_conversion_factor<
       wpi::units::volts_, wpi::units::inverse<wpi::units::radians_per_second_>>;
-  using ka_unit = wpi::units::compound_conversion_factor<wpi::units::volts_,
-                                            wpi::units::inverse<Acceleration>>;
+  using ka_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new ArmFeedforward with the specified gains.
@@ -101,9 +103,9 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    */
   [[deprecated("Use the current/next velocity overload instead.")]]
   wpi::units::volts<> Calculate(wpi::units::unit<Angle> currentAngle,
-                               wpi::units::unit<Velocity> currentVelocity,
-                               wpi::units::unit<Velocity> nextVelocity,
-                               wpi::units::seconds<> dt) const {
+                                wpi::units::unit<Velocity> currentVelocity,
+                                wpi::units::unit<Velocity> nextVelocity,
+                                wpi::units::seconds<> dt) const {
     return Calculate(currentAngle, currentVelocity, nextVelocity);
   }
 
@@ -138,8 +140,8 @@ class WPILIB_DLLEXPORT ArmFeedforward {
    * @return The computed feedforward in volts.
    */
   wpi::units::volts<> Calculate(wpi::units::unit<Angle> currentAngle,
-                               wpi::units::unit<Velocity> currentVelocity,
-                               wpi::units::unit<Velocity> nextVelocity) const;
+                                wpi::units::unit<Velocity> currentVelocity,
+                                wpi::units::unit<Velocity> nextVelocity) const;
 
   // Rearranging the main equation from the calculate() method yields the
   // formulas for the methods below:
@@ -164,8 +166,7 @@ class WPILIB_DLLEXPORT ArmFeedforward {
       wpi::units::volts<> maxVoltage, wpi::units::unit<Angle> angle,
       wpi::units::unit<Acceleration> acceleration) {
     // Assume max velocity is positive
-    return (maxVoltage - kS - kG * wpi::units::cos(angle) -
-            kA * acceleration) /
+    return (maxVoltage - kS - kG * wpi::units::cos(angle) - kA * acceleration) /
            kV;
   }
 

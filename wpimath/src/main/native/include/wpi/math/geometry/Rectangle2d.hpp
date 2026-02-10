@@ -7,11 +7,12 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <wpi/units/length.h>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -113,12 +114,12 @@ class WPILIB_DLLEXPORT Rectangle2d {
     auto pointInRect = point - m_center.Translation();
     pointInRect = pointInRect.RotateBy(-m_center.Rotation());
 
-    if (wpi::units::abs(wpi::units::abs(pointInRect.X()) -
-                              m_xWidth / 2.0) <= 1E-9_m) {
+    if (wpi::units::abs(wpi::units::abs(pointInRect.X()) - m_xWidth / 2.0) <=
+        1E-9_m) {
       // Point rests on left/right perimeter
       return wpi::units::abs(pointInRect.Y()) <= m_yWidth / 2.0;
     } else if (wpi::units::abs(wpi::units::abs(pointInRect.Y()) -
-                                     m_yWidth / 2.0) <= 1E-9_m) {
+                               m_yWidth / 2.0) <= 1E-9_m) {
       // Point rests on top/bottom perimeter
       return wpi::units::abs(pointInRect.X()) <= m_xWidth / 2.0;
     }

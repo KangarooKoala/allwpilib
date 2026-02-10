@@ -108,7 +108,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteSpeed(
 
 LEDPattern LEDPattern::Blink(wpi::units::seconds<> onTime,
                              wpi::units::seconds<> offTime) {
-  auto totalMicros = wpi::units::microseconds<>{onTime + offTime}.to<uint64_t>();
+  auto totalMicros =
+      wpi::units::microseconds<>{onTime + offTime}.to<uint64_t>();
   auto onMicros = wpi::units::microseconds<>{onTime}.to<uint64_t>();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {

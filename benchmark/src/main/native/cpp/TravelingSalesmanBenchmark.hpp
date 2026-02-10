@@ -5,11 +5,11 @@
 #pragma once
 
 #include <benchmark/benchmark.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/path/TravelingSalesman.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
 #include "wpi/util/array.hpp"
 
 static constexpr wpi::util::array<wpi::math::Pose2d, 6> poses{

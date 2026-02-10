@@ -12,10 +12,11 @@
 #include <span>
 #include <utility>
 
+#include <wpi/units/time.h>
+
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Watchdog.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/FunctionExtras.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"

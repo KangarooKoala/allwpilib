@@ -5,12 +5,12 @@
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 static constexpr auto Ks = 0.5_V;
 static constexpr auto Kv = 1.5_V * 1_s / 1_m;

@@ -9,8 +9,9 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/linalg/EigenCore.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/math/linalg/EigenCore.hpp"
 
 namespace wpi::math {
 
@@ -130,10 +131,10 @@ class KalmanFilterLatencyCompensator {
       int prevIdx = nextIdx - 1;
 
       // Find the snapshot closest in time to global measurement
-      wpi::units::seconds<> prevTimeDiff = wpi::units::abs(
-          timestamp - m_pastObserverSnapshots[prevIdx].first);
-      wpi::units::seconds<> nextTimeDiff = wpi::units::abs(
-          timestamp - m_pastObserverSnapshots[nextIdx].first);
+      wpi::units::seconds<> prevTimeDiff =
+          wpi::units::abs(timestamp - m_pastObserverSnapshots[prevIdx].first);
+      wpi::units::seconds<> nextTimeDiff =
+          wpi::units::abs(timestamp - m_pastObserverSnapshots[nextIdx].first);
       indexOfClosestEntry = prevTimeDiff < nextTimeDiff ? prevIdx : nextIdx;
     }
 

@@ -6,6 +6,11 @@
 
 #include <numbers>
 
+#include <wpi/units/angle.h>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/velocity.h>
+
 #include "wpi/apriltag/AprilTagFieldLayout.hpp"
 #include "wpi/apriltag/AprilTagFields.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
@@ -24,10 +29,6 @@
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/angular_velocity.h>
-#include <wpi/units/length.h>
-#include <wpi/units/velocity.h>
 
 /**
  * Represents a differential drive style drivetrain.

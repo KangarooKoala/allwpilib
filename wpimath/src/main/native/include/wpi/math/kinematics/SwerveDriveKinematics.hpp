@@ -9,6 +9,7 @@
 #include <cstddef>
 
 #include <Eigen/QR>
+#include <wpi/units/velocity.h>
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -21,7 +22,6 @@
 #include "wpi/math/kinematics/SwerveModuleState.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -359,13 +359,13 @@ class SwerveDriveKinematics
       wpi::util::array<SwerveModuleState, NumModules>* moduleStates,
       wpi::units::meters_per_second<> attainableMaxSpeed) {
     auto& states = *moduleStates;
-    auto realMaxSpeed = wpi::units::abs(
-        std::max_element(states.begin(), states.end(),
-                         [](const auto& a, const auto& b) {
-                           return wpi::units::abs(a.speed) <
-                                  wpi::units::abs(b.speed);
-                         })
-            ->speed);
+    auto realMaxSpeed =
+        wpi::units::abs(std::max_element(states.begin(), states.end(),
+                                         [](const auto& a, const auto& b) {
+                                           return wpi::units::abs(a.speed) <
+                                                  wpi::units::abs(b.speed);
+                                         })
+                            ->speed);
 
     if (realMaxSpeed > attainableMaxSpeed) {
       for (auto& module : states) {
@@ -408,13 +408,13 @@ class SwerveDriveKinematics
       wpi::units::radians_per_second<> attainableMaxRobotRotationSpeed) {
     auto& states = *moduleStates;
 
-    auto realMaxSpeed = wpi::units::abs(
-        std::max_element(states.begin(), states.end(),
-                         [](const auto& a, const auto& b) {
-                           return wpi::units::abs(a.speed) <
-                                  wpi::units::abs(b.speed);
-                         })
-            ->speed);
+    auto realMaxSpeed =
+        wpi::units::abs(std::max_element(states.begin(), states.end(),
+                                         [](const auto& a, const auto& b) {
+                                           return wpi::units::abs(a.speed) <
+                                                  wpi::units::abs(b.speed);
+                                         })
+                            ->speed);
 
     if (attainableMaxRobotTranslationSpeed == 0_mps ||
         attainableMaxRobotRotationSpeed == 0_rad_per_s ||
@@ -422,17 +422,17 @@ class SwerveDriveKinematics
       return;
     }
 
-    auto translationalK = wpi::units::hypot(desiredChassisSpeed.vx,
-                                                  desiredChassisSpeed.vy) /
-                          attainableMaxRobotTranslationSpeed;
+    auto translationalK =
+        wpi::units::hypot(desiredChassisSpeed.vx, desiredChassisSpeed.vy) /
+        attainableMaxRobotTranslationSpeed;
 
     auto rotationalK = wpi::units::abs(desiredChassisSpeed.omega) /
                        attainableMaxRobotRotationSpeed;
 
     auto k = wpi::units::max(translationalK, rotationalK);
 
-    auto scale = wpi::units::min(
-        k * attainableMaxModuleSpeed / realMaxSpeed, wpi::units::dimensionless<>{1});
+    auto scale = wpi::units::min(k * attainableMaxModuleSpeed / realMaxSpeed,
+                                 wpi::units::dimensionless<>{1});
     for (auto& module : states) {
       module.speed = module.speed * scale;
     }

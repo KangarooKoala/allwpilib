@@ -13,8 +13,8 @@
 #include <random>
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/time.h>
+
 #include "wpi/util/array.hpp"
 
 // Filter constants

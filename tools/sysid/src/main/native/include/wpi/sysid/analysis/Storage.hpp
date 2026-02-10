@@ -7,9 +7,10 @@
 #include <string>
 #include <vector>
 
-#include "wpi/sysid/analysis/AnalysisType.hpp"
 #include <wpi/units/time.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/sysid/analysis/AnalysisType.hpp"
 #include "wpi/util/StringMap.hpp"
 
 namespace sysid {

@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <wpi/units/time.h>
+
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/timestamp.h"
 

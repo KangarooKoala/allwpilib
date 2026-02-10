@@ -32,7 +32,6 @@
 
 #include <fmt/format.h>
 
-
 using namespace wpi::math;
 
 Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
@@ -55,8 +54,9 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
     constrainedState.pose = points[i];
 
     // Begin constraining based on predecessor
-    wpi::units::meters<> ds = constrainedState.pose.first.Translation().Distance(
-        predecessor.pose.first.Translation());
+    wpi::units::meters<> ds =
+        constrainedState.pose.first.Translation().Distance(
+            predecessor.pose.first.Translation());
     constrainedState.distance = ds + predecessor.distance;
 
     // We may need to iterate to find the maximum end velocity and common
@@ -66,8 +66,8 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // acceleration limit. v_f = √(v_i² + 2ad).
 
       constrainedState.maxVelocity = wpi::units::min(
-          maxVelocity, wpi::units::sqrt(
-                           predecessor.maxVelocity * predecessor.maxVelocity +
+          maxVelocity,
+          wpi::units::sqrt(predecessor.maxVelocity * predecessor.maxVelocity +
                            predecessor.maxAcceleration * ds * 2.0));
 
       constrainedState.minAcceleration = -maxAcceleration;
@@ -130,7 +130,7 @@ Trajectory TrajectoryParameterizer::TimeParameterizeTrajectory(
       // v_f = √(v_i² + 2ad), where v_i = successor.
       wpi::units::meters_per_second<> newMaxVelocity =
           wpi::units::sqrt(successor.maxVelocity * successor.maxVelocity +
-                                 successor.minAcceleration * ds * 2.0);
+                           successor.minAcceleration * ds * 2.0);
 
       // No more limits to impose! This state can be finalized.
       if (newMaxVelocity >= constrainedState.maxVelocity) {

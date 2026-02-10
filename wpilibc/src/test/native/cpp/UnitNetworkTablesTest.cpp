@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/units/length.h>
 
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/UnitTopic.hpp"
-#include <wpi/units/length.h>
 
 class UnitNetworkTablesTest : public ::testing::Test {
  public:

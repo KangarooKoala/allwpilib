@@ -4,6 +4,11 @@
 
 #include <numbers>
 
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
+#include <wpi/units/velocity.h>
+
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -14,10 +19,6 @@
 #include "wpi/math/system/LinearSystemLoop.hpp"
 #include "wpi/math/system/Models.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/length.h>
-#include <wpi/units/mass.h>
-#include <wpi/units/velocity.h>
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller

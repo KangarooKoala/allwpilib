@@ -16,6 +16,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 #include "wpi/fields/fields.hpp"
 #include "wpi/glass/Context.hpp"
@@ -27,8 +29,6 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -49,9 +49,9 @@ enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
 struct FieldFrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {wpi::units::meters<>{(std::clamp(cursor.x, min.x, max.x) - min.x) /
-                                scale},
+                                 scale},
             wpi::units::meters<>{(max.y - std::clamp(cursor.y, min.y, max.y)) /
-                                scale}};
+                                 scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
@@ -513,7 +513,8 @@ bool FieldInfo::LoadJson(std::span<const char> is, std::string_view filename) {
   // convert size units to meters
   if (unit == "foot" || unit == "feet") {
     width = wpi::units::convert<wpi::units::feet_, wpi::units::meters_>(width);
-    height = wpi::units::convert<wpi::units::feet_, wpi::units::meters_>(height);
+    height =
+        wpi::units::convert<wpi::units::feet_, wpi::units::meters_>(height);
   }
 
   // check scaling
@@ -1095,7 +1096,7 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       if (target->corner != 1) {
         gDragState.initialAngle =
             wpi::units::radians<>{std::atan2(gDragState.initialOffset.y,
-                                            gDragState.initialOffset.x)} +
+                                             gDragState.initialOffset.x)} +
             target->rot;
       }
     }

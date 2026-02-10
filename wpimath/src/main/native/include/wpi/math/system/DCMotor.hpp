@@ -9,6 +9,7 @@
 #include <wpi/units/impedance.h>
 #include <wpi/units/torque.h>
 #include <wpi/units/voltage.h>
+
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -18,12 +19,14 @@ namespace wpi::math {
  */
 class WPILIB_DLLEXPORT DCMotor {
  public:
-  using radians_per_second_per_volt_t = wpi::units::unit<
-      wpi::units::compound_conversion_factor<wpi::units::radians_per_second_,
-                                wpi::units::inverse<wpi::units::volts_>>>;
+  using radians_per_second_per_volt_t =
+      wpi::units::unit<wpi::units::compound_conversion_factor<
+          wpi::units::radians_per_second_,
+          wpi::units::inverse<wpi::units::volts_>>>;
   using newton_meters_per_ampere_t =
       wpi::units::unit<wpi::units::compound_conversion_factor<
-          wpi::units::newton_meters_, wpi::units::inverse<wpi::units::amperes_>>>;
+          wpi::units::newton_meters_,
+          wpi::units::inverse<wpi::units::amperes_>>>;
 
   /// Voltage at which the motor constants were measured.
   wpi::units::volts<> nominalVoltage;

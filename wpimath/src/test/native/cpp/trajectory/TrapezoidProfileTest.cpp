@@ -8,7 +8,6 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/velocity.h>
@@ -179,8 +178,7 @@ TEST(TrapezoidProfileTest, TimingBeforeGoal) {
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
     state = profile.Calculate(kDt, state, goal);
-    if (!reachedGoal &&
-        (wpi::units::abs(state.velocity - 1_mps) < 10e-5_mps)) {
+    if (!reachedGoal && (wpi::units::abs(state.velocity - 1_mps) < 10e-5_mps)) {
       EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
       reachedGoal = true;
     }
@@ -226,8 +224,7 @@ TEST(TrapezoidProfileTest, TimingBeforeNegativeGoal) {
   bool reachedGoal = false;
   for (int i = 0; i < 400; i++) {
     state = profile.Calculate(kDt, state, goal);
-    if (!reachedGoal &&
-        (wpi::units::abs(state.velocity + 1_mps) < 10e-5_mps)) {
+    if (!reachedGoal && (wpi::units::abs(state.velocity + 1_mps) < 10e-5_mps)) {
       EXPECT_NEAR(unit_cast<double>(predictedTimeLeft), i / 100.0, 2e-2);
       reachedGoal = true;
     }

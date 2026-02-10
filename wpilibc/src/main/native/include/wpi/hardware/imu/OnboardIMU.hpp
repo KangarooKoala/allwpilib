@@ -3,12 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
-#include "wpi/math/geometry/Quaternion.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/geometry/Rotation3d.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_velocity.h>
+
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
 
 namespace wpi {
 

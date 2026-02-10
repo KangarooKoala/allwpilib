@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

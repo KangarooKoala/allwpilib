@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <wpi/units/time.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
@@ -19,7 +20,6 @@
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

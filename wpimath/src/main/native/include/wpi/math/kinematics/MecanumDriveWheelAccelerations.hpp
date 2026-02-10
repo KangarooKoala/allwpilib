@@ -5,6 +5,7 @@
 #pragma once
 
 #include <wpi/units/acceleration.h>
+
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

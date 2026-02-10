@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <Eigen/Cholesky>
+#include <wpi/units/time.h>
 
 #include "wpi/math/estimator/SigmaPoints.hpp"
 #include "wpi/math/estimator/UnscentedTransform.hpp"
@@ -16,7 +17,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {

@@ -5,11 +5,11 @@
 #include "wpi/math/controller/struct/SimpleMotorFeedforwardStruct.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/acceleration.h>
+#include <wpi/units/velocity.h>
 
 #include "../../StructTestBase.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/velocity.h>
 
 using namespace wpi::math;
 

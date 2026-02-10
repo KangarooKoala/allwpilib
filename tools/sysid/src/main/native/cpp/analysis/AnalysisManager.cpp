@@ -10,10 +10,10 @@
 #include <vector>
 
 #include <fmt/format.h>
+#include <wpi/units/angle.h>
 
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"

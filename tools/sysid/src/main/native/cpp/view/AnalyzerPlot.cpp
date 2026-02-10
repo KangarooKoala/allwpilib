@@ -361,8 +361,7 @@ void AnalyzerPlot::SetData(
   m_timestepData.fitLine[0] =
       ImPlotPoint{minTime.value(), wpi::units::milliseconds<>{dtMean}.value()};
 
-  auto maxTime =
-      wpi::units::max(slow.back().timestamp, fast.back().timestamp);
+  auto maxTime = wpi::units::max(slow.back().timestamp, fast.back().timestamp);
   m_timestepData.fitLine[1] =
       ImPlotPoint{maxTime.value(), wpi::units::milliseconds<>{dtMean}.value()};
 

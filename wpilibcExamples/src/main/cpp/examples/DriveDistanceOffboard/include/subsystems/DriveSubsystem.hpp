@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "Constants.hpp"
 #include "ExampleSmartMotorController.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
@@ -13,7 +15,6 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/system/Timer.hpp"
-#include <wpi/units/length.h>
 
 class DriveSubsystem : public wpi::cmd::SubsystemBase {
  public:

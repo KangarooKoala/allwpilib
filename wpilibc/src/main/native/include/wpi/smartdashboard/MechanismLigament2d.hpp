@@ -7,10 +7,11 @@
 #include <memory>
 #include <string_view>
 
+#include <wpi/units/angle.h>
+
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/smartdashboard/MechanismObject2d.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/Color8Bit.hpp"
 
 namespace wpi {

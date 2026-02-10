@@ -8,12 +8,12 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angle.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 
 using namespace wpi::math;
 

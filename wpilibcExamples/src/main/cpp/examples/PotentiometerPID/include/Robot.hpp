@@ -6,12 +6,13 @@
 
 #include <array>
 
+#include <wpi/units/length.h>
+
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/AnalogPotentiometer.hpp"
 #include "wpi/math/controller/PIDController.hpp"
-#include <wpi/units/length.h>
 
 /**
  * This is a sample program to demonstrate how to use a soft potentiometer and a

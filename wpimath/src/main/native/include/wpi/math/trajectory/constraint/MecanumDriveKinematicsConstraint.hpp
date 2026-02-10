@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/velocity.h>
+
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

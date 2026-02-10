@@ -5,7 +5,6 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelAccelerations.hpp"
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/acceleration.h>
 
 using namespace wpi::math;
@@ -20,8 +19,7 @@ TEST(DifferentialDriveWheelAccelerationsTest, DefaultConstructor) {
 }
 
 TEST(DifferentialDriveWheelAccelerationsTest, ParameterizedConstructor) {
-  DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps2,
-                                                         2.5_mps2};
+  DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps2, 2.5_mps2};
 
   EXPECT_NEAR(wheelAccelerations.left.value(), 1.5, kEpsilon);
   EXPECT_NEAR(wheelAccelerations.right.value(), 2.5, kEpsilon);

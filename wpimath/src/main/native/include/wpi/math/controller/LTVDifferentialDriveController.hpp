@@ -7,15 +7,15 @@
 #include <cmath>
 
 #include <Eigen/Core>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
 
 #include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/length.h>
-#include <wpi/units/time.h>
-#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

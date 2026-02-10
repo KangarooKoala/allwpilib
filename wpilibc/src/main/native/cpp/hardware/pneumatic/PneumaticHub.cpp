@@ -34,9 +34,9 @@ wpi::units::pounds_per_square_inch<> VoltsToPSI(
 
 /** Converts PSI to volts per the REV Analog Pressure Sensor datasheet. */
 wpi::units::volts<> PSIToVolts(wpi::units::pounds_per_square_inch<> pressure,
-                              wpi::units::volts<> supplyVoltage) {
+                               wpi::units::volts<> supplyVoltage) {
   return wpi::units::volts<>{supplyVoltage.value() *
-                            (0.004 * pressure.value() + 0.1)};
+                             (0.004 * pressure.value() + 0.1)};
 }
 
 wpi::util::mutex PneumaticHub::m_handleLock;

@@ -8,10 +8,10 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
 
 #include "wpi/math/trajectory/TestTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
-#include <wpi/units/time.h>
 
 using namespace wpi::math;
 

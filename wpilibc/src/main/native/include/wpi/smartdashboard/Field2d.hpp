@@ -8,13 +8,14 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/units/length.h>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/nt/NTSendable.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableEntry.hpp"
 #include "wpi/smartdashboard/FieldObject2d.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

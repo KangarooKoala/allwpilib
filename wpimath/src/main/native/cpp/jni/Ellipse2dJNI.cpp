@@ -30,7 +30,8 @@ Java_org_wpilib_math_jni_Ellipse2dJNI_nearest
                             wpi::units::meters<>{centerY},
                             wpi::units::radians<>{centerHeading}},
           wpi::units::meters<>{xSemiAxis}, wpi::units::meters<>{ySemiAxis}}
-          .Nearest({wpi::units::meters<>{pointX}, wpi::units::meters<>{pointY}});
+          .Nearest(
+              {wpi::units::meters<>{pointX}, wpi::units::meters<>{pointY}});
 
   wpi::util::array buf{point.X().value(), point.Y().value()};
   env->SetDoubleArrayRegion(nearestPoint, 0, 2, buf.data());

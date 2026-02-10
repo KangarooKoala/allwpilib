@@ -5,13 +5,13 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/controller/LinearPlantInversionFeedforward.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 
 namespace wpi::math {
 
@@ -25,7 +25,8 @@ TEST(SimpleMotorFeedforwardTest, Calculate) {
   constexpr Matrixd<1, 1> B{{1.0 / Ka.value()}};
 
   wpi::math::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> simpleMotor{Ks, Kv, Ka};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> simpleMotor{Ks, Kv,
+                                                                     Ka};
 
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
@@ -47,7 +48,7 @@ TEST(SimpleMotorFeedforwardTest, NegativeGains) {
   constexpr auto Ka = -0.6_V / 1_mps2;
   constexpr wpi::units::seconds<> dt = 0_ms;
   wpi::math::SimpleMotorFeedforward<wpi::units::meters_> simpleMotor{Ks, Kv, Ka,
-                                                                   dt};
+                                                                     dt};
   EXPECT_EQ(simpleMotor.GetKv().value(), 0);
   EXPECT_EQ(simpleMotor.GetKa().value(), 0);
   EXPECT_EQ(simpleMotor.GetDt().value(), 0.02);

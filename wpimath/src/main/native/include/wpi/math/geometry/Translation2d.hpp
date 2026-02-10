@@ -9,10 +9,10 @@
 #include <span>
 
 #include <Eigen/Core>
-
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include <wpi/units/area.h>
 #include <wpi/units/length.h>
+
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 
@@ -50,7 +50,8 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param distance The distance from the origin to the end of the translation.
    * @param angle The angle between the x-axis and the translation vector.
    */
-  constexpr Translation2d(wpi::units::meters<> distance, const Rotation2d& angle)
+  constexpr Translation2d(wpi::units::meters<> distance,
+                          const Rotation2d& angle)
       : m_x{distance * angle.Cos()}, m_y{distance * angle.Sin()} {}
 
   /**
@@ -210,7 +211,8 @@ class WPILIB_DLLEXPORT Translation2d {
    * @param other The translation to compute the cross product with.
    * @return The cross product between the two translations.
    */
-  constexpr wpi::units::square_meters<> Cross(const Translation2d& other) const {
+  constexpr wpi::units::square_meters<> Cross(
+      const Translation2d& other) const {
     return m_x * other.Y() - m_y * other.X();
   }
 

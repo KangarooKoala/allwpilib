@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "Constants.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -17,7 +19,6 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/MechanismRoot2d.hpp"
-#include <wpi/units/length.h>
 
 class Arm {
  public:

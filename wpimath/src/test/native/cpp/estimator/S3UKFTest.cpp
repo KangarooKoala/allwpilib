@@ -11,6 +11,7 @@
 
 #include <Eigen/QR>
 #include <gtest/gtest.h>
+#include <wpi/units/moment_of_inertia.h>
 
 #include "wpi/math/estimator/AngleStatistics.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -21,7 +22,6 @@
 #include "wpi/math/system/NumericalIntegration.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include <wpi/units/moment_of_inertia.h>
 
 namespace {
 

@@ -11,7 +11,6 @@
 #include <random>
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/time.h>
 
 // Filter constants

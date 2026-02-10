@@ -8,11 +8,12 @@
 #include <span>
 #include <utility>
 
-#include "wpi/hardware/led/AddressableLED.hpp"
 #include <wpi/units/frequency.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/hardware/led/AddressableLED.hpp"
 #include "wpi/util/Color.hpp"
 
 namespace wpi {

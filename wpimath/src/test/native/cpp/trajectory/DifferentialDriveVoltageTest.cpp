@@ -6,24 +6,24 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
+
 using namespace wpi::math;
 
 TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
   SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps2};
+                                                          3_V / 1_mps2};
   const DifferentialDriveKinematics kinematics{0.5_m};
   const auto maxVoltage = 10_V;
 
@@ -64,7 +64,7 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
 
 TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
   SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps2};
+                                                          3_V / 1_mps2};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth
   const DifferentialDriveKinematics kinematics{3_m};

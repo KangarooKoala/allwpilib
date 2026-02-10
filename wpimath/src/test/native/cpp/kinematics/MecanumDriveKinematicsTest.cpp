@@ -7,9 +7,9 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/units/angular_velocity.h>
 
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/angular_velocity.h>
 
 using namespace wpi::math;
 
@@ -307,8 +307,8 @@ TEST_F(MecanumDriveKinematicsTest,
 
 TEST_F(MecanumDriveKinematicsTest,
        MixedTranslationRotationForwardAccelerations) {
-  MecanumDriveWheelAccelerations wheelAccelerations{
-      -17.677670_mps2, 20.51_mps2, -13.44_mps2, 16.26_mps2};
+  MecanumDriveWheelAccelerations wheelAccelerations{-17.677670_mps2, 20.51_mps2,
+                                                    -13.44_mps2, 16.26_mps2};
   auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 

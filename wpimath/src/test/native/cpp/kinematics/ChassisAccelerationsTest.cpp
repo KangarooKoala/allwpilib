@@ -7,7 +7,6 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
-
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angular_acceleration.h>
 

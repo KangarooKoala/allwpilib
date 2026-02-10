@@ -6,12 +6,13 @@
 
 #include <array>
 
-#include "wpi/math/system/DCMotor.hpp"
-#include "wpi/simulation/LinearSystemSim.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/length.h>
 #include <wpi/units/mass.h>
 #include <wpi/units/moment_of_inertia.h>
+
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/simulation/LinearSystemSim.hpp"
 
 namespace wpi::sim {
 /**

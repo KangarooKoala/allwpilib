@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/motor/PWMMotorController.hpp"
-#include <wpi/units/length.h>
 
 namespace wpi {
 

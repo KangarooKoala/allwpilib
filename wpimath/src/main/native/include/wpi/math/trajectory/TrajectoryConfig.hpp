@@ -8,6 +8,9 @@
 #include <memory>
 #include <vector>
 
+#include <wpi/units/acceleration.h>
+#include <wpi/units/velocity.h>
+
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
@@ -15,8 +18,6 @@
 #include "wpi/math/trajectory/constraint/MecanumDriveKinematicsConstraint.hpp"
 #include "wpi/math/trajectory/constraint/SwerveDriveKinematicsConstraint.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

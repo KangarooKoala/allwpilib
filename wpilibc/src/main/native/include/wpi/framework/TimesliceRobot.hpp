@@ -6,8 +6,9 @@
 
 #include <functional>
 
-#include "wpi/framework/TimedRobot.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/framework/TimedRobot.hpp"
 
 namespace wpi {
 

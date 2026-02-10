@@ -4,16 +4,17 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/linalg/EigenCore.hpp"
-#include "wpi/math/system/DCMotor.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
 #include <wpi/units/length.h>
 #include <wpi/units/moment_of_inertia.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/DCMotor.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
 
 namespace wpi::sim {
 

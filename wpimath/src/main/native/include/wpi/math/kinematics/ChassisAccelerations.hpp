@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/math/geometry/Translation2d.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angular_acceleration.h>
+
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

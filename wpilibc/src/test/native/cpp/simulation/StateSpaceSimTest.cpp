@@ -3,6 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <gtest/gtest.h>
+#include <wpi/units/angular_acceleration.h>
+#include <wpi/units/angular_velocity.h>
 
 #include "wpi/hardware/motor/PWMVictorSPX.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
@@ -18,8 +20,6 @@
 #include "wpi/simulation/PWMSim.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/system/RobotController.hpp"
-#include <wpi/units/angular_acceleration.h>
-#include <wpi/units/angular_velocity.h>
 
 TEST(StateSpaceSimTest, FlywheelSim) {
   const wpi::math::LinearSystem<1, 1, 1> plant =

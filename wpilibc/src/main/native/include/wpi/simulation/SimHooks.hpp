@@ -6,9 +6,10 @@
 
 #include <stdint.h>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HALBase.h"
-#include <wpi/units/time.h>
 
 namespace wpi::sim {
 

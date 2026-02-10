@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

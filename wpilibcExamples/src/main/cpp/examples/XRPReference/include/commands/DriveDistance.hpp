@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "subsystems/Drivetrain.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
-#include <wpi/units/length.h>
 
 class DriveDistance
     : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveDistance> {

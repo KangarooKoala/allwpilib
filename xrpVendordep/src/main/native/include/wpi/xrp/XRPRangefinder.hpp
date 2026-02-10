@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "wpi/hardware/discrete/AnalogInput.hpp"
 #include <wpi/units/length.h>
+
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
 namespace wpi::xrp {
 

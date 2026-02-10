@@ -16,6 +16,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
 
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/Storage.hpp"
@@ -25,8 +27,6 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
 #include "wpi/util/print.hpp"
 
 using namespace wpi::glass;
@@ -39,9 +39,9 @@ namespace {
 struct FrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
     return {wpi::units::meters<>{(std::clamp(cursor.x, min.x, max.x) - min.x) /
-                                scale},
+                                 scale},
             wpi::units::meters<>{(max.y - std::clamp(cursor.y, min.y, max.y)) /
-                                scale}};
+                                 scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),

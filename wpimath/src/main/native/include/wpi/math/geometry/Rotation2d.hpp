@@ -9,10 +9,10 @@
 
 #include <Eigen/Core>
 #include <gcem.hpp>
+#include <wpi/units/angle.h>
 
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/math/util/MathShared.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/StackTrace.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
@@ -36,8 +36,10 @@ class WPILIB_DLLEXPORT Rotation2d {
    * @param value The value of the angle.
    */
   constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
-      : m_cos{gcem::cos(value.template convert<wpi::units::radians_>().value())},
-        m_sin{gcem::sin(value.template convert<wpi::units::radians_>().value())} {
+      : m_cos{gcem::cos(
+            value.template convert<wpi::units::radians_>().value())},
+        m_sin{
+            gcem::sin(value.template convert<wpi::units::radians_>().value())} {
   }
 
   /**

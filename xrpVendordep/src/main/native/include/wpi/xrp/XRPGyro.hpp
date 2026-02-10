@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "wpi/hal/SimDevice.h"
-#include "wpi/math/geometry/Rotation2d.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_velocity.h>
+
+#include "wpi/hal/SimDevice.h"
+#include "wpi/math/geometry/Rotation2d.hpp"
 
 namespace wpi::xrp {
 

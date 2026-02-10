@@ -6,12 +6,13 @@
 
 #include <memory>
 
-#include "EdgeConfiguration.hpp"
-#include "wpi/hal/Counter.h"
-#include "wpi/hal/Types.h"
 #include <wpi/units/angular_velocity.h>
 #include <wpi/units/frequency.h>
 #include <wpi/units/time.h>
+
+#include "EdgeConfiguration.hpp"
+#include "wpi/hal/Counter.h"
+#include "wpi/hal/Types.h"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

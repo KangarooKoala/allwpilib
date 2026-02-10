@@ -4,6 +4,12 @@
 
 #include <numbers>
 
+#include <wpi/units/acceleration.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/motor/PWMSparkMax.hpp"
@@ -11,11 +17,6 @@
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
-#include <wpi/units/acceleration.h>
-#include <wpi/units/length.h>
-#include <wpi/units/time.h>
-#include <wpi/units/velocity.h>
-#include <wpi/units/voltage.h>
 
 class Robot : public wpi::TimedRobot {
  public:

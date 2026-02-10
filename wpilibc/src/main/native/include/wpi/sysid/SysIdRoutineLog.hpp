@@ -7,7 +7,6 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/datalog/DataLog.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angle.h>
 #include <wpi/units/angular_acceleration.h>
@@ -16,6 +15,8 @@
 #include <wpi/units/length.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/datalog/DataLog.hpp"
 
 namespace wpi::sysid {
 

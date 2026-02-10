@@ -5,14 +5,14 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/time.h>
+#include <wpi/units/velocity.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/kinematics/ChassisSpeeds.hpp"
 #include "wpi/math/trajectory/Trajectory.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/angular_velocity.h>
-#include <wpi/units/time.h>
-#include <wpi/units/velocity.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

@@ -5,12 +5,12 @@
 #include "wpi/math/trajectory/constraint/RectangularRegionConstraint.hpp"
 
 #include <gtest/gtest.h>
-
-#include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/length.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/trajectory/TestTrajectory.hpp"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
 
 using namespace wpi::math;
 
@@ -26,10 +26,8 @@ TEST(RectangularRegionConstraintTest, Constraint) {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.States()) {
     if (rectangle.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(wpi::units::abs(point.velocity) <
-                  maxVelocity + 0.05_mps);
-    } else if (wpi::units::abs(point.velocity) >=
-               maxVelocity + 0.05_mps) {
+      EXPECT_TRUE(wpi::units::abs(point.velocity) < maxVelocity + 0.05_mps);
+    } else if (wpi::units::abs(point.velocity) >= maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }

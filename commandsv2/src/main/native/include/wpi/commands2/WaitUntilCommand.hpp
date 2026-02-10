@@ -6,9 +6,10 @@
 
 #include <functional>
 
+#include <wpi/units/time.h>
+
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandHelper.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::cmd {
 /**

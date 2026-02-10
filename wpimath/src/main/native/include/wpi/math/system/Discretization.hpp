@@ -5,9 +5,9 @@
 #pragma once
 
 #include <unsupported/Eigen/MatrixFunctions>
+#include <wpi/units/time.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::math {
 
@@ -39,8 +39,8 @@ void DiscretizeA(const Matrixd<States, States>& contA, wpi::units::seconds<> dt,
  */
 template <int States, int Inputs>
 void DiscretizeAB(const Matrixd<States, States>& contA,
-                  const Matrixd<States, Inputs>& contB, wpi::units::seconds<> dt,
-                  Matrixd<States, States>* discA,
+                  const Matrixd<States, Inputs>& contB,
+                  wpi::units::seconds<> dt, Matrixd<States, States>* discA,
                   Matrixd<States, Inputs>* discB) {
   // M = [A  B]
   //     [0  0]
@@ -69,8 +69,8 @@ void DiscretizeAB(const Matrixd<States, States>& contA,
  */
 template <int States>
 void DiscretizeAQ(const Matrixd<States, States>& contA,
-                  const Matrixd<States, States>& contQ, wpi::units::seconds<> dt,
-                  Matrixd<States, States>* discA,
+                  const Matrixd<States, States>& contQ,
+                  wpi::units::seconds<> dt, Matrixd<States, States>* discA,
                   Matrixd<States, States>* discQ) {
   // Make continuous Q symmetric if it isn't already
   Matrixd<States, States> Q = (contQ + contQ.transpose()) / 2.0;

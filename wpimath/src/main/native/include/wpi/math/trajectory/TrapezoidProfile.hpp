@@ -6,8 +6,9 @@
 
 #include <type_traits>
 
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/math/util/MathShared.hpp"
 
 namespace wpi::math {
 
@@ -45,13 +46,11 @@ template <class Distance>
 class TrapezoidProfile {
  public:
   using Distance_t = wpi::units::unit<Distance>;
-  using Velocity =
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
   using Velocity_t = wpi::units::unit<Velocity>;
-  using Acceleration =
-      wpi::units::compound_conversion_factor<Velocity,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
   using Acceleration_t = wpi::units::unit<Acceleration>;
 
   /**
@@ -130,13 +129,14 @@ class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(wpi::units::seconds<> t, State current, State goal) {
+  constexpr State Calculate(wpi::units::seconds<> t, State current,
+                            State goal) {
     m_direction = ShouldFlipAcceleration(current, goal) ? -1 : 1;
     m_current = Direct(current);
     goal = Direct(goal);
     if (wpi::units::abs(m_current.velocity) > m_constraints.maxVelocity) {
-      m_current.velocity = wpi::units::copysign(m_constraints.maxVelocity,
-                                                      m_current.velocity);
+      m_current.velocity =
+          wpi::units::copysign(m_constraints.maxVelocity, m_current.velocity);
     }
 
     // Deal with a possibly truncated motion profile (with nonzero initial or
@@ -166,8 +166,8 @@ class TrapezoidProfile {
 
     // Handle the case where the profile never reaches full speed
     if (fullSpeedDist < Distance_t{0}) {
-      accelerationTime = wpi::units::sqrt(fullTrapezoidDist /
-                                                m_constraints.maxAcceleration);
+      accelerationTime =
+          wpi::units::sqrt(fullTrapezoidDist / m_constraints.maxAcceleration);
       fullSpeedDist = Distance_t{0};
     }
 
@@ -213,7 +213,8 @@ class TrapezoidProfile {
     Velocity_t velocity = m_current.velocity * m_direction;
 
     wpi::units::seconds<> endAccel = m_endAccel * m_direction;
-    wpi::units::seconds<> endFullSpeed = m_endFullSpeed * m_direction - endAccel;
+    wpi::units::seconds<> endFullSpeed =
+        m_endFullSpeed * m_direction - endAccel;
 
     if (target < position) {
       endAccel *= -1.0;
@@ -238,8 +239,8 @@ class TrapezoidProfile {
 
     Velocity_t decelVelocity;
     if (endAccel > 0_s) {
-      decelVelocity = wpi::units::sqrt(wpi::units::abs(
-          velocity * velocity + 2 * acceleration * accelDist));
+      decelVelocity = wpi::units::sqrt(
+          wpi::units::abs(velocity * velocity + 2 * acceleration * accelDist));
     } else {
       decelVelocity = velocity;
     }
@@ -265,8 +266,8 @@ class TrapezoidProfile {
 
     wpi::units::seconds<> decelTime =
         (-decelVelocity +
-         wpi::units::sqrt(wpi::units::abs(
-             decelVelocity * decelVelocity + 2 * deceleration * decelDist))) /
+         wpi::units::sqrt(wpi::units::abs(decelVelocity * decelVelocity +
+                                          2 * deceleration * decelDist))) /
         deceleration;
 
     wpi::units::seconds<> fullSpeedTime =

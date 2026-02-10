@@ -4,9 +4,10 @@
 
 #include "wpi/simulation/SharpIRSim.hpp"
 
+#include <wpi/units/length.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/simulation/SimDeviceSim.hpp"
-#include <wpi/units/length.h>
 
 using namespace wpi;
 

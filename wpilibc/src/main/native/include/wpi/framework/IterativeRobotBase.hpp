@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/time.h>
+
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi {
 

@@ -12,11 +12,12 @@
 #include <utility>
 #include <vector>
 
+#include <wpi/units/voltage.h>
+
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hardware/discrete/PWM.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/hardware/motor/MotorSafety.hpp"
-#include <wpi/units/voltage.h>
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"

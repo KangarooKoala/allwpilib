@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
-#include "wpi/math/system/LinearSystem.hpp"
-#include "wpi/math/system/Models.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/angular_acceleration.h>
 #include <wpi/units/angular_velocity.h>
@@ -14,6 +11,10 @@
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+#include "wpi/math/system/LinearSystem.hpp"
+#include "wpi/math/system/Models.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

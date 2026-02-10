@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/length.h>
+
 #include "pb.h"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpimath/protobuf/controller.npb.h"
 
@@ -25,9 +26,8 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
 
   static std::optional<wpi::math::SimpleMotorFeedforward<Distance>> Unpack(
       InputStream& stream) {
-    using BaseUnit =
-        wpi::units::conversion_factor<std::ratio<1>,
-                         wpi::units::traits::dimension_of_t<Distance>>;
+    using BaseUnit = wpi::units::conversion_factor<
+        std::ratio<1>, wpi::units::traits::dimension_of_t<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
@@ -44,18 +44,15 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
 
   static bool Pack(OutputStream& stream,
                    const wpi::math::SimpleMotorFeedforward<Distance>& value) {
-    using BaseUnit =
-        wpi::units::conversion_factor<std::ratio<1>,
-                         wpi::units::traits::dimension_of_t<Distance>>;
+    using BaseUnit = wpi::units::conversion_factor<
+        std::ratio<1>, wpi::units::traits::dimension_of_t<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
         .ks = value.GetKs().value(),
-        .kv =
-            wpi::units::unit<typename BaseFeedforward::kv_unit>{value.GetKv()}
-                .value(),
-        .ka =
-            wpi::units::unit<typename BaseFeedforward::ka_unit>{value.GetKa()}
-                .value(),
+        .kv = wpi::units::unit<typename BaseFeedforward::kv_unit>{value.GetKv()}
+                  .value(),
+        .ka = wpi::units::unit<typename BaseFeedforward::ka_unit>{value.GetKa()}
+                  .value(),
         .dt = wpi::units::seconds<>{value.GetDt()}.value(),
     };
     return stream.Encode(msg);

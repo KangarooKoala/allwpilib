@@ -2,6 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <wpi/units/angular_velocity.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/event/EventLoop.hpp"
@@ -10,10 +15,6 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include <wpi/units/angular_velocity.h>
-#include <wpi/units/length.h>
-#include <wpi/units/time.h>
-#include <wpi/units/voltage.h>
 
 static const auto SHOT_VELOCITY = 200_rpm;
 static const auto TOLERANCE = 8_rpm;
@@ -55,7 +56,7 @@ class Robot : public wpi::TimedRobot {
                  &encoder = m_shooterEncoder] {
           shooter.SetVoltage(
               wpi::units::volts<>{controller.Calculate(encoder.GetRate(),
-                                                      SHOT_VELOCITY.value())} +
+                                                       SHOT_VELOCITY.value())} +
               ff.Calculate(wpi::units::radians_per_second<>{SHOT_VELOCITY}));
         });
     // if not, stop
@@ -85,7 +86,7 @@ class Robot : public wpi::TimedRobot {
   wpi::Encoder m_shooterEncoder{0, 1};
   wpi::math::PIDController m_controller{0.3, 0, 0};
   wpi::math::SimpleMotorFeedforward<wpi::units::radians_> m_ff{0.1_V,
-                                                              0.065_V / 1_rpm};
+                                                               0.065_V / 1_rpm};
 
   wpi::PWMSparkMax m_kicker{1};
 

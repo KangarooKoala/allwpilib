@@ -6,9 +6,10 @@
 
 #include <span>
 
+#include <wpi/units/length.h>
+
 #include "wpi/apriltag/AprilTagPoseEstimate.hpp"
 #include "wpi/math/geometry/Transform3d.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::apriltag {

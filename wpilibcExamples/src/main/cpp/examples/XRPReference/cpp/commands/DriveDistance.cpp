@@ -4,7 +4,6 @@
 
 #include "commands/DriveDistance.hpp"
 
-
 void DriveDistance::Initialize() {
   m_drive->ArcadeDrive(0, 0);
   m_drive->ResetEncoders();

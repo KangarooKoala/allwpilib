@@ -5,12 +5,12 @@
 #include "wpi/math/controller/LinearQuadraticRegulator.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/time.h>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/system/Models.hpp"
-#include <wpi/units/time.h>
 
 namespace wpi::math {
 

@@ -6,15 +6,16 @@
 
 #include <memory>
 
+#include <wpi/units/angle.h>
+#include <wpi/units/current.h>
+#include <wpi/units/time.h>
+#include <wpi/units/voltage.h>
+
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubPidConstants.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/current.h>
-#include <wpi/units/time.h>
-#include <wpi/units/voltage.h>
 
 namespace wpi {
 

@@ -8,12 +8,13 @@
 #include <stdexcept>
 #include <vector>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Transform2d.hpp"
 #include <wpi/units/acceleration.h>
 #include <wpi/units/curvature.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
@@ -73,8 +74,8 @@ class WPILIB_DLLEXPORT Trajectory {
 
       // Check whether the robot is reversing at this stage.
       const auto reversing =
-          velocity < 0_mps || (wpi::units::abs(velocity) < 1E-9_mps &&
-                               acceleration < 0_mps2);
+          velocity < 0_mps ||
+          (wpi::units::abs(velocity) < 1E-9_mps && acceleration < 0_mps2);
 
       // Calculate the new velocity.
       // v = v_0 + at

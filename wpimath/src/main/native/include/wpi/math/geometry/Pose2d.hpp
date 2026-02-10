@@ -10,10 +10,10 @@
 #include <utility>
 
 #include <gcem.hpp>
+#include <wpi/units/length.h>
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/json_fwd.hpp"
 

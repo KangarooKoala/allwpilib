@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "wpi/commands2/SubsystemBase.hpp"
 #include <wpi/units/angle.h>
+
+#include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/xrp/XRPServo.hpp"
 
 class Arm : public wpi::cmd::SubsystemBase {

@@ -6,9 +6,10 @@
 
 #include <algorithm>
 
+#include <wpi/units/length.h>
+
 #include "wpi/hal/UsageReporting.h"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/sendable/SendableBuilder.hpp"
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
@@ -54,8 +55,8 @@ wpi::units::meters<> SharpIR::GetRange() const {
     // Don't allow zero/negative values
     auto v = std::max(m_sensor.GetVoltage(), 0.00001);
 
-    return std::clamp(wpi::units::meters<>{m_A * std::pow(v, m_B) * 1e-2}, m_min,
-                      m_max);
+    return std::clamp(wpi::units::meters<>{m_A * std::pow(v, m_B) * 1e-2},
+                      m_min, m_max);
   }
 }
 

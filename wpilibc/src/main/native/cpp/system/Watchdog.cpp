@@ -129,7 +129,8 @@ void Watchdog::Impl::Main() {
   }
 }
 
-Watchdog::Watchdog(wpi::units::seconds<> timeout, std::function<void()> callback)
+Watchdog::Watchdog(wpi::units::seconds<> timeout,
+                   std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {

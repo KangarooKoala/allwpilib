@@ -7,12 +7,13 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
-#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include <wpi/units/current.h>
 #include <wpi/units/pressure.h>
 #include <wpi/units/time.h>
 #include <wpi/units/voltage.h>
+
+#include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 
 namespace wpi {
 class Solenoid;
@@ -164,7 +165,8 @@ class PneumaticsBase {
    * @param index solenoid index
    * @param duration shot duration
    */
-  virtual void SetOneShotDuration(int index, wpi::units::seconds<> duration) = 0;
+  virtual void SetOneShotDuration(int index,
+                                  wpi::units::seconds<> duration) = 0;
 
   /**
    * Check if a solenoid channel is valid.

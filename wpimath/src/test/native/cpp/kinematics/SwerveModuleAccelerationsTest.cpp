@@ -5,9 +5,9 @@
 #include <numbers>
 
 #include <gtest/gtest.h>
+#include <wpi/units/acceleration.h>
 
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-#include <wpi/units/acceleration.h>
 
 using namespace wpi::math;
 
@@ -28,12 +28,9 @@ TEST(SwerveModuleAccelerationsTest, ParameterizedConstructor) {
 }
 
 TEST(SwerveModuleAccelerationsTest, Equals) {
-  SwerveModuleAcceleration moduleAccelerations1{2.0_mps2,
-                                                Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations2{2.0_mps2,
-                                                Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations3{2.1_mps2,
-                                                Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations1{2.0_mps2, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations2{2.0_mps2, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations3{2.1_mps2, Rotation2d{1.5_rad}};
 
   EXPECT_EQ(moduleAccelerations1, moduleAccelerations2);
   EXPECT_NE(moduleAccelerations1, moduleAccelerations3);

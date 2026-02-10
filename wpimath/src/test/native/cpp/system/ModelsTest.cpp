@@ -5,11 +5,11 @@
 #include "wpi/math/system/Models.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/length.h>
+#include <wpi/units/mass.h>
 
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
-#include <wpi/units/length.h>
-#include <wpi/units/mass.h>
 
 TEST(ModelsTest, FlywheelFromPhysicalConstants) {
 #if __GNUC__ <= 11
@@ -79,11 +79,11 @@ TEST(ModelsTest, ElevatorFromSysId) {
   constexpr double ka = 0.5;
 
 #if __GNUC__ <= 11
-  auto model = wpi::math::Models::ElevatorFromSysId(kv * 1_V / 1_mps,
-                                                    ka * 1_V / 1_mps2);
+  auto model =
+      wpi::math::Models::ElevatorFromSysId(kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #else
-  constexpr auto model = wpi::math::Models::ElevatorFromSysId(
-      kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
+  constexpr auto model =
+      wpi::math::Models::ElevatorFromSysId(kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 #endif
 
   ASSERT_TRUE(model.A().isApprox(

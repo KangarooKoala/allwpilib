@@ -11,14 +11,14 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <wpi/units/angle.h>
+#include <wpi/units/length.h>
+#include <wpi/units/time.h>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
 #include "wpi/math/trajectory/TrajectoryGenerator.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/length.h>
-#include <wpi/units/time.h>
 #include "wpi/util/print.hpp"
 
 void testFollowTrajectory(
@@ -30,7 +30,8 @@ void testFollowTrajectory(
     std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
-    const wpi::units::seconds<> dt, const wpi::units::seconds<> kVisionUpdateRate,
+    const wpi::units::seconds<> dt,
+    const wpi::units::seconds<> kVisionUpdateRate,
     const wpi::units::seconds<> kVisionUpdateDelay, const bool checkError,
     const bool debug) {
   wpi::units::meters<> leftDistance = 0_m;
@@ -45,8 +46,8 @@ void testFollowTrajectory(
   wpi::units::seconds<> t = 0_s;
 
   std::vector<std::pair<wpi::units::seconds<>, wpi::math::Pose2d>> visionPoses;
-  std::vector<
-      std::tuple<wpi::units::seconds<>, wpi::units::seconds<>, wpi::math::Pose2d>>
+  std::vector<std::tuple<wpi::units::seconds<>, wpi::units::seconds<>,
+                         wpi::math::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -357,9 +358,9 @@ TEST(DifferentialDrivePoseEstimator3dTest, TestSampleAt) {
   // Add a tiny tolerance for the upper bound because of floating point rounding
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-    estimator.UpdateWithTime(wpi::units::seconds<>{time},
-                             wpi::math::Rotation3d{}, wpi::units::meters<>{time},
-                             wpi::units::meters<>{time});
+    estimator.UpdateWithTime(
+        wpi::units::seconds<>{time}, wpi::math::Rotation3d{},
+        wpi::units::meters<>{time}, wpi::units::meters<>{time});
   }
 
   // Sample at an added time

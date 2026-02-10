@@ -8,8 +8,9 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/system/Tracer.hpp"
 #include <wpi/units/time.h>
+
+#include "wpi/system/Tracer.hpp"
 
 namespace wpi {
 

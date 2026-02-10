@@ -115,8 +115,8 @@ TEST(DifferentialDriveAccelerationLimiterTest, HighLimits) {
 
   // Limits are so high, they don't get hit, so states of constrained and
   // unconstrained systems should match
-  DifferentialDriveAccelerationLimiter accelLimiter{
-      plant, trackwidth, 1e3_mps2, 1e3_rad_per_s_sq};
+  DifferentialDriveAccelerationLimiter accelLimiter{plant, trackwidth, 1e3_mps2,
+                                                    1e3_rad_per_s_sq};
 
   Vectord<2> x{0.0, 0.0};
   Vectord<2> xAccelLimiter{0.0, 0.0};

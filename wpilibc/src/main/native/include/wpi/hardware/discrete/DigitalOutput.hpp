@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/DIO.h"
 #include "wpi/hal/Types.h"
-#include <wpi/units/time.h>
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 

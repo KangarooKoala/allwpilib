@@ -6,11 +6,12 @@
 
 #include <memory>
 
+#include <wpi/units/angle.h>
+#include <wpi/units/time.h>
+
 #include "wpi/hardware/expansionhub/ExpansionHub.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
-#include <wpi/units/angle.h>
-#include <wpi/units/time.h>
 
 namespace wpi {
 

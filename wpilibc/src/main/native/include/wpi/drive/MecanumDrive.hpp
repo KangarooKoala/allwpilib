@@ -8,9 +8,10 @@
 #include <memory>
 #include <string>
 
+#include <wpi/units/angle.h>
+
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/deprecated.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"

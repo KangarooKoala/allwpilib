@@ -7,12 +7,13 @@
 #include <functional>
 #include <utility>
 
+#include <wpi/units/time.h>
+
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/event/BooleanEvent.hpp"
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/FunctionExtras.hpp"
 
 namespace wpi::cmd {

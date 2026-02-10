@@ -5,11 +5,11 @@
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 
 #include <gtest/gtest.h>
+#include <wpi/units/angle.h>
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
-#include <wpi/units/angle.h>
 #include "wpi/util/Color8Bit.hpp"
 
 class Mechanism2dTest;

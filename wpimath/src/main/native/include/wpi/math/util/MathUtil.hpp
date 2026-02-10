@@ -8,15 +8,15 @@
 #include <type_traits>
 
 #include <gcem.hpp>
-
-#include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/math/geometry/Translation3d.hpp"
-#include "wpi/math/util/MathShared.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/core.h>
 #include <wpi/units/length.h>
 #include <wpi/units/time.h>
 #include <wpi/units/velocity.h>
+
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -150,8 +150,7 @@ constexpr T CopyDirectionPow(T value, double exponent,
         value);
   } else {
     return wpi::units::copysign(
-        gcem::pow((wpi::units::abs(value) / maxMagnitude).value(),
-                  exponent) *
+        gcem::pow((wpi::units::abs(value) / maxMagnitude).value(), exponent) *
             maxMagnitude,
         value);
   }

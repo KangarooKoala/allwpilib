@@ -32,10 +32,11 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/spline/Spline.hpp"
 #include <wpi/units/angle.h>
 #include <wpi/units/curvature.h>
 #include <wpi/units/length.h>
+
+#include "wpi/math/spline/Spline.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {

@@ -25,7 +25,8 @@ void testFollowTrajectory(
     std::function<wpi::math::Pose2d(wpi::math::Trajectory::State&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
-    const wpi::units::seconds<> dt, const wpi::units::seconds<> kVisionUpdateRate,
+    const wpi::units::seconds<> dt,
+    const wpi::units::seconds<> kVisionUpdateRate,
     const wpi::units::seconds<> kVisionUpdateDelay, const bool checkError,
     const bool debug) {
   wpi::math::MecanumDriveWheelPositions wheelPositions{};
@@ -39,8 +40,8 @@ void testFollowTrajectory(
   wpi::units::seconds<> t = 0_s;
 
   std::vector<std::pair<wpi::units::seconds<>, wpi::math::Pose2d>> visionPoses;
-  std::vector<
-      std::tuple<wpi::units::seconds<>, wpi::units::seconds<>, wpi::math::Pose2d>>
+  std::vector<std::tuple<wpi::units::seconds<>, wpi::units::seconds<>,
+                         wpi::math::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();

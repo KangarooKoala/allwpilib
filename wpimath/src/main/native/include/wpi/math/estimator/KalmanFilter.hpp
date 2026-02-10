@@ -8,6 +8,7 @@
 #include <string>
 
 #include <Eigen/Cholesky>
+#include <wpi/units/time.h>
 
 #include "wpi/math/fmt/Eigen.hpp"
 #include "wpi/math/linalg/DARE.hpp"
@@ -16,7 +17,6 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -68,7 +68,8 @@ class KalmanFilter {
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const StateArray& stateStdDevs,
-               const OutputArray& measurementStdDevs, wpi::units::seconds<> dt) {
+               const OutputArray& measurementStdDevs,
+               wpi::units::seconds<> dt) {
     m_plant = &plant;
 
     m_contQ = CovarianceMatrix(stateStdDevs);

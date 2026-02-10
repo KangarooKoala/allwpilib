@@ -13,8 +13,8 @@
   EXPECT_LE(wpi::units::abs(val1 - val2), eps)
 
 static constexpr wpi::units::meters<> kTolerance{1 / 12.0};
-static constexpr wpi::units::radians<> kAngularTolerance{2.0 * std::numbers::pi /
-                                                        180.0};
+static constexpr wpi::units::radians<> kAngularTolerance{
+    2.0 * std::numbers::pi / 180.0};
 
 TEST(LTVUnicycleControllerTest, ReachesReference) {
   constexpr wpi::units::seconds<> kDt = 20_ms;

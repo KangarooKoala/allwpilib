@@ -10,7 +10,8 @@
 
 using namespace wpi::cmd;
 
-WaitCommand::WaitCommand(wpi::units::seconds<> duration) : m_duration{duration} {
+WaitCommand::WaitCommand(wpi::units::seconds<> duration)
+    : m_duration{duration} {
   SetName(fmt::format("{}: {}", GetName(), duration));
 }
 

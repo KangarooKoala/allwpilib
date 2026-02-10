@@ -10,10 +10,11 @@
 #include <string_view>
 #include <vector>
 
+#include <wpi/units/length.h>
+
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/nt/DoubleArrayTopic.hpp"
-#include <wpi/units/length.h>
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 

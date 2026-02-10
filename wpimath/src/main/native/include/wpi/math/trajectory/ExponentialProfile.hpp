@@ -41,21 +41,22 @@ template <class Distance, class Input>
 class ExponentialProfile {
  public:
   using Distance_t = wpi::units::unit<Distance>;
-  using Velocity =
-      wpi::units::compound_conversion_factor<Distance,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
   using Velocity_t = wpi::units::unit<Velocity>;
-  using Acceleration =
-      wpi::units::compound_conversion_factor<Velocity,
-                                wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
   using Input_t = wpi::units::unit<Input>;
   using A_t = wpi::units::hertz<>;
-  using B_t = wpi::units::unit<
-      wpi::units::compound_conversion_factor<Acceleration, wpi::units::inverse<Input>>>;
-  using KV = wpi::units::compound_conversion_factor<Input, wpi::units::inverse<Velocity>>;
+  using B_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+      Acceleration, wpi::units::inverse<Input>>>;
+  using KV =
+      wpi::units::compound_conversion_factor<Input,
+                                             wpi::units::inverse<Velocity>>;
   using kV_t = wpi::units::unit<KV>;
   using KA =
-      wpi::units::compound_conversion_factor<Input, wpi::units::inverse<Acceleration>>;
+      wpi::units::compound_conversion_factor<Input,
+                                             wpi::units::inverse<Acceleration>>;
   using kA_t = wpi::units::unit<KA>;
 
   /**
@@ -157,8 +158,8 @@ class ExponentialProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(const wpi::units::seconds<>& t, const State& current,
-                            const State& goal) const {
+  constexpr State Calculate(const wpi::units::seconds<>& t,
+                            const State& current, const State& goal) const {
     auto direction = ShouldFlipInput(current, goal) ? -1 : 1;
     auto u = direction * m_constraints.maxInput;
 
@@ -202,7 +203,7 @@ class ExponentialProfile {
    * @return The total duration of this profile.
    */
   constexpr wpi::units::seconds<> TimeLeftUntil(const State& current,
-                                               const State& goal) const {
+                                                const State& goal) const {
     auto timing = CalculateProfileTiming(current, goal);
 
     return timing.totalTime;
@@ -285,7 +286,7 @@ class ExponentialProfile {
     // point velocity. For case 5, we have reached inflection point velocity.
     auto epsilon = Velocity_t(1e-9);
     if (wpi::units::abs(u_dir * m_constraints.MaxVelocity() -
-                              inflectionPoint.velocity) < epsilon) {
+                        inflectionPoint.velocity) < epsilon) {
       auto solvableV = inflectionPoint.velocity;
       wpi::units::seconds<> t_to_solvable_v;
       Distance_t x_at_solvable_v;
@@ -294,8 +295,7 @@ class ExponentialProfile {
         t_to_solvable_v = 0_s;
         x_at_solvable_v = current.position;
       } else {
-        if (wpi::units::abs(current.velocity) >
-            m_constraints.MaxVelocity()) {
+        if (wpi::units::abs(current.velocity) > m_constraints.MaxVelocity()) {
           solvableV += u_dir * epsilon;
         } else {
           solvableV -= u_dir * epsilon;
@@ -331,16 +331,16 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Distance_t ComputeDistanceFromTime(const wpi::units::seconds<>& time,
-                                               const Input_t& input,
-                                               const State& initial) const {
+  constexpr Distance_t ComputeDistanceFromTime(
+      const wpi::units::seconds<>& time, const Input_t& input,
+      const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
 
     return initial.position +
-           (-B * u * time + (initial.velocity + B * u / A) *
-                                (wpi::units::exp(A * time) - 1)) /
+           (-B * u * time +
+            (initial.velocity + B * u / A) * (wpi::units::exp(A * time) - 1)) /
                A;
   }
 
@@ -354,9 +354,9 @@ class ExponentialProfile {
    * @param initial The initial state.
    * @return The distance travelled by this profile.
    */
-  constexpr Velocity_t ComputeVelocityFromTime(const wpi::units::seconds<>& time,
-                                               const Input_t& input,
-                                               const State& initial) const {
+  constexpr Velocity_t ComputeVelocityFromTime(
+      const wpi::units::seconds<>& time, const Input_t& input,
+      const State& initial) const {
     auto A = m_constraints.A;
     auto B = m_constraints.B;
     auto u = input;
@@ -382,9 +382,7 @@ class ExponentialProfile {
     auto B = m_constraints.B;
     auto u = input;
 
-    return wpi::units::log((A * velocity + B * u) /
-                                 (A * initial + B * u)) /
-           A;
+    return wpi::units::log((A * velocity + B * u) / (A * initial + B * u)) / A;
   }
 
   /**
@@ -407,7 +405,7 @@ class ExponentialProfile {
     return initial.position + (velocity - initial.velocity) / A -
            B * u / (A * A) *
                wpi::units::log((A * velocity + B * u) /
-                                     (A * initial.velocity + B * u));
+                               (A * initial.velocity + B * u));
   }
 
   /**

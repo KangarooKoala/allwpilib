@@ -7,9 +7,10 @@
 #include <functional>
 #include <memory>
 
+#include <wpi/units/time.h>
+
 #include "EventLoop.hpp"
 #include "wpi/math/filter/Debouncer.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/FunctionExtras.hpp"
 
 namespace wpi {

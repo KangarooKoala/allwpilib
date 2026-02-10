@@ -10,11 +10,12 @@
 #include <functional>
 #include <vector>
 
+#include <wpi/units/time.h>
+
 #include "wpi/hal/Notifier.h"
 #include "wpi/hal/Types.h"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
-#include <wpi/units/time.h>
 #include "wpi/util/priority_queue.hpp"
 
 namespace wpi {
